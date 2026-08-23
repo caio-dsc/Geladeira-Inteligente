@@ -13,7 +13,8 @@ class RecipeService implements IRecipeService {
   private isLoadedFromFirestore = false;
 
   constructor() {
-    this.initRecipes();
+    // Inicialização síncrona com fallback local MOCK_RECIPES.
+    // Nenhuma gravação no Firestore é realizada na inicialização.
   }
 
   private async initRecipes() {
@@ -21,13 +22,12 @@ class RecipeService implements IRecipeService {
       const remoteRecipes = await firestoreService.getRecipes();
       if (remoteRecipes.length > 0) {
         this.recipes = remoteRecipes;
-      } else {
-        // Se ainda não houver receitas no Firestore, semeia o catálogo padrão
-        await firestoreService.seedInitialRecipes(MOCK_RECIPES);
       }
+      // Se remoteRecipes estiver vazio ou falhar, mantém MOCK_RECIPES em memória
       this.isLoadedFromFirestore = true;
     } catch (e) {
-      console.warn('Aviso ao carregar receitas do Firestore:', e);
+      console.warn('Aviso ao carregar receitas do Firestore (utilizando catálogo local):', e);
+      this.isLoadedFromFirestore = true;
     }
   }
 
