@@ -32,7 +32,7 @@ service cloud.firestore {
     // Coleção pública de Receitas
     match /recipes/{recipeId} {
       allow read: if true;
-      allow write: if isAuthenticated();
+      allow write: if false;
     }
   }
 }
