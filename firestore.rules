@@ -1,0 +1,38 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Funções auxiliares de autenticação e permissão
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Documento principal do Usuário
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isOwner(userId);
+      allow delete: if false;
+
+      // Subcoleção: Itens do Inventário / Geladeira
+      match /inventory/{itemId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Subcoleção: Histórico de Escaneamentos
+      match /scans/{scanId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+
+    // Coleção pública de Receitas
+    match /recipes/{recipeId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+  }
+}

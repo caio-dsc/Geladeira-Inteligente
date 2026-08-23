@@ -1,0 +1,6 @@
+{
+  "name": "Geladeira Inteligente",
+  "description": "Aplicativo inteligente para gerenciamento de alimentos, escaneamento de geladeira e sugestão de receitas personalizadas com base nos ingredientes disponíveis.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

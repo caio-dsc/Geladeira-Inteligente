@@ -1,0 +1,105 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Perfil do usuário, preferências alimentares e saldo de créditos",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "avatarUrl": { "type": "string" },
+        "credits": { "type": "number" },
+        "preferences": {
+          "type": "object",
+          "properties": {
+            "dietaryRestrictions": { "type": "array", "items": { "type": "string" } },
+            "cookingLevel": { "type": "string" },
+            "allergies": { "type": "array", "items": { "type": "string" } },
+            "defaultServings": { "type": "number" }
+          }
+        },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "name", "email", "credits"]
+    },
+    "InventoryItem": {
+      "title": "InventoryItem",
+      "description": "Item presente na geladeira ou despensa do usuário",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "category": { "type": "string" },
+        "quantity": { "type": "number" },
+        "unit": { "type": "string" },
+        "state": { "type": "string" },
+        "location": { "type": "string" },
+        "addedAt": { "type": "string" },
+        "expiryDate": { "type": "string" },
+        "notes": { "type": "string" }
+      },
+      "required": ["id", "name", "category", "quantity", "unit", "state", "location", "addedAt"]
+    },
+    "Recipe": {
+      "title": "Recipe",
+      "description": "Catálogo de receitas compatíveis com os ingredientes",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "prepTimeMinutes": { "type": "number" },
+        "difficulty": { "type": "string" },
+        "servings": { "type": "number" },
+        "category": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "ingredients": { "type": "array" },
+        "steps": { "type": "array" },
+        "tags": { "type": "array" }
+      },
+      "required": ["id", "title", "prepTimeMinutes", "difficulty", "servings", "ingredients", "steps"]
+    },
+    "ScanRecord": {
+      "title": "ScanRecord",
+      "description": "Histórico de sessões de escaneamento de geladeira",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "timestamp": { "type": "string" },
+        "status": { "type": "string" },
+        "detectedItems": { "type": "array" },
+        "progressMessage": { "type": "string" },
+        "errorMessage": { "type": "string" }
+      },
+      "required": ["id", "userId", "timestamp", "status"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Documento de dados e preferências do usuário autenticado"
+    },
+    "users/{userId}/inventory/{itemId}": {
+      "schema": "InventoryItem",
+      "description": "Itens estocados na geladeira do usuário"
+    },
+    "users/{userId}/scans/{scanId}": {
+      "schema": "ScanRecord",
+      "description": "Registro de análises visuais do usuário"
+    },
+    "recipes/{recipeId}": {
+      "schema": "Recipe",
+      "description": "Banco de receitas disponíveis"
+    }
+  },
+  "storage": {
+    "users/{userId}/scans/{scanId}": {
+      "description": "Fotografias e capturas da geladeira enviadas pelo usuário"
+    }
+  }
+}
