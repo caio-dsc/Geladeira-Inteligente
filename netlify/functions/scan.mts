@@ -63,33 +63,27 @@ export default async (req: Request) => {
                 {
                   type: "text",
                   text: `
-Você é o sistema de visão de um aplicativo chamado
-Geladeira Inteligente.
+Analise cuidadosamente a imagem que foi enviada.
 
-Analise cuidadosamente a imagem da geladeira.
+Primeiro, descreva exatamente o que você consegue visualizar
+na imagem.
 
-Identifique os alimentos e produtos alimentícios que estejam
-claramente visíveis.
+Informe:
+- se a imagem mostra uma geladeira, cozinha, pessoa, objeto
+  ou outra cena;
+- quais objetos aparecem;
+- quais alimentos aparecem, se houver;
+- cores e características visuais importantes.
 
-Para cada item identificado, informe:
-- nome do alimento;
-- quantidade aproximada, se puder estimar;
-- unidade, se puder identificar;
-- nível de confiança entre 0 e 1.
+IMPORTANTE:
+Não responda que não consegue analisar imagens.
+Você recebeu uma imagem e deve analisá-la.
 
-REGRAS IMPORTANTES:
+Não invente informações.
+Se a imagem realmente não tiver alimentos, diga isso.
+Se houver alimentos, liste-os.
 
-1. Não invente alimentos.
-2. Só identifique alimentos que estejam realmente visíveis.
-3. Se não conseguir determinar a quantidade, use null.
-4. Não invente datas de validade.
-5. Não invente marcas.
-6. Se um alimento estiver parcialmente escondido, só identifique
-   se houver evidência visual suficiente.
-7. Responda em português.
-8. Seja objetivo.
-
-Retorne somente uma lista dos alimentos encontrados.
+Responda em português.
                   `,
                 },
 
