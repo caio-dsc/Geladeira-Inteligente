@@ -1,6 +1,6 @@
 import type { Config } from "@netlify/functions";
 
-const MODEL = "Qwen/Qwen2.5-VL-3B-Instruct";
+const MODEL = "google/gemma-3-4b-it:featherless-ai";
 
 export default async (req: Request) => {
   if (req.method !== "POST") {
@@ -54,29 +54,45 @@ export default async (req: Request) => {
         },
         body: JSON.stringify({
           model: MODEL,
+
           messages: [
             {
               role: "user",
+
               content: [
                 {
                   type: "text",
                   text: `
-Analise esta imagem como um scanner de geladeira.
+Você é o sistema de visão de um aplicativo chamado
+Geladeira Inteligente.
+
+Analise cuidadosamente a imagem da geladeira.
 
 Identifique os alimentos e produtos alimentícios que estejam
 claramente visíveis.
 
-Para cada item, informe:
-- nome;
-- quantidade aproximada, se for possível estimar;
-- unidade, se for possível identificar.
+Para cada item identificado, informe:
+- nome do alimento;
+- quantidade aproximada, se puder estimar;
+- unidade, se puder identificar;
+- nível de confiança entre 0 e 1.
 
-Não invente alimentos que não estejam claramente visíveis.
-Não invente datas de validade.
+REGRAS IMPORTANTES:
 
-Responda em português.
+1. Não invente alimentos.
+2. Só identifique alimentos que estejam realmente visíveis.
+3. Se não conseguir determinar a quantidade, use null.
+4. Não invente datas de validade.
+5. Não invente marcas.
+6. Se um alimento estiver parcialmente escondido, só identifique
+   se houver evidência visual suficiente.
+7. Responda em português.
+8. Seja objetivo.
+
+Retorne somente uma lista dos alimentos encontrados.
                   `,
                 },
+
                 {
                   type: "image_url",
                   image_url: {
@@ -86,7 +102,9 @@ Responda em português.
               ],
             },
           ],
+
           max_tokens: 1000,
+          temperature: 0.1,
         }),
       }
     );
@@ -94,7 +112,10 @@ Responda em português.
     const data = await response.json();
 
     if (!response.ok) {
-      console.error("Erro retornado pelo Hugging Face:", data);
+      console.error(
+        "Erro retornado pelo Hugging Face:",
+        data
+      );
 
       return Response.json(
         {
@@ -109,29 +130,47 @@ Responda em português.
       data?.choices?.[0]?.message?.content;
 
     if (!result) {
-      console.error("Resposta inesperada do Hugging Face:", data);
+      console.error(
+        "Resposta inesperada do Hugging Face:",
+        data
+      );
 
       return Response.json(
         {
-          error: "O Hugging Face não retornou uma resposta válida.",
+          error:
+            "O Hugging Face não retornou uma resposta válida.",
+          details: data,
         },
         { status: 502 }
       );
     }
 
-    console.log("Resposta do Hugging Face:", result);
+    console.log(
+      "Modelo utilizado:",
+      MODEL
+    );
+
+    console.log(
+      "Resposta do Hugging Face:",
+      result
+    );
 
     return Response.json({
       success: true,
       result,
       model: MODEL,
     });
+
   } catch (error) {
-    console.error("Erro no scanner Hugging Face:", error);
+    console.error(
+      "Erro no scanner Hugging Face:",
+      error
+    );
 
     return Response.json(
       {
-        error: "Erro ao analisar a imagem com o Hugging Face.",
+        error:
+          "Erro ao analisar a imagem com o Hugging Face.",
         details:
           error instanceof Error
             ? error.message
