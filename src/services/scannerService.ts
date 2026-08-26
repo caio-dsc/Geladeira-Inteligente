@@ -54,8 +54,20 @@ class HuggingFaceScannerService implements IScannerService {
     const data: HuggingFaceScanResponse = await response.json();
 
     if (!response.ok || !data.success) {
+      console.error(
+        'Erro retornado pela função scan:',
+        data
+      );
+
+      const details =
+        typeof data === 'object'
+          ? JSON.stringify(data, null, 2)
+          : '';
+
       throw new Error(
-        data.error || 'Não foi possível analisar a imagem.'
+        `${data.error || 'Não foi possível analisar a imagem.'}${
+          details ? `\n\nDetalhes: ${details}` : ''
+        }`
       );
     }
 
