@@ -1,5 +1,6 @@
-import { GoogleGenAI } from "@google/genai";
 import type { Config } from "@netlify/functions";
+
+const MODEL = "Qwen/Qwen2.5-VL-3B-Instruct";
 
 export default async (req: Request) => {
   if (req.method !== "POST") {
@@ -9,90 +10,132 @@ export default async (req: Request) => {
     );
   }
 
-  const apiKey = process.env.GEMINI_API_KEY;
+  const token = process.env.HF_TOKEN;
 
-  if (!apiKey) {
+  if (!token) {
     return Response.json(
-      { error: "GEMINI_API_KEY não configurada." },
+      {
+        error: "HF_TOKEN não configurado no Netlify.",
+      },
       { status: 500 }
     );
   }
 
   try {
     const body = await req.json();
-
     const image = body?.image;
 
     if (!image || typeof image !== "string") {
       return Response.json(
-        { error: "A propriedade 'image' é obrigatória." },
+        {
+          error: "A propriedade 'image' é obrigatória.",
+        },
         { status: 400 }
       );
     }
 
-    const match = image.match(
-      /^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/
-    );
-
-    if (!match) {
+    if (!image.startsWith("data:image/")) {
       return Response.json(
         {
           error:
-            "Imagem inválida. Envie uma Data URL no formato data:image/...;base64,...",
+            "Formato de imagem inválido. Esperado data:image/...;base64,...",
         },
         { status: 400 }
       );
     }
 
-    const mimeType = match[1];
-    const base64Data = match[2];
-
-    const ai = new GoogleGenAI({
-      apiKey,
-    });
-
-    const response = await ai.models.generateContent({
-      model: "gemini-3.6-flash",
-      contents: [
-        {
-          inlineData: {
-            mimeType,
-            data: base64Data,
-          },
+    const response = await fetch(
+      "https://router.huggingface.co/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
-        {
-          text: `
-Analise a imagem enviada.
+        body: JSON.stringify({
+          model: MODEL,
+          messages: [
+            {
+              role: "user",
+              content: [
+                {
+                  type: "text",
+                  text: `
+Analise esta imagem como um scanner de geladeira.
+
+Identifique os alimentos e produtos alimentícios que estejam
+claramente visíveis.
+
+Para cada item, informe:
+- nome;
+- quantidade aproximada, se for possível estimar;
+- unidade, se for possível identificar.
+
+Não invente alimentos que não estejam claramente visíveis.
+Não invente datas de validade.
 
 Responda em português.
+                  `,
+                },
+                {
+                  type: "image_url",
+                  image_url: {
+                    url: image,
+                  },
+                },
+              ],
+            },
+          ],
+          max_tokens: 1000,
+        }),
+      }
+    );
 
-Diga quais alimentos ou produtos alimentícios estão claramente visíveis na imagem.
+    const data = await response.json();
 
-Não invente alimentos que não possam ser identificados visualmente.
-Não tente identificar datas de validade nesta etapa.
+    if (!response.ok) {
+      console.error("Erro retornado pelo Hugging Face:", data);
 
-Retorne uma descrição curta dos alimentos encontrados.
-          `,
+      return Response.json(
+        {
+          error: "O Hugging Face recusou a solicitação.",
+          details: data,
         },
-      ],
-    });
+        { status: response.status }
+      );
+    }
+
+    const result =
+      data?.choices?.[0]?.message?.content;
+
+    if (!result) {
+      console.error("Resposta inesperada do Hugging Face:", data);
+
+      return Response.json(
+        {
+          error: "O Hugging Face não retornou uma resposta válida.",
+        },
+        { status: 502 }
+      );
+    }
+
+    console.log("Resposta do Hugging Face:", result);
 
     return Response.json({
       success: true,
-      result: response.text,
+      result,
+      model: MODEL,
     });
   } catch (error) {
-    console.error("Erro no scanner Gemini:", error);
-
-    const message =
-      error instanceof Error
-        ? error.message
-        : String(error);
+    console.error("Erro no scanner Hugging Face:", error);
 
     return Response.json(
       {
-        error: "Erro ao analisar a imagem com o Gemini.",
-        details: message,
+        error: "Erro ao analisar a imagem com o Hugging Face.",
+        details:
+          error instanceof Error
+            ? error.message
+            : String(error),
       },
       { status: 500 }
     );
