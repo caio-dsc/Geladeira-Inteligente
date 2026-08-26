@@ -84,9 +84,15 @@ Retorne uma descrição curta dos alimentos encontrados.
   } catch (error) {
     console.error("Erro no scanner Gemini:", error);
 
+    const message =
+      error instanceof Error
+        ? error.message
+        : String(error);
+
     return Response.json(
       {
         error: "Erro ao analisar a imagem com o Gemini.",
+        details: message,
       },
       { status: 500 }
     );
