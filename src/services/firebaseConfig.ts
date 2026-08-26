@@ -1,7 +1,7 @@
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { initializeAppCheck, ReCaptchaEnterpriseProvider, AppCheck } from 'firebase/app-check';
 import { getAuth, GoogleAuthProvider, Auth, browserLocalPersistence, setPersistence } from 'firebase/auth';
-import { getFirestore, Firestore } from 'firebase/firestore';
+import { initializeFirestore, getFirestore, Firestore, doc, getDocFromServer } from 'firebase/firestore';
 import { getStorage, FirebaseStorage } from 'firebase/storage';
 import firebaseConfigData from '../../firebase-applet-config.json';
 
@@ -10,7 +10,7 @@ import firebaseConfigData from '../../firebase-applet-config.json';
  * 1. Firebase App (Singleton)
  * 2. Firebase App Check (reCAPTCHA Enterprise Provider + Debug mode)
  * 3. Firebase Authentication (Google Auth & Session Persistence)
- * 4. Cloud Firestore (Base de dados NoSQL estruturada)
+ * 4. Cloud Firestore (Base de dados NoSQL estruturada com fallback de conexão inteligente)
  * 5. Cloud Storage (Armazenamento para fotos de escaneamento)
  */
 
@@ -82,12 +82,37 @@ googleAuthProvider.setCustomParameters({
   prompt: 'select_account',
 });
 
-// 4. Instância do Cloud Firestore com o databaseId configurado
-export const db: Firestore = firebaseConfig.firestoreDatabaseId && firebaseConfig.firestoreDatabaseId !== '(default)'
-  ? getFirestore(app, firebaseConfig.firestoreDatabaseId)
-  : getFirestore(app);
+// 4. Instância do Cloud Firestore com suporte a Long Polling e ID de base de dados customizado
+const targetDatabaseId = firebaseConfig.firestoreDatabaseId && firebaseConfig.firestoreDatabaseId !== '(default)'
+  ? firebaseConfig.firestoreDatabaseId
+  : undefined;
+
+let firestoreInstance: Firestore;
+try {
+  firestoreInstance = initializeFirestore(app, {
+    experimentalAutoDetectLongPolling: true,
+  }, targetDatabaseId);
+} catch {
+  firestoreInstance = targetDatabaseId ? getFirestore(app, targetDatabaseId) : getFirestore(app);
+}
+
+export const db: Firestore = firestoreInstance;
+
+// Valida conexão em background sem travar o runtime do app
+if (typeof window !== 'undefined') {
+  setTimeout(async () => {
+    try {
+      await getDocFromServer(doc(db, 'test', 'connection'));
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('the client is offline')) {
+        console.info('Firestore em modo offline/cache.');
+      }
+    }
+  }, 1000);
+}
 
 // 5. Instância do Cloud Storage para imagens de geladeira
 export const storage: FirebaseStorage = getStorage(app);
 
 export const isFirebaseInitialized = Boolean(app && auth && db && storage);
+
