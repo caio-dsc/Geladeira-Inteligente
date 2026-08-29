@@ -114,10 +114,8 @@ export const InventoryView: React.FC<InventoryViewProps> = ({
               className="rounded-2xl border border-emerald-500/30 bg-[#081d12] px-3.5 py-2.5 text-xs font-semibold text-white focus:outline-none focus:ring-2 focus:ring-emerald-400/30"
             >
               <option value="all">Todos os Estados</option>
-              <option value="fresh">Apenas Frescos</option>
-              <option value="attention">Atenção</option>
-              <option value="expiring_soon">Consumir Logo</option>
-              <option value="frozen">Congelados</option>
+              <option value="fresh">Fresco</option>
+              <option value="frozen">Congelado</option>
             </select>
           </div>
         </div>

@@ -210,8 +210,6 @@ export const FoodFormModal: React.FC<FoodFormModalProps> = ({
               className="w-full rounded-2xl border border-emerald-500/30 bg-[#081e13] px-3.5 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-400/30"
             >
               <option value="fresh">Fresco</option>
-              <option value="attention">Atenção (Consumir em breve)</option>
-              <option value="expiring_soon">Consumir logo (Urgente)</option>
               <option value="frozen">Congelado</option>
             </select>
           </div>

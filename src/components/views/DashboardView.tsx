@@ -4,7 +4,6 @@ import {
   FoodItem, 
   RecipeMatch, 
   NavigationTab, 
-  FreshnessState,
   CategoryType 
 } from '../../types';
 import { Card } from '../common/Card';
@@ -15,15 +14,12 @@ import { RecipeCard } from '../recipe/RecipeCard';
 import { 
   Camera, 
   UtensilsCrossed, 
-  BookOpen, 
   Sparkles, 
-  AlertTriangle, 
-  Clock, 
+  Snowflake,
+  Leaf,
   ArrowRight, 
   Plus, 
-  Flame, 
   CheckCircle2,
-  Layers,
   ChefHat,
   Refrigerator
 } from 'lucide-react';
@@ -47,9 +43,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   onSelectRecipe,
   onOpenCreditsModal,
 }) => {
-  const expiringSoonCount = inventory.filter((i) => i.state === 'expiring_soon').length;
-  const attentionCount = inventory.filter((i) => i.state === 'attention').length;
   const freshCount = inventory.filter((i) => i.state === 'fresh').length;
+  const frozenCount = inventory.filter((i) => i.state === 'frozen').length;
   const readyRecipes = recipes.filter((r) => r.isReadyToCook);
 
   const categories: Array<{ id: CategoryType; label: string }> = [
@@ -152,32 +147,28 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <p className="text-[11px] sm:text-xs text-emerald-300/60 mt-0.5">Alimentos no total</p>
         </Card>
 
-        {/* Expiring Soon Alert */}
+        {/* Fresh Items */}
         <Card variant="interactive" padding="sm" onClick={() => onNavigate('inventory')} className="text-left">
           <div className="flex items-center justify-between mb-2">
-            <div className={`w-9 h-9 rounded-2xl flex items-center justify-center border ${
-              expiringSoonCount > 0 
-                ? 'bg-rose-950/80 text-rose-400 border-rose-500/40 shadow-[0_0_15px_rgba(244,63,94,0.3)]' 
-                : 'bg-emerald-950/80 text-emerald-400 border-emerald-500/30'
-            }`}>
-              <AlertTriangle className="w-4.5 h-4.5" />
+            <div className="w-9 h-9 rounded-2xl bg-emerald-950/80 border border-emerald-500/40 text-emerald-400 flex items-center justify-center shadow-[0_0_10px_rgba(16,185,129,0.2)]">
+              <Leaf className="w-4.5 h-4.5" />
             </div>
-            <span className="text-[11px] font-bold text-rose-400">Urgente</span>
+            <span className="text-[11px] font-bold text-emerald-400">Frescos</span>
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-white">{expiringSoonCount}</div>
-          <p className="text-[11px] sm:text-xs text-rose-300/70 mt-0.5">Consumir nos próx. 3 dias</p>
+          <div className="text-2xl sm:text-3xl font-black text-white">{freshCount}</div>
+          <p className="text-[11px] sm:text-xs text-emerald-300/70 mt-0.5">Alimentos frescos</p>
         </Card>
 
-        {/* Attention State */}
+        {/* Frozen Items */}
         <Card variant="interactive" padding="sm" onClick={() => onNavigate('inventory')} className="text-left">
           <div className="flex items-center justify-between mb-2">
-            <div className="w-9 h-9 rounded-2xl bg-amber-950/80 border border-amber-500/40 text-amber-400 flex items-center justify-center shadow-[0_0_10px_rgba(245,158,11,0.2)]">
-              <Clock className="w-4.5 h-4.5" />
+            <div className="w-9 h-9 rounded-2xl bg-sky-950/80 border border-sky-500/40 text-sky-400 flex items-center justify-center shadow-[0_0_10px_rgba(56,189,248,0.2)]">
+              <Snowflake className="w-4.5 h-4.5" />
             </div>
-            <span className="text-[11px] font-bold text-amber-400">Atenção</span>
+            <span className="text-[11px] font-bold text-sky-400">Congelados</span>
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-white">{attentionCount}</div>
-          <p className="text-[11px] sm:text-xs text-amber-300/70 mt-0.5">Consumir nesta semana</p>
+          <div className="text-2xl sm:text-3xl font-black text-white">{frozenCount}</div>
+          <p className="text-[11px] sm:text-xs text-sky-300/70 mt-0.5">No freezer / congelador</p>
         </Card>
 
         {/* Ready Recipes */}
@@ -231,36 +222,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           })}
         </div>
       </div>
-
-      {/* Section: Urgent Items to consume (Expiring soon) */}
-      {expiringSoonCount > 0 && (
-        <div className="space-y-3.5 text-left">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping" />
-              <h3 className="text-base font-extrabold text-white">
-                Alimentos para Consumir com Urgência
-              </h3>
-            </div>
-            <button
-              onClick={() => onNavigate('inventory')}
-              className="text-xs font-bold text-emerald-400 hover:text-emerald-300 flex items-center gap-1 cursor-pointer"
-            >
-              <span>Ver geladeira</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
-            {inventory
-              .filter((i) => i.state === 'expiring_soon')
-              .slice(0, 3)
-              .map((item) => (
-                <FoodCard key={item.id} item={item} />
-              ))}
-          </div>
-        </div>
-      )}
 
       {/* Section: Top Recipe Recommendations */}
       <div className="space-y-4 text-left">

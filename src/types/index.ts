@@ -9,7 +9,9 @@ export type CategoryType =
   | 'bakery'
   | 'other';
 
-export type FreshnessState = 'fresh' | 'attention' | 'expiring_soon' | 'frozen';
+export type FreshnessState =
+  | 'fresh'
+  | 'frozen';
 
 export type StorageLocation = 'geladeira' | 'freezer' | 'gaveta_legumes' | 'porta' | 'despensa';
 

@@ -60,18 +60,6 @@ export const getFreshnessBadge = (state: FreshnessState) => {
         classes: 'bg-emerald-950/80 text-emerald-300 border-emerald-500/40 shadow-[0_0_10px_rgba(16,185,129,0.2)]',
         dot: 'bg-emerald-400',
       };
-    case 'attention':
-      return {
-        label: 'Atenção',
-        classes: 'bg-amber-950/80 text-amber-300 border-amber-500/40 shadow-[0_0_10px_rgba(245,158,11,0.2)]',
-        dot: 'bg-amber-400',
-      };
-    case 'expiring_soon':
-      return {
-        label: 'Consumir logo',
-        classes: 'bg-rose-950/80 text-rose-300 border-rose-500/40 shadow-[0_0_10px_rgba(244,63,94,0.3)]',
-        dot: 'bg-rose-400 animate-pulse',
-      };
     case 'frozen':
       return {
         label: 'Congelado',
