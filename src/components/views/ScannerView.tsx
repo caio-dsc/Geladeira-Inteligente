@@ -887,11 +887,11 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
               <div>
 
                 <h3 className="text-sm sm:text-base font-extrabold text-white">
-                  {detectedItems.length} Alimentos Identificados
+                  {detectedItems.length} {detectedItems.length === 1 ? 'Alimento Identificado' : 'Alimentos Identificados'} com Sucesso!
                 </h3>
 
                 <p className="text-xs text-emerald-300/80">
-                  Confirme a quantidade de cada alimento antes de adicionar ao estoque.
+                  Revise a lista abaixo e selecione quais deseja sincronizar com o estoque.
                 </p>
 
               </div>
@@ -977,10 +977,10 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
                     >
 
                       {/* CABEÇALHO DO CARD: LADO ESQUERDO (CHECKBOX + ÍCONE + DADOS) | LADO DIREITO (CONTROLE - 1 uni +) */}
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div className="flex items-center justify-between gap-2 sm:gap-4">
 
                         {/* LADO ESQUERDO: CHECKBOX, ÍCONE, NOME, CATEGORIA, PRECISÃO */}
-                        <div className="flex items-start gap-3 min-w-0 flex-1">
+                        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
 
                           {/* CHECKBOX */}
                           <button
@@ -991,7 +991,7 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
                                 item.id
                               );
                             }}
-                            className="mt-1 shrink-0 cursor-pointer text-emerald-400 hover:text-emerald-300 transition-colors"
+                            className="shrink-0 cursor-pointer text-emerald-400 hover:text-emerald-300 transition-colors"
                             aria-label={
                               item.selected
                                 ? 'Desmarcar alimento'
@@ -1006,33 +1006,25 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
                           </button>
 
                           {/* ÍCONE DA CATEGORIA */}
-                          <div className="w-10 h-10 rounded-xl bg-emerald-950/90 border border-emerald-500/30 flex items-center justify-center shrink-0">
+                          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-950/90 border border-emerald-500/30 flex items-center justify-center shrink-0">
                             {getCategoryIcon(
                               item.category
                             )}
                           </div>
 
                           {/* NOME / CATEGORIA / CONFIANÇA */}
-                          <div className="flex-1 min-w-0">
-                            <h4 className="text-base font-bold text-white uppercase tracking-wide truncate">
+                          <div className="min-w-0 flex-1">
+                            <h4 className="text-sm sm:text-base font-bold text-white uppercase tracking-wide truncate">
                               {item.name}
                             </h4>
 
-                            <div className="flex items-center gap-2 text-xs text-emerald-300/80 font-medium mt-0.5">
-                              <span>
-                                {getCategoryLabel(
-                                  item.category
-                                )}
-                              </span>
-
-                              {isFrozen && (
-                                <span className="px-1.5 py-0.2 rounded text-[9px] font-bold text-sky-300 bg-sky-950/60 border border-sky-500/30 uppercase">
-                                  Congelado
-                                </span>
+                            <div className="text-xs text-emerald-300/80 font-medium truncate mt-0.5">
+                              {getCategoryLabel(
+                                item.category
                               )}
                             </div>
 
-                            <div className="text-xs text-emerald-400/90 font-semibold mt-0.5">
+                            <div className="text-[11px] sm:text-xs text-emerald-400/90 font-semibold mt-0.5">
                               {(
                                 item.confidence *
                                 100
@@ -1045,7 +1037,7 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
 
                         {/* LADO DIREITO: CONTROLE DE QUANTIDADE [ - ] 1 uni [ + ] */}
                         <div
-                          className="shrink-0 flex items-center justify-end ml-8 sm:ml-0"
+                          className="shrink-0 flex items-center justify-end"
                           onClick={(e) =>
                             e.stopPropagation()
                           }
@@ -1065,14 +1057,14 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
                               disabled={
                                 item.quantity <= 1
                               }
-                              className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center text-emerald-300 hover:bg-emerald-500/20 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                              className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center text-emerald-300 hover:bg-emerald-500/20 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                               aria-label="Diminuir quantidade"
                             >
-                              <Minus className="w-4 h-4" />
+                              <Minus className="w-3.5 h-3.5" />
                             </button>
 
                             {/* NÚMERO + UNIDADE (1 uni) */}
-                            <div className="flex items-center px-1.5 sm:px-2 border-x border-emerald-500/30 min-w-[62px] sm:min-w-[70px] justify-center">
+                            <div className="flex items-center px-1 sm:px-1.5 border-x border-emerald-500/30 min-w-[52px] sm:min-w-[60px] justify-center">
                               <input
                                 type="number"
                                 min={1}
@@ -1092,10 +1084,10 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
                                 onClick={(e) =>
                                   e.stopPropagation()
                                 }
-                                className="w-8 sm:w-9 h-9 sm:h-10 text-center bg-transparent text-white font-bold text-sm sm:text-base focus:outline-none focus:bg-emerald-950/80 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                className="w-6 sm:w-7 h-8 sm:h-9 text-center bg-transparent text-white font-bold text-xs sm:text-sm focus:outline-none focus:bg-emerald-950/80 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                 aria-label={`Quantidade de ${item.name}`}
                               />
-                              <span className="text-xs font-semibold text-emerald-400/90 select-none ml-0.5">
+                              <span className="text-[11px] sm:text-xs font-semibold text-emerald-400/90 select-none ml-0.5">
                                 {formatUnitShort(item.unit)}
                               </span>
                             </div>
@@ -1110,10 +1102,10 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
                                   1
                                 );
                               }}
-                              className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center text-emerald-300 hover:bg-emerald-500/20 hover:text-white transition-colors"
+                              className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center text-emerald-300 hover:bg-emerald-500/20 hover:text-white transition-colors"
                               aria-label="Aumentar quantidade"
                             >
-                              <Plus className="w-4 h-4" />
+                              <Plus className="w-3.5 h-3.5" />
                             </button>
 
                           </div>
@@ -1134,9 +1126,9 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
 
             <div className="p-4 bg-emerald-950/50 border-t border-emerald-500/15 flex flex-col sm:flex-row items-center justify-between gap-3">
 
-              <div className="text-xs text-emerald-300/60">
+              <div className="text-xs text-emerald-300/70 text-center sm:text-left">
 
-                Você pode ajustar a quantidade antes de salvar.
+                Os itens adicionados atualizarão instantaneamente o cálculo das receitas compatíveis.
 
               </div>
 
