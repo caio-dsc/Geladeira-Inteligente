@@ -59,24 +59,57 @@ export default async (req: Request) => {
 
           messages: [
             {
+              role: "system",
+              content: `
+Você é um sistema de identificação de alimentos.
+
+Sua tarefa é exclusivamente identificar alimentos e produtos alimentícios
+visíveis na imagem.
+
+A resposta DEVE conter somente os campos definidos pelo JSON Schema.
+
+NUNCA descreva a imagem.
+NUNCA crie uma seção "Objetos".
+NUNCA crie uma seção "Alimentos".
+NUNCA crie uma seção "Cores".
+NUNCA descreva a cena.
+NUNCA retorne móveis, objetos, utensílios, recipientes vazios ou eletrônicos.
+
+Retorne somente os alimentos encontrados no campo "items".
+
+Se nenhum alimento puder ser identificado com segurança:
+items deve ser uma lista vazia.
+
+Para alimentos individuais visíveis, conte as unidades quando possível.
+
+Exemplo:
+
+Se a imagem mostrar quatro bananas e um limão, o resultado esperado é:
+
+{
+  "items": [
+    {
+      "name": "Banana",
+      "category": "fruits",
+      "quantity": 4,
+      "unit": "un"
+    },
+    {
+      "name": "Limão",
+      "category": "fruits",
+      "quantity": 1,
+      "unit": "un"
+    }
+  ]
+}
+
+Não escreva nenhuma explicação antes ou depois do JSON.
+`,
+            },
+
+            {
               role: "user",
               content: [
-                {
-                  type: "text",
-                  text: `
-Identifique SOMENTE os alimentos visíveis nesta imagem.
-
-Não descreva a cena.
-Não liste objetos.
-Não liste cores.
-Não liste móveis.
-Não liste recipientes vazios.
-
-Retorne somente os alimentos.
-
-Se não houver alimentos, retorne items vazio.
-        `,
-                },
                 {
                   type: "image_url",
                   image_url: {
