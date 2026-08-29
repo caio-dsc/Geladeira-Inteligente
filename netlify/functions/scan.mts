@@ -109,6 +109,11 @@ export default async (req: Request) => {
       );
     }
 
+    console.log(
+      "RESPOSTA COMPLETA DO HUGGING FACE:",
+      JSON.stringify(data, null, 2)
+    );
+
     const result =
       data?.choices?.[0]?.message?.content;
 
