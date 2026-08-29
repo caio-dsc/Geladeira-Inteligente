@@ -976,142 +976,150 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
                       }`}
                     >
 
-                      {/* 1ª LINHA: [CHECKBOX] [ÍCONE] NOME DO ALIMENTO (ESQUERDA) ------------ [ - ] 1 uni [ + ] (DIREITA) */}
-                      <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-start gap-3">
 
-                        {/* ESQUERDA: CHECKBOX + ÍCONE + NOME */}
-                        <div className="flex items-center gap-3 min-w-0 flex-1">
-
-                          {/* CHECKBOX */}
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleToggleItem(
-                                item.id
-                              );
-                            }}
-                            className="shrink-0 cursor-pointer text-emerald-400 hover:text-emerald-300 transition-colors"
-                            aria-label={
-                              item.selected
-                                ? 'Desmarcar alimento'
-                                : 'Selecionar alimento'
-                            }
-                          >
-                            {item.selected ? (
-                              <CheckSquare className="w-5 h-5 text-emerald-400" />
-                            ) : (
-                              <Square className="w-5 h-5 text-emerald-800" />
-                            )}
-                          </button>
-
-                          {/* ÍCONE DA CATEGORIA */}
-                          <div className="w-10 h-10 rounded-xl bg-emerald-950/90 border border-emerald-500/30 flex items-center justify-center shrink-0">
-                            {getCategoryIcon(
-                              item.category
-                            )}
-                          </div>
-
-                          {/* NOME DO ALIMENTO */}
-                          <h4 className="text-sm sm:text-base font-bold text-white uppercase tracking-wide truncate">
-                            {item.name}
-                          </h4>
-
-                        </div>
-
-                        {/* DIREITA: CONTROLE DE QUANTIDADE [ - ] 1 uni [ + ] */}
-                        <div
-                          className="shrink-0 flex items-center"
-                          onClick={(e) =>
-                            e.stopPropagation()
+                        {/* CHECKBOX */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleToggleItem(
+                              item.id
+                            );
+                          }}
+                          className="mt-1 shrink-0 cursor-pointer text-emerald-400 hover:text-emerald-300 transition-colors"
+                          aria-label={
+                            item.selected
+                              ? 'Desmarcar alimento'
+                              : 'Selecionar alimento'
                           }
                         >
-                          <div className="flex items-center border border-emerald-500/50 rounded-xl overflow-hidden bg-[#051a0e] shadow-inner">
+                          {item.selected ? (
+                            <CheckSquare className="w-5 h-5 text-emerald-400" />
+                          ) : (
+                            <Square className="w-5 h-5 text-emerald-800" />
+                          )}
+                        </button>
 
-                            {/* BOTÃO DIMINUIR (-) */}
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleQuantityChange(
-                                  item.id,
-                                  -1
-                                );
-                              }}
-                              disabled={
-                                item.quantity <= 1
-                              }
-                              className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center text-emerald-300 hover:bg-emerald-500/20 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                              aria-label="Diminuir quantidade"
-                            >
-                              <Minus className="w-3.5 h-3.5" />
-                            </button>
-
-                            {/* NÚMERO + UNIDADE (ex: 1 uni) */}
-                            <div className="flex items-center px-1.5 border-x border-emerald-500/30 min-w-[54px] sm:min-w-[62px] justify-center">
-                              <input
-                                type="number"
-                                min={1}
-                                step={
-                                  isIntegerUnit(item.unit)
-                                    ? 1
-                                    : 'any'
-                                }
-                                value={item.quantity}
-                                onChange={(e) => {
-                                  e.stopPropagation();
-                                  handleQuantityInputChange(
-                                    item.id,
-                                    e.target.value
-                                  );
-                                }}
-                                onClick={(e) =>
-                                  e.stopPropagation()
-                                }
-                                className="w-7 sm:w-8 h-8 sm:h-9 text-center bg-transparent text-white font-bold text-xs sm:text-sm focus:outline-none focus:bg-emerald-950/80 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                aria-label={`Quantidade de ${item.name}`}
-                              />
-                              <span className="text-xs font-semibold text-emerald-400/90 select-none ml-0.5">
-                                {formatUnitShort(item.unit)}
-                              </span>
-                            </div>
-
-                            {/* BOTÃO AUMENTAR (+) */}
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleQuantityChange(
-                                  item.id,
-                                  1
-                                );
-                              }}
-                              className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center text-emerald-300 hover:bg-emerald-500/20 hover:text-white transition-colors"
-                              aria-label="Aumentar quantidade"
-                            >
-                              <Plus className="w-3.5 h-3.5" />
-                            </button>
-
-                          </div>
-                        </div>
-
-                      </div>
-
-                      {/* 2ª E 3ª LINHAS: CATEGORIA E % DE PRECISÃO (ALINHADAS ABAIXO DO NOME) */}
-                      <div className="ml-14 sm:ml-16 mt-1 flex flex-col gap-0.5">
-                        <div className="text-xs text-emerald-300/80 font-medium">
-                          {getCategoryLabel(
+                        {/* ÍCONE DA CATEGORIA */}
+                        <div className="mt-0.5 w-10 h-10 rounded-xl bg-emerald-950/90 border border-emerald-500/30 flex items-center justify-center shrink-0">
+                          {getCategoryIcon(
                             item.category
                           )}
                         </div>
 
-                        <div className="text-xs text-emerald-400/90 font-semibold">
-                          {(
-                            item.confidence *
-                            100
-                          ).toFixed(0)}
-                          % de precisão
+                        {/* BLOCO DO ITEM COM NOME, CATEGORIA, PRECISÃO E CONTROLE DE QUANTIDADE */}
+                        <div className="min-w-0 flex-1">
+                          <h4 className="text-sm font-bold text-white">
+                            {item.name}
+                          </h4>
+
+                          <div className="flex flex-wrap items-center gap-2 text-xs text-emerald-300/70 mt-0.5">
+                            <span>{getCategoryLabel(item.category)}</span>
+                            <span>•</span>
+
+                            <span className="text-[11px] text-emerald-400 font-semibold">
+                              {(item.confidence * 100).toFixed(0)}% de precisão
+                            </span>
+                          </div>
+
+                          <div
+                            className="flex items-center gap-1.5 mt-2"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+
+                                setDetectedItems((prev) =>
+                                  prev.map((current) =>
+                                    current.id === item.id
+                                      ? {
+                                          ...current,
+                                          quantity: Math.max(1, current.quantity - 1),
+                                        }
+                                      : current
+                                  )
+                                );
+                              }}
+                              disabled={item.quantity <= 1}
+                              className="w-8 h-8 rounded-lg border border-emerald-500/30 bg-emerald-950 text-emerald-300 hover:bg-emerald-900 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center font-bold"
+                              aria-label={`Diminuir quantidade de ${item.name}`}
+                            >
+                              −
+                            </button>
+
+                            <input
+                              type="number"
+                              min="1"
+                              step={
+                                item.unit === 'kg' ||
+                                item.unit === 'g' ||
+                                item.unit === 'L' ||
+                                item.unit === 'ml'
+                                  ? '0.1'
+                                  : '1'
+                              }
+                              value={item.quantity}
+                              onClick={(e) => e.stopPropagation()}
+                              onChange={(e) => {
+                                e.stopPropagation();
+
+                                const value = Number(e.target.value);
+
+                                if (!Number.isFinite(value) || value < 1) {
+                                  return;
+                                }
+
+                                setDetectedItems((prev) =>
+                                  prev.map((current) =>
+                                    current.id === item.id
+                                      ? {
+                                          ...current,
+                                          quantity:
+                                            item.unit === 'un' ||
+                                            item.unit === 'pct' ||
+                                            item.unit === 'fatias'
+                                              ? Math.floor(value)
+                                              : value,
+                                        }
+                                      : current
+                                  )
+                                );
+                              }}
+                              className="w-14 h-8 rounded-lg border border-emerald-500/30 bg-[#05130b] text-white text-center text-sm font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                              aria-label={`Quantidade de ${item.name}`}
+                            />
+
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+
+                                setDetectedItems((prev) =>
+                                  prev.map((current) =>
+                                    current.id === item.id
+                                      ? {
+                                          ...current,
+                                          quantity: current.quantity + 1,
+                                        }
+                                      : current
+                                  )
+                                );
+                              }}
+                              className="w-8 h-8 rounded-lg border border-emerald-500/30 bg-emerald-950 text-emerald-300 hover:bg-emerald-900 hover:text-white flex items-center justify-center font-bold"
+                              aria-label={`Aumentar quantidade de ${item.name}`}
+                            >
+                              +
+                            </button>
+
+                            <span className="text-[10px] font-bold uppercase text-emerald-400/70 ml-1">
+                              {item.unit}
+                            </span>
+                          </div>
                         </div>
+
                       </div>
 
                     </div>
