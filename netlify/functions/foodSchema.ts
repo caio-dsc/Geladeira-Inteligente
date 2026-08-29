@@ -29,6 +29,7 @@ export const foodDetectionSchema = {
 
           quantity: {
             type: "number",
+            minimum: 1,
           },
 
           unit: {
@@ -51,13 +52,9 @@ export const foodDetectionSchema = {
           "quantity",
           "unit",
         ],
-
-        additionalProperties: false,
       },
     },
   },
 
   required: ["items"],
-
-  additionalProperties: false,
 };
