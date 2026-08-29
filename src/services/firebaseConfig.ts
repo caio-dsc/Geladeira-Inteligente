@@ -1,9 +1,16 @@
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { initializeAppCheck, ReCaptchaEnterpriseProvider, AppCheck } from 'firebase/app-check';
 import { getAuth, GoogleAuthProvider, Auth, browserLocalPersistence, setPersistence } from 'firebase/auth';
-import { initializeFirestore, getFirestore, Firestore, doc, getDocFromServer } from 'firebase/firestore';
+import { initializeFirestore, getFirestore, Firestore, setLogLevel } from 'firebase/firestore';
 import { getStorage, FirebaseStorage } from 'firebase/storage';
 import firebaseConfigData from '../../firebase-applet-config.json';
+
+// Define nível de log do Firestore para evitar alertas benignos de handshake inicial
+try {
+  setLogLevel('error');
+} catch {
+  // Ignora se não suportado
+}
 
 /**
  * Configuração e Inicialização Modular do Firebase
@@ -82,34 +89,21 @@ googleAuthProvider.setCustomParameters({
   prompt: 'select_account',
 });
 
-// 4. Instância do Cloud Firestore com suporte a Long Polling e ID de base de dados customizado
+// 4. Instância do Cloud Firestore com detecção automática de transporte (Long Polling / WebSockets)
 const targetDatabaseId = firebaseConfig.firestoreDatabaseId && firebaseConfig.firestoreDatabaseId !== '(default)'
   ? firebaseConfig.firestoreDatabaseId
   : undefined;
 
 let firestoreInstance: Firestore;
 try {
-  firestoreInstance = initializeFirestore(app, {
-    experimentalAutoDetectLongPolling: true,
-  }, targetDatabaseId);
+  firestoreInstance = targetDatabaseId
+    ? initializeFirestore(app, { experimentalAutoDetectLongPolling: true }, targetDatabaseId)
+    : initializeFirestore(app, { experimentalAutoDetectLongPolling: true });
 } catch {
   firestoreInstance = targetDatabaseId ? getFirestore(app, targetDatabaseId) : getFirestore(app);
 }
 
 export const db: Firestore = firestoreInstance;
-
-// Valida conexão em background sem travar o runtime do app
-if (typeof window !== 'undefined') {
-  setTimeout(async () => {
-    try {
-      await getDocFromServer(doc(db, 'test', 'connection'));
-    } catch (error) {
-      if (error instanceof Error && error.message.includes('the client is offline')) {
-        console.info('Firestore em modo offline/cache.');
-      }
-    }
-  }, 1000);
-}
 
 // 5. Instância do Cloud Storage para imagens de geladeira
 export const storage: FirebaseStorage = getStorage(app);

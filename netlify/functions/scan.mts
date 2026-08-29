@@ -1,4 +1,6 @@
 import type { Config } from "@netlify/functions";
+import { foodDetectionSchema } from "./foodSchema";
+import { foodDetectionPrompt } from "./foodPrompt";
 
 const MODEL = "google/gemma-3-4b-it:featherless-ai";
 
@@ -62,29 +64,7 @@ export default async (req: Request) => {
               content: [
                 {
                   type: "text",
-                  text: `
-Analise cuidadosamente a imagem que foi enviada.
-
-Primeiro, descreva exatamente o que você consegue visualizar
-na imagem.
-
-Informe:
-- se a imagem mostra uma geladeira, cozinha, pessoa, objeto
-  ou outra cena;
-- quais objetos aparecem;
-- quais alimentos aparecem, se houver;
-- cores e características visuais importantes.
-
-IMPORTANTE:
-Não responda que não consegue analisar imagens.
-Você recebeu uma imagem e deve analisá-la.
-
-Não invente informações.
-Se a imagem realmente não tiver alimentos, diga isso.
-Se houver alimentos, liste-os.
-
-Responda em português.
-                  `,
+                  text: foodDetectionPrompt,
                 },
 
                 {
@@ -96,6 +76,15 @@ Responda em português.
               ],
             },
           ],
+
+          response_format: {
+            type: "json_schema",
+            json_schema: {
+              name: "food_detection",
+              schema: foodDetectionSchema,
+              strict: true,
+            },
+          },
 
           max_tokens: 1000,
           temperature: 0.1,

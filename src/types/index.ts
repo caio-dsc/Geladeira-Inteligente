@@ -81,7 +81,25 @@ export interface DetectedFoodItem {
   state: FreshnessState;
   location: StorageLocation;
   confidence: number;
+  expiryDate?: string;
+  expirySource?: 'image' | 'manual';
   selected: boolean;
+}
+
+export interface GemmaDetectedFoodItem {
+  name: string;
+  category: CategoryType;
+  quantity: number;
+  unit: 'un' | 'kg' | 'g' | 'L' | 'ml' | 'pct' | 'fatias';
+  state: FreshnessState;
+  location: StorageLocation;
+  confidence: number;
+  expiryDate: string | null;
+  expirySource: 'image' | null;
+}
+
+export interface GemmaScanResponse {
+  items: GemmaDetectedFoodItem[];
 }
 
 export interface ScanSession {
