@@ -17,6 +17,31 @@ interface HuggingFaceScanResponse {
   error?: string;
 }
 
+interface StructuredFoodDetection {
+  items: Array<{
+    name: string;
+    category: DetectedFoodItem['category'];
+    quantity: number;
+    unit: DetectedFoodItem['unit'];
+    state: DetectedFoodItem['state'];
+    location: DetectedFoodItem['location'] | null;
+    confidence: number;
+    expiryDate: string | null;
+    expirySource: 'image' | null;
+  }>;
+}
+
+const ALLOWED_CATEGORIES: DetectedFoodItem['category'][] = [
+  'vegetables',
+  'fruits',
+  'dairy',
+  'proteins',
+  'drinks',
+  'pantry',
+  'condiments',
+  'bakery',
+];
+
 class HuggingFaceScannerService implements IScannerService {
   public getSampleImages() {
     return SAMPLE_FRIDGE_IMAGES;
@@ -80,281 +105,140 @@ class HuggingFaceScannerService implements IScannerService {
     onProgress?.('Processando alimentos identificados...');
 
     console.log(
-      'Resposta do Hugging Face:',
+      'Resposta estruturada do Hugging Face:',
       data.result
     );
 
-    return this.parseDetectionResult(data.result);
+    return this.parseStructuredResult(data.result);
   }
 
-  private parseDetectionResult(
+  private parseStructuredResult(
     result: string
   ): DetectedFoodItem[] {
-    const items: DetectedFoodItem[] = [];
+    let parsed: StructuredFoodDetection;
 
-    const lines = result
-      .split('\n')
-      .map((line) => line.trim())
-      .filter(Boolean);
+    try {
+      parsed = JSON.parse(result);
+    } catch (error) {
+      console.error(
+        'O Hugging Face retornou um JSON inválido:',
+        result,
+        error
+      );
 
-    for (const line of lines) {
-      /*
-       * Esperamos inicialmente algo parecido com:
-       *
-       * - Banana: Quantidade: 6-8 unidades; Unidade: unidades; Confiança: 0.95
-       *
-       * ou:
-       *
-       * Banana: Quantidade: 6-8 unidades; Unidade: unidades; Confiança: 0.95
-       */
+      throw new Error(
+        'A IA retornou uma resposta inválida. Tente tirar a foto novamente.'
+      );
+    }
 
-      const cleanLine = line
-        .replace(/^[-•*]\s*/, '')
-        .trim();
+    if (
+      !parsed ||
+      !Array.isArray(parsed.items)
+    ) {
+      throw new Error(
+        'A IA não retornou uma lista válida de alimentos.'
+      );
+    }
 
-      if (!cleanLine) {
+    const validItems: DetectedFoodItem[] = [];
+
+    for (const item of parsed.items) {
+      if (!this.isValidFoodItem(item)) {
+        console.warn(
+          'Item rejeitado pelo filtro de alimentos:',
+          item
+        );
+
         continue;
       }
 
-      const nameMatch = cleanLine.match(
-        /^([^:]+):/
-      );
-
-      if (!nameMatch) {
-        continue;
-      }
-
-      const name = nameMatch[1].trim();
-
-      if (
-        !name ||
-        name.toLowerCase().includes('não foram identificados')
-      ) {
-        continue;
-      }
-
-      const quantityMatch = cleanLine.match(
-        /Quantidade:\s*([^;]+)/i
-      );
-
-      const unitMatch = cleanLine.match(
-        /Unidade:\s*([^;]+)/i
-      );
-
-      const confidenceMatch = cleanLine.match(
-        /Confiança:\s*(0(?:\.\d+)?|1(?:\.0+)?)/i
-      );
-
-      const rawQuantity =
-        quantityMatch?.[1]?.trim() ?? '';
-
-      const unit =
-        unitMatch?.[1]?.trim() ?? 'un';
-
-      const confidence = confidenceMatch
-        ? Number(confidenceMatch[1])
-        : 0.5;
-
-      let quantity = 1;
-
-      /*
-       * Se vier algo como "6-8", usamos a média:
-       *
-       * 6-8 → 7
-       *
-       * Se vier "6", usamos 6.
-       */
-      const rangeMatch = rawQuantity.match(
-        /(\d+(?:[.,]\d+)?)\s*[-–]\s*(\d+(?:[.,]\d+)?)/ 
-      );
-
-      if (rangeMatch) {
-        const min = Number(
-          rangeMatch[1].replace(',', '.')
-        );
-
-        const max = Number(
-          rangeMatch[2].replace(',', '.')
-        );
-
-        quantity = Math.round(
-          (min + max) / 2
-        );
-      } else {
-        const numberMatch =
-          rawQuantity.match(
-            /\d+(?:[.,]\d+)?/
-          );
-
-        if (numberMatch) {
-          quantity = Number(
-            numberMatch[0].replace(',', '.')
-          );
-        }
-      }
-
-      const normalizedUnit =
-        this.normalizeUnit(unit);
-
-      const category =
-        this.guessCategory(name);
-
-      const detectedItem: DetectedFoodItem = {
+      validItems.push({
         id: `det_${Date.now()}_${Math.random()
           .toString(36)
           .substring(2, 7)}`,
 
-        name,
+        name: item.name.trim(),
 
-        category,
+        category: item.category,
 
-        quantity,
+        quantity: item.quantity,
 
-        unit: normalizedUnit,
+        unit: item.unit,
 
-        state: 'fresh',
+        state: item.state,
 
-        location: 'geladeira',
+        location:
+          item.location ?? 'geladeira',
 
-        confidence: Math.min(
-          Math.max(confidence, 0),
-          1
-        ),
+        confidence: item.confidence,
 
         selected: true,
-      };
-
-      items.push(detectedItem);
+      });
     }
 
-    if (items.length === 0) {
+    if (validItems.length === 0) {
       throw new Error(
-        'A IA analisou a imagem, mas não conseguiu identificar alimentos com clareza.'
+        'Nenhum alimento foi identificado na imagem.'
       );
     }
 
-    return items;
+    return validItems;
   }
 
-  private normalizeUnit(unit: string): DetectedFoodItem['unit'] {
-    const normalized =
-      unit
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .trim();
-
-    if (
-      normalized.includes('unidade') ||
-      normalized === 'un' ||
-      normalized === 'unidades'
-    ) {
-      return 'un';
+  private isValidFoodItem(
+    item: StructuredFoodDetection['items'][number]
+  ): boolean {
+    if (!item) {
+      return false;
     }
 
     if (
-      normalized === 'kg' ||
-      normalized.includes('quilo')
+      typeof item.name !== 'string' ||
+      !item.name.trim()
     ) {
-      return 'kg';
+      return false;
     }
 
     if (
-      normalized === 'g' ||
-      normalized.includes('gram')
-    ) {
-      return 'g';
-    }
-
-    if (
-      normalized === 'l' ||
-      normalized.includes('litro')
-    ) {
-      return 'L';
-    }
-
-    if (
-      normalized === 'ml' ||
-      normalized.includes('mililitro')
-    ) {
-      return 'ml';
-    }
-
-    if (
-      normalized === 'pct' ||
-      normalized.includes('pacote')
-    ) {
-      return 'pct';
-    }
-
-    if (
-      normalized === 'fatias' ||
-      normalized.includes('fatia')
-    ) {
-      return 'fatias';
-    }
-
-    return 'un';
-  }
-
-  private guessCategory(
-    name: string
-  ): DetectedFoodItem['category'] {
-    const normalized =
-      name
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '');
-
-    if (
-      /banana|maca|laranja|mamao|manga|uva|morango|abacaxi|limao|pera|melancia|fruta/.test(
-        normalized
+      !ALLOWED_CATEGORIES.includes(
+        item.category
       )
     ) {
-      return 'fruits';
+      return false;
     }
 
     if (
-      /tomate|alface|cenoura|batata|cebola|alho|pepino|brocolis|couve|pimentao|legume|verdura/.test(
-        normalized
-      )
+      typeof item.quantity !== 'number' ||
+      !Number.isFinite(item.quantity) ||
+      item.quantity <= 0
     ) {
-      return 'vegetables';
+      return false;
     }
 
     if (
-      /leite|queijo|iogurte|manteiga|requeijao|creme de leite|laticinio/.test(
-        normalized
-      )
+      typeof item.confidence !== 'number' ||
+      !Number.isFinite(item.confidence) ||
+      item.confidence < 0 ||
+      item.confidence > 1
     ) {
-      return 'dairy';
+      return false;
     }
 
     if (
-      /ovo|frango|carne|bife|peixe|presunto|linguica|salsicha|proteina/.test(
-        normalized
-      )
+      item.expiryDate !== null &&
+      typeof item.expiryDate !== 'string'
     ) {
-      return 'proteins';
+      return false;
     }
 
     if (
-      /arroz|feijao|macarrao|farinha|aveia|cereal|pao|massa|grao/.test(
-        normalized
-      )
+      item.expirySource !== null &&
+      item.expirySource !== 'image'
     ) {
-      return 'pantry';
+      return false;
     }
 
-    if (
-      /suco|refrigerante|agua|cha|cafe|cerveja|bebida/.test(
-        normalized
-      )
-    ) {
-      return 'drinks';
-    }
-
-    return 'other';
+    return true;
   }
 }
 

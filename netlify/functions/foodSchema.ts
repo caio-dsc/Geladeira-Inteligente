@@ -21,7 +21,6 @@ export const foodDetectionSchema = {
               "pantry",
               "condiments",
               "bakery",
-              "other",
             ],
           },
 
