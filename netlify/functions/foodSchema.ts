@@ -54,13 +54,14 @@ export const foodDetectionSchema = {
           },
 
           location: {
-            type: "string",
+            type: ["string", "null"],
             enum: [
               "geladeira",
               "freezer",
               "gaveta_legumes",
               "porta",
               "despensa",
+              null,
             ],
           },
 

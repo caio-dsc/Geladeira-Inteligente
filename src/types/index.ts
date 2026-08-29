@@ -92,7 +92,7 @@ export interface GemmaDetectedFoodItem {
   quantity: number;
   unit: 'un' | 'kg' | 'g' | 'L' | 'ml' | 'pct' | 'fatias';
   state: FreshnessState;
-  location: StorageLocation;
+  location: StorageLocation | null;
   confidence: number;
   expiryDate: string | null;
   expirySource: 'image' | null;
