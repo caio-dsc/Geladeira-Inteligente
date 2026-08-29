@@ -969,18 +969,18 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
                           item.id
                         )
                       }
-                      className={`p-4 sm:p-5 transition-colors cursor-pointer rounded-2xl ${
+                      className={`p-4 sm:p-5 transition-all cursor-pointer rounded-2xl border ${
                         item.selected
-                          ? 'bg-[#0b281b]/90 border border-emerald-500/30'
-                          : 'bg-[#081e13]/60 border border-emerald-900/40 opacity-80'
+                          ? 'bg-[#0b281b]/95 border-emerald-500/40 shadow-sm'
+                          : 'bg-[#081e13]/60 border-emerald-900/40 opacity-75'
                       }`}
                     >
 
-                      {/* CABEÇALHO DO CARD: LADO ESQUERDO (CHECKBOX + ÍCONE + DADOS) | LADO DIREITO (CONTROLE - 1 uni +) */}
-                      <div className="flex items-center justify-between gap-2 sm:gap-4">
+                      {/* 1ª LINHA: [CHECKBOX] [ÍCONE] NOME DO ALIMENTO (ESQUERDA) ------------ [ - ] 1 uni [ + ] (DIREITA) */}
+                      <div className="flex items-center justify-between gap-3">
 
-                        {/* LADO ESQUERDO: CHECKBOX, ÍCONE, NOME, CATEGORIA, PRECISÃO */}
-                        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+                        {/* ESQUERDA: CHECKBOX + ÍCONE + NOME */}
+                        <div className="flex items-center gap-3 min-w-0 flex-1">
 
                           {/* CHECKBOX */}
                           <button
@@ -1006,43 +1006,27 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
                           </button>
 
                           {/* ÍCONE DA CATEGORIA */}
-                          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-950/90 border border-emerald-500/30 flex items-center justify-center shrink-0">
+                          <div className="w-10 h-10 rounded-xl bg-emerald-950/90 border border-emerald-500/30 flex items-center justify-center shrink-0">
                             {getCategoryIcon(
                               item.category
                             )}
                           </div>
 
-                          {/* NOME / CATEGORIA / CONFIANÇA */}
-                          <div className="min-w-0 flex-1">
-                            <h4 className="text-sm sm:text-base font-bold text-white uppercase tracking-wide truncate">
-                              {item.name}
-                            </h4>
-
-                            <div className="text-xs text-emerald-300/80 font-medium truncate mt-0.5">
-                              {getCategoryLabel(
-                                item.category
-                              )}
-                            </div>
-
-                            <div className="text-[11px] sm:text-xs text-emerald-400/90 font-semibold mt-0.5">
-                              {(
-                                item.confidence *
-                                100
-                              ).toFixed(0)}
-                              % de precisão
-                            </div>
-                          </div>
+                          {/* NOME DO ALIMENTO */}
+                          <h4 className="text-sm sm:text-base font-bold text-white uppercase tracking-wide truncate">
+                            {item.name}
+                          </h4>
 
                         </div>
 
-                        {/* LADO DIREITO: CONTROLE DE QUANTIDADE [ - ] 1 uni [ + ] */}
+                        {/* DIREITA: CONTROLE DE QUANTIDADE [ - ] 1 uni [ + ] */}
                         <div
-                          className="shrink-0 flex items-center justify-end"
+                          className="shrink-0 flex items-center"
                           onClick={(e) =>
                             e.stopPropagation()
                           }
                         >
-                          <div className="flex items-center border border-emerald-500/40 rounded-xl overflow-hidden bg-[#051a0e] shadow-inner">
+                          <div className="flex items-center border border-emerald-500/50 rounded-xl overflow-hidden bg-[#051a0e] shadow-inner">
 
                             {/* BOTÃO DIMINUIR (-) */}
                             <button
@@ -1063,8 +1047,8 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
                               <Minus className="w-3.5 h-3.5" />
                             </button>
 
-                            {/* NÚMERO + UNIDADE (1 uni) */}
-                            <div className="flex items-center px-1 sm:px-1.5 border-x border-emerald-500/30 min-w-[52px] sm:min-w-[60px] justify-center">
+                            {/* NÚMERO + UNIDADE (ex: 1 uni) */}
+                            <div className="flex items-center px-1.5 border-x border-emerald-500/30 min-w-[54px] sm:min-w-[62px] justify-center">
                               <input
                                 type="number"
                                 min={1}
@@ -1084,10 +1068,10 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
                                 onClick={(e) =>
                                   e.stopPropagation()
                                 }
-                                className="w-6 sm:w-7 h-8 sm:h-9 text-center bg-transparent text-white font-bold text-xs sm:text-sm focus:outline-none focus:bg-emerald-950/80 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                className="w-7 sm:w-8 h-8 sm:h-9 text-center bg-transparent text-white font-bold text-xs sm:text-sm focus:outline-none focus:bg-emerald-950/80 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                 aria-label={`Quantidade de ${item.name}`}
                               />
-                              <span className="text-[11px] sm:text-xs font-semibold text-emerald-400/90 select-none ml-0.5">
+                              <span className="text-xs font-semibold text-emerald-400/90 select-none ml-0.5">
                                 {formatUnitShort(item.unit)}
                               </span>
                             </div>
@@ -1111,6 +1095,23 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
                           </div>
                         </div>
 
+                      </div>
+
+                      {/* 2ª E 3ª LINHAS: CATEGORIA E % DE PRECISÃO (ALINHADAS ABAIXO DO NOME) */}
+                      <div className="ml-14 sm:ml-16 mt-1 flex flex-col gap-0.5">
+                        <div className="text-xs text-emerald-300/80 font-medium">
+                          {getCategoryLabel(
+                            item.category
+                          )}
+                        </div>
+
+                        <div className="text-xs text-emerald-400/90 font-semibold">
+                          {(
+                            item.confidence *
+                            100
+                          ).toFixed(0)}
+                          % de precisão
+                        </div>
                       </div>
 
                     </div>
