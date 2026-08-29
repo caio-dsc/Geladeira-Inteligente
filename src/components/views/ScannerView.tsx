@@ -398,6 +398,41 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
   };
 
   /*
+   * Helper para verificar se a unidade trabalha estritamente com inteiros.
+   */
+
+  const isIntegerUnit = (unit?: string): boolean => {
+    if (!unit) return true;
+    return ['un', 'pct', 'fatias'].includes(unit.toLowerCase().trim());
+  };
+
+  /*
+   * Formata o rótulo da unidade para exibição amigável em caixa alta.
+   */
+
+  const formatUnitLabel = (unit?: string): string => {
+    const u = (unit || 'un').toLowerCase().trim();
+    switch (u) {
+      case 'un':
+        return 'UNIDADE';
+      case 'pct':
+        return 'PACOTE';
+      case 'fatias':
+        return 'FATIAS';
+      case 'kg':
+        return 'KG';
+      case 'g':
+        return 'G';
+      case 'l':
+        return 'L';
+      case 'ml':
+        return 'ML';
+      default:
+        return (unit || 'UN').toUpperCase();
+    }
+  };
+
+  /*
    * Alterar quantidade via botões - e +.
    *
    * Nunca permitimos quantidade menor que 1.
@@ -413,8 +448,9 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
           return item;
         }
 
+        const isInt = isIntegerUnit(item.unit);
         let newQuantity: number;
-        if (item.unit === 'un') {
+        if (isInt) {
           newQuantity = Math.max(
             1,
             Math.round(item.quantity + delta)
@@ -453,8 +489,9 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
           };
         }
 
+        const isInt = isIntegerUnit(item.unit);
         let parsed: number;
-        if (item.unit === 'un') {
+        if (isInt) {
           const intVal = parseInt(rawValue, 10);
           parsed = isNaN(intVal) ? 1 : Math.max(1, intVal);
         } else {
@@ -934,17 +971,17 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
                       }
                       className={`p-4 sm:p-5 transition-colors cursor-pointer ${
                         item.selected
-                          ? 'bg-[#0b281b]/80'
-                          : 'bg-[#081e13]/60'
+                          ? 'bg-[#0b281b]/90'
+                          : 'bg-[#081e13]/60 opacity-80'
                       }`}
                     >
 
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      {/* CABEÇALHO DO CARD: CHECKBOX + ÍCONE + DADOS + BADGE ESTADO */}
+                      <div className="flex items-start justify-between gap-3">
 
-                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div className="flex items-start gap-3 min-w-0 flex-1">
 
                           {/* CHECKBOX */}
-
                           <button
                             type="button"
                             onClick={(e) => {
@@ -953,165 +990,135 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
                                 item.id
                               );
                             }}
-                            className="shrink-0 cursor-pointer"
+                            className="mt-0.5 shrink-0 cursor-pointer text-emerald-400 hover:text-emerald-300 transition-colors"
                             aria-label={
                               item.selected
                                 ? 'Desmarcar alimento'
                                 : 'Selecionar alimento'
                             }
                           >
-
                             {item.selected ? (
                               <CheckSquare className="w-5 h-5 text-emerald-400" />
                             ) : (
                               <Square className="w-5 h-5 text-emerald-800" />
                             )}
-
                           </button>
 
-                          {/* ÍCONE */}
-
+                          {/* ÍCONE DA CATEGORIA */}
                           <div className="w-10 h-10 rounded-xl bg-emerald-950/90 border border-emerald-500/30 flex items-center justify-center shrink-0">
-
                             {getCategoryIcon(
                               item.category
                             )}
-
                           </div>
 
                           {/* NOME / CATEGORIA / CONFIANÇA */}
-
                           <div className="flex-1 min-w-0">
-
-                            <h4 className="text-base font-bold text-white truncate">
-
+                            <h4 className="text-base font-bold text-white uppercase tracking-wide truncate">
                               {item.name}
-
                             </h4>
 
-                            <div className="flex flex-wrap items-center gap-2 text-xs text-emerald-300/70 mt-1">
-
-                              <span>
-                                {getCategoryLabel(
-                                  item.category
-                                )}
-                              </span>
-
-                              <span>
-                                •
-                              </span>
-
-                              <span className="text-emerald-400 font-semibold">
-                                {(
-                                  item.confidence *
-                                  100
-                                ).toFixed(0)}
-                                % de precisão
-                              </span>
-
+                            <div className="text-xs text-emerald-300/80 font-medium mt-0.5">
+                              {getCategoryLabel(
+                                item.category
+                              )}
                             </div>
 
+                            <div className="text-xs text-emerald-400/90 font-semibold mt-0.5">
+                              {(
+                                item.confidence *
+                                100
+                              ).toFixed(0)}
+                              % de precisão
+                            </div>
                           </div>
 
                         </div>
 
-                        {/* CONTROLE DE QUANTIDADE: [ - ] [ quantidade ] [ + ] [ unidade ] */}
-
-                        <div
-                          className="flex items-center gap-2 shrink-0 self-end sm:self-center ml-8 sm:ml-0"
-                          onClick={(e) =>
-                            e.stopPropagation()
-                          }
-                        >
-
-                          <div className="flex items-center border border-emerald-500/30 rounded-xl overflow-hidden bg-[#051a0e] shadow-inner">
-
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleQuantityChange(
-                                  item.id,
-                                  -1
-                                );
-                              }}
-                              disabled={
-                                item.quantity <= 1
-                              }
-                              className="w-9 h-9 flex items-center justify-center text-emerald-300 hover:bg-emerald-500/20 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                              aria-label="Diminuir quantidade"
-                            >
-
-                              <Minus className="w-4 h-4" />
-
-                            </button>
-
-                            <input
-                              type="number"
-                              min={1}
-                              step={
-                                item.unit === 'un'
-                                  ? 1
-                                  : 'any'
-                              }
-                              value={item.quantity}
-                              onChange={(e) => {
-                                e.stopPropagation();
-                                handleQuantityInputChange(
-                                  item.id,
-                                  e.target.value
-                                );
-                              }}
-                              onClick={(e) =>
-                                e.stopPropagation()
-                              }
-                              className="w-14 sm:w-16 h-9 px-1 text-center bg-transparent border-x border-emerald-500/20 text-white font-bold text-sm focus:outline-none focus:bg-emerald-950/60 focus:ring-1 focus:ring-emerald-400/40"
-                              aria-label={`Quantidade de ${item.name}`}
-                            />
-
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleQuantityChange(
-                                  item.id,
-                                  1
-                                );
-                              }}
-                              className="w-9 h-9 flex items-center justify-center text-emerald-300 hover:bg-emerald-500/20 hover:text-white transition-colors"
-                              aria-label="Aumentar quantidade"
-                            >
-
-                              <Plus className="w-4 h-4" />
-
-                            </button>
-
-                          </div>
-
-                          <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider min-w-[28px]">
-                            {item.unit}
-                          </span>
-
-                        </div>
-
-                      </div>
-
-                      {/* ESTADO */}
-
-                      <div className="ml-8 sm:ml-[52px] mt-2 flex items-center gap-2">
-
+                        {/* BADGE DE ESTADO (FRESCO / CONGELADO) */}
                         <span
-                          className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
+                          className={`shrink-0 px-2.5 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wider ${
                             isFrozen
-                              ? 'text-sky-300 bg-sky-950/40 border-sky-500/30'
-                              : 'text-emerald-300 bg-emerald-950/40 border-emerald-500/30'
+                              ? 'text-sky-300 bg-sky-950/60 border-sky-500/30'
+                              : 'text-emerald-300 bg-emerald-950/60 border-emerald-500/30'
                           }`}
                         >
-
                           {isFrozen
                             ? 'Congelado'
                             : 'Fresco'}
+                        </span>
 
+                      </div>
+
+                      {/* CONTROLE DE QUANTIDADE: [ − ] [ 1 ] [ + ] UNIDADE */}
+                      <div
+                        className="mt-4 pt-3 border-t border-emerald-500/15 flex items-center justify-center sm:justify-end gap-3"
+                        onClick={(e) =>
+                          e.stopPropagation()
+                        }
+                      >
+
+                        <div className="flex items-center border border-emerald-500/40 rounded-xl overflow-hidden bg-[#051a0e] shadow-inner">
+
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleQuantityChange(
+                                item.id,
+                                -1
+                              );
+                            }}
+                            disabled={
+                              item.quantity <= 1
+                            }
+                            className="w-10 h-10 flex items-center justify-center text-emerald-300 hover:bg-emerald-500/20 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                            aria-label="Diminuir quantidade"
+                          >
+                            <Minus className="w-4 h-4" />
+                          </button>
+
+                          <input
+                            type="number"
+                            min={1}
+                            step={
+                              isIntegerUnit(item.unit)
+                                ? 1
+                                : 'any'
+                            }
+                            value={item.quantity}
+                            onChange={(e) => {
+                              e.stopPropagation();
+                              handleQuantityInputChange(
+                                item.id,
+                                e.target.value
+                              );
+                            }}
+                            onClick={(e) =>
+                              e.stopPropagation()
+                            }
+                            className="w-14 sm:w-16 h-10 px-1 text-center bg-transparent border-x border-emerald-500/30 text-white font-bold text-base focus:outline-none focus:bg-emerald-950/80 focus:ring-1 focus:ring-emerald-400"
+                            aria-label={`Quantidade de ${item.name}`}
+                          />
+
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleQuantityChange(
+                                item.id,
+                                1
+                              );
+                            }}
+                            className="w-10 h-10 flex items-center justify-center text-emerald-300 hover:bg-emerald-500/20 hover:text-white transition-colors"
+                            aria-label="Aumentar quantidade"
+                          >
+                            <Plus className="w-4 h-4" />
+                          </button>
+
+                        </div>
+
+                        <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider min-w-[32px]">
+                          {formatUnitLabel(item.unit)}
                         </span>
 
                       </div>
