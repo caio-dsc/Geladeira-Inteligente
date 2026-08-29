@@ -134,10 +134,6 @@ Sem texto antes ou depois.
             },
           ],
 
-          response_format: {
-            type: "json_object",
-          },
-
           max_tokens: 1000,
           temperature: 0.1,
         }),

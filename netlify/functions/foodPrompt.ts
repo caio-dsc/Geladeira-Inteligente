@@ -1,95 +1,65 @@
 export const foodDetectionPrompt = `
-Você é um sistema de visão para inventário de alimentos.
+Identifique os alimentos visíveis nesta imagem.
 
-ANALISE A IMAGEM E IDENTIFIQUE SOMENTE ALIMENTOS.
+Ignore completamente qualquer objeto que não seja alimento.
 
-IGNORE completamente:
-mesas, bancadas, bandejas, pratos, talheres, potes vazios,
-recipientes vazios, utensílios, escorredores, celulares,
-computadores, geladeiras, móveis, pessoas, animais e qualquer
-objeto que não seja alimento.
+NÃO descreva a cena.
+NÃO descreva a cozinha.
+NÃO liste objetos.
+NÃO liste cores.
+NÃO liste características visuais.
+NÃO explique sua resposta.
 
-PRODUTOS ALIMENTÍCIOS EMBALADOS DEVEM SER IDENTIFICADOS.
+Identifique somente alimentos e produtos alimentícios.
+
+Para alimentos individuais, escreva o nome e, quando conseguir,
+a quantidade visível.
+
 Exemplos:
-pote de requeijão = REQUEIJAO
-pote de manteiga = MANTEIGA
-pacote de biscoito = BISCOITO
-embalagem de iogurte = IOGURTE
 
-A embalagem NÃO deve ser identificada como alimento.
+4 bananas
+2 limões
+3 maçãs
+1 abacate
 
-==================================================
-CONTAGEM
-==================================================
+Para produtos alimentícios embalados:
 
-CONTE AS UNIDADES VISÍVEIS.
+2 iogurtes
+1 requeijão
+1 pacote de biscoito
 
-Exemplo:
+A embalagem deve ser usada para identificar o alimento, mas não deve
+ser tratada como o alimento.
 
-Se existem 4 bananas visíveis:
+IMPORTANTE:
 
-BANANA | 4
+Mesa NÃO é alimento.
+Bandeja NÃO é alimento.
+Pote vazio NÃO é alimento.
+Escorredor NÃO é alimento.
+Celular NÃO é alimento.
+Computador NÃO é alimento.
+Geladeira NÃO é alimento.
+Talheres NÃO são alimentos.
 
-Se existem 2 bananas visíveis:
+Não inclua esses objetos.
 
-BANANA | 2
+Se houver vários alimentos iguais, tente informar a quantidade
+visível.
 
-Se existe 1 banana:
+Se não conseguir contar com segurança, escreva apenas o nome.
 
-BANANA | 1
-
-Faça o mesmo para todos os alimentos.
-
-NÃO transforme automaticamente um grupo de alimentos em 1.
-
-Se você consegue visualizar várias unidades individuais,
-conte cada unidade.
-
-Se uma unidade estiver parcialmente escondida e não puder ser
-contada com segurança, conte somente as unidades claramente visíveis.
-
-==================================================
-FORMATO OBRIGATÓRIO
-==================================================
-
-NÃO descreva a imagem.
-
-NÃO escreva:
-"Objetos"
-"Alimentos"
-"Cores"
-"Características visuais"
-"Imagem"
-"Cena"
-
-NÃO escreva explicações.
-
-NÃO escreva frases.
-
-NÃO use Markdown.
-
-Para cada alimento identificado, escreva SOMENTE:
-
-NOME | QUANTIDADE
+Responda apenas com uma lista simples de alimentos.
 
 Exemplo:
 
-BANANA | 4
-LIMAO | 2
-ABACATE | 3
-IOGURTE | 2
+Bananas — 4
+Limões — 2
+Abacates — 3
+Iogurte — 2
 
-Cada alimento deve ocupar uma linha.
-
-==================================================
-REGRA FINAL
-==================================================
-
-Se não houver alimentos, responda exatamente:
-
-NENHUM
-
-Se houver alimentos, responda SOMENTE as linhas dos alimentos.
-
-Não inclua nenhum objeto que não seja alimento.
+Não escreva "Objetos".
+Não escreva "Alimentos".
+Não escreva "Cores".
+Não escreva "Cena".
 `;
