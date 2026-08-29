@@ -217,70 +217,299 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
    */
 
   const sanitizeDetectedItems = (
-    results: DetectedFoodItem[]
-  ): DetectedFoodItem[] => {
-    const validItems: DetectedFoodItem[] = [];
+  results: DetectedFoodItem[]
+): DetectedFoodItem[] => {
 
-    for (const item of results) {
-      const cleanedName = cleanFoodName(
-        item.name
+  const validItems: DetectedFoodItem[] = [];
+
+  for (const item of results) {
+
+    if (!item || !item.name) {
+      continue;
+    }
+
+    // Remove Markdown da resposta da IA
+    const cleanedName = item.name
+      .replace(/\*\*/g, '')
+      .replace(/\*/g, '')
+      .replace(/`/g, '')
+      .replace(/^[-•]\s*/, '')
+      .trim();
+
+    const normalizedName = cleanedName
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim();
+
+    // =====================================================
+    // DESCARTAR QUALQUER COISA QUE NÃO SEJA ALIMENTO
+    // =====================================================
+
+    const blockedWords = [
+      'objeto',
+      'objetos',
+      'alimento',
+      'alimentos',
+      'cor',
+      'cores',
+      'caracteristica',
+      'caracteristicas',
+      'características',
+      'características visuais',
+      'cena',
+      'fundo',
+      'mesa',
+      'bancada',
+      'prato',
+      'prato vazio',
+      'computador',
+      'notebook',
+      'celular',
+      'telefone',
+      'tablet',
+      'medicamento',
+      'medicamentos',
+      'remedio',
+      'remédio',
+      'sal',
+      'pimenta',
+      'bandeja',
+      'panela',
+      'frigideira',
+      'geladeira',
+      'freezer',
+      'fogao',
+      'fogão',
+      'forno',
+      'microondas',
+      'micro-ondas',
+      'liquidificador',
+      'cafeteira',
+      'talher',
+      'talheres',
+      'faca',
+      'garfo',
+      'colher',
+      'tabua',
+      'tábua',
+      'escorredor',
+      'recipiente',
+      'frasco',
+      'embalagem',
+      'caixa',
+      'garrafa',
+      'computador',
+      'celular',
+      'mesa'
+    ];
+
+    const isBlocked = blockedWords.some(
+      (blocked) =>
+        normalizedName === blocked ||
+        normalizedName.includes(blocked)
+    );
+
+    if (isBlocked) {
+      console.log(
+        'ITEM DESCARTADO PELO FRONTEND:',
+        cleanedName
       );
 
-      if (isClearlyNonFood(cleanedName)) {
-        continue;
-      }
-
-      /*
-       * Preserva a quantidade agrupada calculada pelo scannerService,
-       * garantindo no mínimo 1. O usuário poderá ajustar livremente com os botões - e +.
-       */
-
-      validItems.push({
-        ...item,
-
-        name: cleanedName,
-
-        quantity: Math.max(1, item.quantity || 1),
-
-        state: normalizeFreshness(item.state),
-
-        selected: true,
-      });
+      continue;
     }
 
-    /*
-     * Evita alimentos duplicados.
-     *
-     * Exemplo:
-     *
-     * Banana
-     * **Banana**
-     * BANANAS
-     *
-     * podem acabar representando o mesmo alimento.
-     */
+    // =====================================================
+    // ALIMENTOS CONHECIDOS
+    // =====================================================
 
-    const uniqueItems: DetectedFoodItem[] = [];
+    const knownFoods = [
+      'banana',
+      'bananas',
 
-    const seen = new Set<string>();
+      'abacate',
+      'abacates',
 
-    for (const item of validItems) {
-      const key = item.name
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/s$/, '')
-        .trim();
+      'limao',
+      'limoes',
 
-      if (seen.has(key)) {
-        continue;
+      'maca',
+      'macas',
+
+      'pera',
+      'peras',
+
+      'manga',
+      'mangas',
+
+      'laranja',
+      'laranjas',
+
+      'mamao',
+      'mamaos',
+
+      'melancia',
+      'melancias',
+
+      'melao',
+      'meloes',
+
+      'uva',
+      'uvas',
+
+      'morango',
+      'morangos',
+
+      'abacaxi',
+      'abacaxis',
+
+      'kiwi',
+      'kiwis',
+
+      'coco',
+      'cocos',
+
+      'tomate',
+      'tomates',
+
+      'batata',
+      'batatas',
+
+      'cenoura',
+      'cenouras',
+
+      'cebola',
+      'cebolas',
+
+      'alho',
+
+      'pepino',
+      'pepinos',
+
+      'pimentao',
+      'pimentoes',
+
+      'alface',
+
+      'brocolis',
+
+      'couve',
+
+      'espinafre',
+
+      'milho',
+
+      'ervilha',
+      'ervilhas',
+
+      'feijao',
+
+      'arroz',
+
+      'macarrao',
+
+      'carne',
+
+      'frango',
+
+      'peixe',
+
+      'ovo',
+      'ovos',
+
+      'queijo',
+
+      'leite',
+
+      'iogurte',
+
+      'manteiga',
+
+      'presunto',
+
+      'pao',
+
+      'azeitona',
+      'azeitonas'
+    ];
+
+    const isFood = knownFoods.some(
+      (food) => {
+        return (
+          normalizedName === food ||
+          normalizedName.includes(food)
+        );
       }
+    );
 
-      seen.add(key);
-      uniqueItems.push(item);
+    // Se não for alimento conhecido,
+    // NÃO aparece na tela.
+    if (!isFood) {
+
+      console.log(
+        'ITEM NÃO RECONHECIDO COMO ALIMENTO:',
+        cleanedName
+      );
+
+      continue;
     }
 
-    return uniqueItems;
+    // =====================================================
+    // ADICIONA O ALIMENTO
+    // =====================================================
+
+    validItems.push({
+      ...item,
+
+      name: cleanedName,
+
+      // Sempre começa com 1.
+      // O usuário confirma a quantidade.
+      quantity: 1,
+
+      unit: 'un',
+
+      state:
+        item.state === 'frozen'
+          ? 'frozen'
+          : 'fresh',
+
+      confidence:
+        typeof item.confidence === 'number'
+          ? item.confidence
+          : 0.5,
+
+      selected: true
+    });
+  }
+
+  // =====================================================
+  // REMOVE DUPLICADOS
+  // =====================================================
+
+  const uniqueItems: DetectedFoodItem[] = [];
+
+  const seen = new Set<string>();
+
+  for (const item of validItems) {
+
+    const key = item.name
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/s$/, '')
+      .trim();
+
+    if (seen.has(key)) {
+      continue;
+    }
+
+    seen.add(key);
+
+    uniqueItems.push(item);
+  }
+
+  return uniqueItems;
   };
 
   const handleFileUpload = (
