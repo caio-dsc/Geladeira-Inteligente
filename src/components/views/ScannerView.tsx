@@ -407,28 +407,28 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
   };
 
   /*
-   * Formata o rótulo da unidade para exibição amigável em caixa alta.
+   * Formata a unidade de forma compacta (ex: 'uni', 'kg', 'pct').
    */
 
-  const formatUnitLabel = (unit?: string): string => {
+  const formatUnitShort = (unit?: string): string => {
     const u = (unit || 'un').toLowerCase().trim();
     switch (u) {
       case 'un':
-        return 'UNIDADE';
+        return 'uni';
       case 'pct':
-        return 'PACOTE';
+        return 'pct';
       case 'fatias':
-        return 'FATIAS';
+        return 'fat';
       case 'kg':
-        return 'KG';
+        return 'kg';
       case 'g':
-        return 'G';
+        return 'g';
       case 'l':
         return 'L';
       case 'ml':
-        return 'ML';
+        return 'ml';
       default:
-        return (unit || 'UN').toUpperCase();
+        return unit || 'uni';
     }
   };
 
@@ -969,16 +969,17 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
                           item.id
                         )
                       }
-                      className={`p-4 sm:p-5 transition-colors cursor-pointer ${
+                      className={`p-4 sm:p-5 transition-colors cursor-pointer rounded-2xl ${
                         item.selected
-                          ? 'bg-[#0b281b]/90'
-                          : 'bg-[#081e13]/60 opacity-80'
+                          ? 'bg-[#0b281b]/90 border border-emerald-500/30'
+                          : 'bg-[#081e13]/60 border border-emerald-900/40 opacity-80'
                       }`}
                     >
 
-                      {/* CABEÇALHO DO CARD: CHECKBOX + ÍCONE + DADOS + BADGE ESTADO */}
-                      <div className="flex items-start justify-between gap-3">
+                      {/* CABEÇALHO DO CARD: LADO ESQUERDO (CHECKBOX + ÍCONE + DADOS) | LADO DIREITO (CONTROLE - 1 uni +) */}
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
 
+                        {/* LADO ESQUERDO: CHECKBOX, ÍCONE, NOME, CATEGORIA, PRECISÃO */}
                         <div className="flex items-start gap-3 min-w-0 flex-1">
 
                           {/* CHECKBOX */}
@@ -990,7 +991,7 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
                                 item.id
                               );
                             }}
-                            className="mt-0.5 shrink-0 cursor-pointer text-emerald-400 hover:text-emerald-300 transition-colors"
+                            className="mt-1 shrink-0 cursor-pointer text-emerald-400 hover:text-emerald-300 transition-colors"
                             aria-label={
                               item.selected
                                 ? 'Desmarcar alimento'
@@ -1017,9 +1018,17 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
                               {item.name}
                             </h4>
 
-                            <div className="text-xs text-emerald-300/80 font-medium mt-0.5">
-                              {getCategoryLabel(
-                                item.category
+                            <div className="flex items-center gap-2 text-xs text-emerald-300/80 font-medium mt-0.5">
+                              <span>
+                                {getCategoryLabel(
+                                  item.category
+                                )}
+                              </span>
+
+                              {isFrozen && (
+                                <span className="px-1.5 py-0.2 rounded text-[9px] font-bold text-sky-300 bg-sky-950/60 border border-sky-500/30 uppercase">
+                                  Congelado
+                                </span>
                               )}
                             </div>
 
@@ -1034,92 +1043,81 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
 
                         </div>
 
-                        {/* BADGE DE ESTADO (FRESCO / CONGELADO) */}
-                        <span
-                          className={`shrink-0 px-2.5 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wider ${
-                            isFrozen
-                              ? 'text-sky-300 bg-sky-950/60 border-sky-500/30'
-                              : 'text-emerald-300 bg-emerald-950/60 border-emerald-500/30'
-                          }`}
+                        {/* LADO DIREITO: CONTROLE DE QUANTIDADE [ - ] 1 uni [ + ] */}
+                        <div
+                          className="shrink-0 flex items-center justify-end ml-8 sm:ml-0"
+                          onClick={(e) =>
+                            e.stopPropagation()
+                          }
                         >
-                          {isFrozen
-                            ? 'Congelado'
-                            : 'Fresco'}
-                        </span>
+                          <div className="flex items-center border border-emerald-500/40 rounded-xl overflow-hidden bg-[#051a0e] shadow-inner">
 
-                      </div>
+                            {/* BOTÃO DIMINUIR (-) */}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleQuantityChange(
+                                  item.id,
+                                  -1
+                                );
+                              }}
+                              disabled={
+                                item.quantity <= 1
+                              }
+                              className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center text-emerald-300 hover:bg-emerald-500/20 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                              aria-label="Diminuir quantidade"
+                            >
+                              <Minus className="w-4 h-4" />
+                            </button>
 
-                      {/* CONTROLE DE QUANTIDADE: [ − ] [ 1 ] [ + ] UNIDADE */}
-                      <div
-                        className="mt-4 pt-3 border-t border-emerald-500/15 flex items-center justify-center sm:justify-end gap-3"
-                        onClick={(e) =>
-                          e.stopPropagation()
-                        }
-                      >
+                            {/* NÚMERO + UNIDADE (1 uni) */}
+                            <div className="flex items-center px-1.5 sm:px-2 border-x border-emerald-500/30 min-w-[62px] sm:min-w-[70px] justify-center">
+                              <input
+                                type="number"
+                                min={1}
+                                step={
+                                  isIntegerUnit(item.unit)
+                                    ? 1
+                                    : 'any'
+                                }
+                                value={item.quantity}
+                                onChange={(e) => {
+                                  e.stopPropagation();
+                                  handleQuantityInputChange(
+                                    item.id,
+                                    e.target.value
+                                  );
+                                }}
+                                onClick={(e) =>
+                                  e.stopPropagation()
+                                }
+                                className="w-8 sm:w-9 h-9 sm:h-10 text-center bg-transparent text-white font-bold text-sm sm:text-base focus:outline-none focus:bg-emerald-950/80 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                aria-label={`Quantidade de ${item.name}`}
+                              />
+                              <span className="text-xs font-semibold text-emerald-400/90 select-none ml-0.5">
+                                {formatUnitShort(item.unit)}
+                              </span>
+                            </div>
 
-                        <div className="flex items-center border border-emerald-500/40 rounded-xl overflow-hidden bg-[#051a0e] shadow-inner">
+                            {/* BOTÃO AUMENTAR (+) */}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleQuantityChange(
+                                  item.id,
+                                  1
+                                );
+                              }}
+                              className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center text-emerald-300 hover:bg-emerald-500/20 hover:text-white transition-colors"
+                              aria-label="Aumentar quantidade"
+                            >
+                              <Plus className="w-4 h-4" />
+                            </button>
 
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleQuantityChange(
-                                item.id,
-                                -1
-                              );
-                            }}
-                            disabled={
-                              item.quantity <= 1
-                            }
-                            className="w-10 h-10 flex items-center justify-center text-emerald-300 hover:bg-emerald-500/20 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                            aria-label="Diminuir quantidade"
-                          >
-                            <Minus className="w-4 h-4" />
-                          </button>
-
-                          <input
-                            type="number"
-                            min={1}
-                            step={
-                              isIntegerUnit(item.unit)
-                                ? 1
-                                : 'any'
-                            }
-                            value={item.quantity}
-                            onChange={(e) => {
-                              e.stopPropagation();
-                              handleQuantityInputChange(
-                                item.id,
-                                e.target.value
-                              );
-                            }}
-                            onClick={(e) =>
-                              e.stopPropagation()
-                            }
-                            className="w-14 sm:w-16 h-10 px-1 text-center bg-transparent border-x border-emerald-500/30 text-white font-bold text-base focus:outline-none focus:bg-emerald-950/80 focus:ring-1 focus:ring-emerald-400"
-                            aria-label={`Quantidade de ${item.name}`}
-                          />
-
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleQuantityChange(
-                                item.id,
-                                1
-                              );
-                            }}
-                            className="w-10 h-10 flex items-center justify-center text-emerald-300 hover:bg-emerald-500/20 hover:text-white transition-colors"
-                            aria-label="Aumentar quantidade"
-                          >
-                            <Plus className="w-4 h-4" />
-                          </button>
-
+                          </div>
                         </div>
-
-                        <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider min-w-[32px]">
-                          {formatUnitLabel(item.unit)}
-                        </span>
 
                       </div>
 
