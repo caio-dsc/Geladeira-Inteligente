@@ -7,7 +7,7 @@ import firebaseConfigData from '../../firebase-applet-config.json';
 
 // Define nível de log do Firestore para evitar alertas benignos de handshake inicial
 try {
-  setLogLevel('error');
+  setLogLevel('silent');
 } catch {
   // Ignora se não suportado
 }
@@ -89,7 +89,7 @@ googleAuthProvider.setCustomParameters({
   prompt: 'select_account',
 });
 
-// 4. Instância do Cloud Firestore com detecção automática de transporte (Long Polling / WebSockets)
+// 4. Instância do Cloud Firestore com transporte estável de Long Polling para ambientes com proxy/iframe
 const targetDatabaseId = firebaseConfig.firestoreDatabaseId && firebaseConfig.firestoreDatabaseId !== '(default)'
   ? firebaseConfig.firestoreDatabaseId
   : undefined;
@@ -97,8 +97,8 @@ const targetDatabaseId = firebaseConfig.firestoreDatabaseId && firebaseConfig.fi
 let firestoreInstance: Firestore;
 try {
   firestoreInstance = targetDatabaseId
-    ? initializeFirestore(app, { experimentalAutoDetectLongPolling: true }, targetDatabaseId)
-    : initializeFirestore(app, { experimentalAutoDetectLongPolling: true });
+    ? initializeFirestore(app, { experimentalForceLongPolling: true }, targetDatabaseId)
+    : initializeFirestore(app, { experimentalForceLongPolling: true });
 } catch {
   firestoreInstance = targetDatabaseId ? getFirestore(app, targetDatabaseId) : getFirestore(app);
 }

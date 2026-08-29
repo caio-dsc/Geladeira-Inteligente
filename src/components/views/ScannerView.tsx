@@ -9,6 +9,7 @@ import {
   CheckSquare,
   Square,
   Plus,
+  Minus,
   X,
   Scan,
   AlertCircle
@@ -100,6 +101,7 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
       setDetectedItems(
         results.map((item) => ({
           ...item,
+          quantity: Math.max(1, item.quantity || 1),
           selected: true,
         }))
       );
@@ -108,6 +110,19 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
       setScanStatus('error');
       setErrorMessage(err?.message || 'Falha ao processar imagem.');
     }
+  };
+
+  const handleQuantityChange = (id: string, quantity: number) => {
+    setDetectedItems((prev) =>
+      prev.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              quantity: Math.max(1, quantity),
+            }
+          : item
+      )
+    );
   };
 
   const handleToggleItem = (id: string) => {
@@ -295,7 +310,7 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
                 <div className="p-4 sm:p-6 bg-[#081e13] flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-emerald-500/20">
                   <div className="text-xs text-emerald-300/70 text-center sm:text-left">
                     <span className="font-bold text-white block">Imagem pronta para reconhecimento</span>
-                    A análise identificará laticínios, verduras, carnes e validade aproximada.
+                    A análise identificará alimentos e produtos alimentícios visíveis na imagem.
                   </div>
 
                   <div className="flex items-center gap-2.5 w-full sm:w-auto">
@@ -411,10 +426,49 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
 
                       <div>
                         <h4 className="text-sm font-bold text-white">{item.name}</h4>
-                        <div className="flex flex-wrap items-center gap-2 text-xs text-emerald-300/70 mt-0.5">
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-emerald-300/70 mt-1">
                           <span>{getCategoryLabel(item.category)}</span>
                           <span>•</span>
-                          <span>{item.quantity} {item.unit}</span>
+                          <div 
+                            onClick={(e) => e.stopPropagation()}
+                            className="inline-flex items-center gap-1 bg-[#05140c] px-1.5 py-0.5 rounded-lg border border-emerald-500/30 shadow-inner"
+                          >
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleQuantityChange(item.id, (item.quantity || 1) - 1);
+                              }}
+                              disabled={(item.quantity || 1) <= 1}
+                              className="w-5 h-5 flex items-center justify-center rounded text-emerald-300 hover:text-white hover:bg-emerald-800/40 disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer transition-colors"
+                              aria-label="Diminuir quantidade"
+                            >
+                              <Minus className="w-3 h-3" />
+                            </button>
+                            <input
+                              type="number"
+                              min={1}
+                              value={item.quantity || 1}
+                              onChange={(e) => {
+                                const val = parseInt(e.target.value, 10);
+                                handleQuantityChange(item.id, isNaN(val) ? 1 : val);
+                              }}
+                              onClick={(e) => e.stopPropagation()}
+                              className="w-10 text-center text-xs font-bold text-white bg-transparent border-0 focus:ring-1 focus:ring-emerald-400 rounded p-0 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            />
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleQuantityChange(item.id, (item.quantity || 1) + 1);
+                              }}
+                              className="w-5 h-5 flex items-center justify-center rounded text-emerald-300 hover:text-white hover:bg-emerald-800/40 cursor-pointer transition-colors"
+                              aria-label="Aumentar quantidade"
+                            >
+                              <Plus className="w-3 h-3" />
+                            </button>
+                            <span className="text-[11px] text-emerald-300/90 font-medium pl-0.5">{item.unit}</span>
+                          </div>
                           <span>•</span>
                           <span className="text-[11px] text-emerald-400 font-semibold">
                             {(item.confidence * 100).toFixed(0)}% de precisão
