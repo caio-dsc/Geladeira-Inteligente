@@ -60,13 +60,23 @@ export default async (req: Request) => {
           messages: [
             {
               role: "user",
-
               content: [
                 {
                   type: "text",
-                  text: foodDetectionPrompt,
-                },
+                  text: `
+Identifique SOMENTE os alimentos visíveis nesta imagem.
 
+Não descreva a cena.
+Não liste objetos.
+Não liste cores.
+Não liste móveis.
+Não liste recipientes vazios.
+
+Retorne somente os alimentos.
+
+Se não houver alimentos, retorne items vazio.
+        `,
+                },
                 {
                   type: "image_url",
                   image_url: {

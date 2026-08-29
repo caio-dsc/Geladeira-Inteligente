@@ -1,10 +1,13 @@
 export const foodDetectionSchema = {
   type: "object",
+
   properties: {
     items: {
       type: "array",
+
       items: {
         type: "object",
+
         properties: {
           name: {
             type: "string",
@@ -26,7 +29,6 @@ export const foodDetectionSchema = {
 
           quantity: {
             type: "number",
-            minimum: 0,
           },
 
           unit: {
@@ -41,43 +43,6 @@ export const foodDetectionSchema = {
               "fatias",
             ],
           },
-
-          state: {
-            type: "string",
-            enum: [
-              "fresh",
-              "attention",
-              "expiring_soon",
-              "frozen",
-            ],
-          },
-
-          location: {
-            type: ["string", "null"],
-            enum: [
-              "geladeira",
-              "freezer",
-              "gaveta_legumes",
-              "porta",
-              "despensa",
-              null,
-            ],
-          },
-
-          confidence: {
-            type: "number",
-            minimum: 0,
-            maximum: 1,
-          },
-
-          expiryDate: {
-            type: ["string", "null"],
-          },
-
-          expirySource: {
-            type: ["string", "null"],
-            enum: ["image", null],
-          },
         },
 
         required: [
@@ -85,15 +50,14 @@ export const foodDetectionSchema = {
           "category",
           "quantity",
           "unit",
-          "state",
-          "location",
-          "confidence",
-          "expiryDate",
-          "expirySource",
         ],
+
+        additionalProperties: false,
       },
     },
   },
 
   required: ["items"],
+
+  additionalProperties: false,
 };
