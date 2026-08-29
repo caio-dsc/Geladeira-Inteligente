@@ -63,28 +63,21 @@ export default async (req: Request) => {
               content: `
 Você é um sistema de identificação de alimentos.
 
-Sua tarefa é exclusivamente identificar alimentos e produtos alimentícios
-visíveis na imagem.
+Analise a imagem e identifique SOMENTE alimentos ou produtos alimentícios
+visíveis.
 
-A resposta DEVE conter somente os campos definidos pelo JSON Schema.
+NÃO descreva a cena.
+NÃO liste objetos.
+NÃO liste cores.
+NÃO liste móveis.
+NÃO liste utensílios.
+NÃO liste eletrônicos.
+NÃO liste recipientes vazios.
 
-NUNCA descreva a imagem.
-NUNCA crie uma seção "Objetos".
-NUNCA crie uma seção "Alimentos".
-NUNCA crie uma seção "Cores".
-NUNCA descreva a cena.
-NUNCA retorne móveis, objetos, utensílios, recipientes vazios ou eletrônicos.
+IMPORTANTE:
+A resposta deve ser SOMENTE um objeto JSON válido.
 
-Retorne somente os alimentos encontrados no campo "items".
-
-Se nenhum alimento puder ser identificado com segurança:
-items deve ser uma lista vazia.
-
-Para alimentos individuais visíveis, conte as unidades quando possível.
-
-Exemplo:
-
-Se a imagem mostrar quatro bananas e um limão, o resultado esperado é:
+Use exatamente esta estrutura:
 
 {
   "items": [
@@ -93,17 +86,38 @@ Se a imagem mostrar quatro bananas e um limão, o resultado esperado é:
       "category": "fruits",
       "quantity": 4,
       "unit": "un"
-    },
-    {
-      "name": "Limão",
-      "category": "fruits",
-      "quantity": 1,
-      "unit": "un"
     }
   ]
 }
 
-Não escreva nenhuma explicação antes ou depois do JSON.
+As categorias permitidas são:
+vegetables, fruits, dairy, proteins, drinks, pantry, condiments, bakery.
+
+Nunca use "other".
+
+Se não houver alimentos identificáveis:
+
+{
+  "items": []
+}
+
+Conte as unidades individuais visíveis sempre que possível.
+
+Se houver quatro bananas visíveis, use quantity 4.
+Se houver três limões visíveis, use quantity 3.
+
+Para produtos embalados, identifique o alimento contido na embalagem.
+Por exemplo:
+"pote de requeijão" → "Requeijão"
+"pacote de biscoito" → "Biscoito"
+"embalagem de iogurte" → "Iogurte"
+
+Não transforme objetos em alimentos.
+
+Retorne SOMENTE JSON.
+Sem Markdown.
+Sem explicações.
+Sem texto antes ou depois.
 `,
             },
 
@@ -121,12 +135,7 @@ Não escreva nenhuma explicação antes ou depois do JSON.
           ],
 
           response_format: {
-            type: "json_schema",
-            json_schema: {
-              name: "food_detection",
-              schema: foodDetectionSchema,
-              strict: true,
-            },
+            type: "json_object",
           },
 
           max_tokens: 1000,
