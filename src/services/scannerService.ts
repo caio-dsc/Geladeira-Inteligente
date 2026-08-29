@@ -20,14 +20,14 @@ interface HuggingFaceScanResponse {
 interface StructuredFoodDetection {
   items: Array<{
     name: string;
-    category: DetectedFoodItem['category'];
-    quantity: number;
-    unit: DetectedFoodItem['unit'];
-    state: DetectedFoodItem['state'];
-    location: DetectedFoodItem['location'] | null;
-    confidence: number;
-    expiryDate: string | null;
-    expirySource: 'image' | null;
+    category?: DetectedFoodItem['category'] | string;
+    quantity?: number;
+    unit?: DetectedFoodItem['unit'] | string;
+    state?: DetectedFoodItem['state'] | string;
+    location?: DetectedFoodItem['location'] | null | string;
+    confidence?: number;
+    expiryDate?: string | null;
+    expirySource?: 'image' | null;
   }>;
 }
 
@@ -127,6 +127,35 @@ const NON_FOOD_TERMS = [
   'pano',
   'guardanapo',
 ];
+
+/**
+ * Extrai JSON válido do retorno da IA (suporta JSON puro, markdown code blocks e texto adjacente).
+ */
+export function extractJsonFromText(rawText: string): string {
+  if (!rawText) return '';
+  let text = rawText.trim();
+
+  // 1. Se estiver envolto em markdown code fence (```json ... ``` ou ``` ... ```)
+  const codeBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+  if (codeBlockMatch && codeBlockMatch[1]) {
+    text = codeBlockMatch[1].trim();
+  }
+
+  // 2. Se já for um objeto JSON válido { ... }
+  if (text.startsWith('{') && text.endsWith('}')) {
+    return text;
+  }
+
+  // 3. Tenta localizar os limites externos { e }
+  const firstBrace = text.indexOf('{');
+  const lastBrace = text.lastIndexOf('}');
+
+  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+    return text.substring(firstBrace, lastBrace + 1).trim();
+  }
+
+  return text;
+}
 
 /**
  * Remove formatação Markdown, prefixos de lista e espaços extras (Regras 4, 5, 6).
@@ -239,7 +268,7 @@ class HuggingFaceScannerService implements IScannerService {
 
     onProgress?.('Processando alimentos identificados...');
 
-    console.log('Resposta estruturada do Hugging Face:', data.result);
+    console.log('RESULTADO BRUTO DA IA:', data.result);
 
     return this.parseStructuredResult(data.result);
   }
@@ -248,7 +277,9 @@ class HuggingFaceScannerService implements IScannerService {
     let parsed: StructuredFoodDetection;
 
     try {
-      parsed = JSON.parse(result);
+      const cleanedJson = extractJsonFromText(result);
+      parsed = JSON.parse(cleanedJson);
+      console.log('RESULTADO APÓS PARSE:', parsed);
     } catch (error) {
       console.error(
         'O Hugging Face retornou um JSON inválido:',
@@ -270,7 +301,7 @@ class HuggingFaceScannerService implements IScannerService {
      * - Rejeita categoria 'other' (Regra 2)
      * - Rejeita objetos e não-alimentos (Regras 1, 3, 7, 8)
      * - Limpa markdown e espaços extras (Regras 4, 5, 6)
-     * - Valida campos obrigatórios: confidence, category, unit, location, state (Regras 13-17)
+     * - Valida e atribui padrões seguros: confidence (0.9), location (null), state ('fresh')
      */
     const individualValidItems: Array<{
       name: string;
@@ -304,17 +335,31 @@ class HuggingFaceScannerService implements IScannerService {
         Number.isFinite(item.quantity) &&
         item.quantity > 0
       ) {
-        finalQuantity = Math.max(1, Math.round(item.quantity));
+        finalQuantity = item.unit === 'un' ? Math.max(1, Math.round(item.quantity)) : Math.max(1, item.quantity);
       }
+
+      // Valores padrão seguros para campos ausentes ou parciais
+      const finalConfidence =
+        typeof item.confidence === 'number' &&
+        Number.isFinite(item.confidence) &&
+        item.confidence >= 0 &&
+        item.confidence <= 1
+          ? item.confidence
+          : 0.9;
+
+      const finalState = normalizeFreshness(item.state);
+      const finalLocation = (item.location as DetectedFoodItem['location']) ?? null;
+      const finalUnit = (item.unit as DetectedFoodItem['unit']) || 'un';
+      const finalCategory = item.category as DetectedFoodItem['category'];
 
       individualValidItems.push({
         name: cleanedName,
-        category: item.category,
+        category: finalCategory,
         quantity: finalQuantity,
-        unit: item.unit || 'un',
-        state: normalizeFreshness(item.state),
-        location: item.location ?? 'geladeira',
-        confidence: Math.min(1, Math.max(0, item.confidence ?? 0.9)),
+        unit: finalUnit,
+        state: finalState,
+        location: finalLocation,
+        confidence: finalConfidence,
         expiryDate: item.expiryDate || undefined,
       });
     }
@@ -322,7 +367,7 @@ class HuggingFaceScannerService implements IScannerService {
     /*
      * ETAPA 2: AGRUPAMENTO DE ALIMENTOS IGUAIS (Regra 10)
      * Exemplo: Banana (1), Banana (1), Banana (1), Banana (1) -> Banana (4)
-     * Preserva confiança média/máxima, categoria e unidade compatíveis.
+     * Preserva confiança máxima, categoria e unidade compatíveis.
      */
     const groupedMap = new Map<string, {
       name: string;
@@ -371,13 +416,14 @@ class HuggingFaceScannerService implements IScannerService {
     }
 
     // Regra 9: Se após o filtro não sobrar nenhum alimento, retornar array vazio []
+    console.log('RESULTADO APÓS FILTRO:', validItems);
     return validItems;
   }
 
   private isValidFoodItem(
-    item: StructuredFoodDetection['items'][number]
+    item: any
   ): boolean {
-    if (!item) {
+    if (!item || typeof item !== 'object') {
       return false;
     }
 
@@ -389,43 +435,15 @@ class HuggingFaceScannerService implements IScannerService {
     }
 
     // Regra 2: Rejeitar completamente 'other' ou categorias não alimentícias
-    if (
-      !item.category ||
-      item.category === 'other' ||
-      !ALLOWED_CATEGORIES.includes(item.category)
-    ) {
-      return false;
-    }
+    const category =
+      typeof item.category === 'string'
+        ? (item.category.toLowerCase().trim() as DetectedFoodItem['category'])
+        : undefined;
 
     if (
-      typeof item.quantity !== 'number' ||
-      !Number.isFinite(item.quantity) ||
-      item.quantity <= 0
-    ) {
-      return false;
-    }
-
-    if (
-      typeof item.confidence !== 'number' ||
-      !Number.isFinite(item.confidence) ||
-      item.confidence < 0 ||
-      item.confidence > 1
-    ) {
-      return false;
-    }
-
-    if (
-      item.expiryDate !== null &&
-      item.expiryDate !== undefined &&
-      typeof item.expiryDate !== 'string'
-    ) {
-      return false;
-    }
-
-    if (
-      item.expirySource !== null &&
-      item.expirySource !== undefined &&
-      item.expirySource !== 'image'
+      !category ||
+      category === 'other' ||
+      !ALLOWED_CATEGORIES.includes(category)
     ) {
       return false;
     }

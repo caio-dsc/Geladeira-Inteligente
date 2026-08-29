@@ -53,6 +53,12 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
   const [detectedItems, setDetectedItems] =
     useState<DetectedFoodItem[]>([]);
 
+  console.log('DETECTED ITEMS NO RENDER:', {
+    scanStatus,
+    itemsCount: detectedItems.length,
+    items: detectedItems,
+  });
+
   const [errorMessage, setErrorMessage] =
     useState('');
 
@@ -351,6 +357,8 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
 
       const sanitized =
         sanitizeDetectedItems(results);
+
+      console.log('DETECTED ITEMS ANTES DO SET:', sanitized);
 
       if (sanitized.length === 0) {
         throw new Error(
