@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { User } from '../../types';
 import { authService } from '../../services/authService';
+import { storageService } from '../../services/storageService';
 import { Card } from '../common/Card';
 import { Button } from '../common/Button';
 import { Input } from '../common/Input';
@@ -10,11 +11,15 @@ import {
   Mail, 
   Sparkles, 
   LogOut, 
-  ShieldCheck, 
   ChefHat, 
   Plus, 
   Check,
-  Database
+  Database,
+  Camera,
+  Edit3,
+  Calendar,
+  Scale,
+  X
 } from 'lucide-react';
 
 export interface ProfileViewProps {
@@ -28,6 +33,19 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   onSignOut,
   onUpdateUser,
 }) => {
+  // Profile info editing state
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [name, setName] = useState(user.name);
+  const [age, setAge] = useState<string>(user.age !== undefined && user.age !== null ? String(user.age) : '');
+  const [weightKg, setWeightKg] = useState<string>(user.weightKg !== undefined && user.weightKg !== null ? String(user.weightKg) : '');
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [profileMessage, setProfileMessage] = useState<string | null>(null);
+  const [profileError, setProfileError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Preferences editing state
   const [isEditingPreferences, setIsEditingPreferences] = useState(false);
   const [cookingLevel, setCookingLevel] = useState(user.preferences.cookingLevel);
   const [servings, setServings] = useState(user.preferences.defaultServings);
@@ -44,6 +62,73 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
     'Vegano',
     'Rico em Proteína',
   ];
+
+  const handleAvatarSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        setProfileError('Por favor selecione um arquivo de imagem válido.');
+        return;
+      }
+      setProfileError(null);
+      setAvatarFile(file);
+      const objectUrl = URL.createObjectURL(file);
+      setAvatarPreview(objectUrl);
+    }
+  };
+
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setProfileError(null);
+    setProfileMessage(null);
+
+    if (!name.trim()) {
+      setProfileError('O nome não pode ficar vazio.');
+      return;
+    }
+
+    try {
+      setIsSavingProfile(true);
+      let newAvatarUrl = user.avatarUrl;
+
+      // Se houver novo arquivo selecionado, faz upload no Cloud Storage (users/{uid}/avatar.jpg)
+      if (avatarFile) {
+        newAvatarUrl = await storageService.uploadAvatarImage(user.id, avatarFile);
+      }
+
+      const parsedAge = age.trim() !== '' ? Math.max(0, parseInt(age, 10)) : null;
+      const parsedWeight = weightKg.trim() !== '' ? Math.max(0, parseFloat(weightKg.replace(',', '.'))) : null;
+
+      const updated = await authService.updateUser({
+        name: name.trim(),
+        avatarUrl: newAvatarUrl,
+        age: parsedAge,
+        weightKg: parsedWeight,
+      });
+
+      onUpdateUser(updated);
+      setIsEditingProfile(false);
+      setAvatarFile(null);
+      setAvatarPreview(null);
+      setProfileMessage('Perfil atualizado com sucesso!');
+      setTimeout(() => setProfileMessage(null), 3500);
+    } catch (err: any) {
+      console.error('Erro ao salvar perfil:', err);
+      setProfileError(err?.message || 'Falha ao salvar alterações de perfil.');
+    } finally {
+      setIsSavingProfile(false);
+    }
+  };
+
+  const handleCancelProfileEdit = () => {
+    setName(user.name);
+    setAge(user.age !== undefined && user.age !== null ? String(user.age) : '');
+    setWeightKg(user.weightKg !== undefined && user.weightKg !== null ? String(user.weightKg) : '');
+    setAvatarFile(null);
+    setAvatarPreview(null);
+    setProfileError(null);
+    setIsEditingProfile(false);
+  };
 
   const handleToggleRestriction = (item: string) => {
     if (restrictions.includes(item)) {
@@ -101,54 +186,208 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
         </p>
       </div>
 
+      {profileMessage && (
+        <div className="p-3.5 bg-[#092b1a] border border-emerald-500/40 rounded-2xl text-xs text-emerald-200 font-bold flex items-center gap-2 shadow-[0_0_15px_rgba(16,185,129,0.2)] animate-in fade-in">
+          <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+          <span>{profileMessage}</span>
+        </div>
+      )}
+
       {saveSuccess && (
-        <div className="p-3.5 bg-[#092b1a] border border-emerald-500/40 rounded-2xl text-xs text-emerald-200 font-bold flex items-center gap-2 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
-          <Check className="w-4 h-4 text-emerald-400" />
+        <div className="p-3.5 bg-[#092b1a] border border-emerald-500/40 rounded-2xl text-xs text-emerald-200 font-bold flex items-center gap-2 shadow-[0_0_15px_rgba(16,185,129,0.2)] animate-in fade-in">
+          <Check className="w-4 h-4 text-emerald-400 shrink-0" />
           <span>Preferências atualizadas com sucesso!</span>
         </div>
       )}
 
       {/* User Info Card */}
       <Card variant="default" padding="md" className="space-y-5">
-        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left">
-          <div className="relative">
-            <img
-              src={user.avatarUrl}
-              alt={user.name}
-              referrerPolicy="no-referrer"
-              className="w-20 h-20 rounded-3xl object-cover ring-2 ring-emerald-400/40 shadow-[0_0_20px_rgba(16,185,129,0.3)]"
-            />
-            <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-emerald-400 text-stone-950 flex items-center justify-center text-xs font-black shadow-xs">
-              ✓
+        <input
+          type="file"
+          ref={fileInputRef}
+          accept="image/*"
+          className="hidden"
+          onChange={handleAvatarSelect}
+        />
+
+        {!isEditingProfile ? (
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left">
+            <div className="relative group">
+              <img
+                src={avatarPreview || user.avatarUrl}
+                alt={user.name}
+                referrerPolicy="no-referrer"
+                className="w-20 h-20 rounded-3xl object-cover ring-2 ring-emerald-400/40 shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+              />
+              <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-emerald-400 text-stone-950 flex items-center justify-center text-xs font-black shadow-xs">
+                ✓
+              </div>
+            </div>
+
+            <div className="flex-1 space-y-1">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                <h3 className="text-lg font-bold text-white">{user.name}</h3>
+              </div>
+              <p className="text-xs text-emerald-300/70 flex items-center justify-center sm:justify-start gap-1.5">
+                <Mail className="w-3.5 h-3.5 text-emerald-400" />
+                {user.email}
+              </p>
+              
+              <div className="pt-2 flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                {user.age !== undefined && user.age !== null && (
+                  <span className="text-[11px] font-bold bg-[#092416] text-emerald-300 px-2.5 py-0.5 rounded-lg border border-emerald-500/20 flex items-center gap-1">
+                    <Calendar className="w-3 h-3 text-emerald-400" />
+                    {user.age} anos
+                  </span>
+                )}
+                {user.weightKg !== undefined && user.weightKg !== null && (
+                  <span className="text-[11px] font-bold bg-[#092416] text-emerald-300 px-2.5 py-0.5 rounded-lg border border-emerald-500/20 flex items-center gap-1">
+                    <Scale className="w-3 h-3 text-emerald-400" />
+                    {user.weightKg} kg
+                  </span>
+                )}
+                <span className="text-[11px] font-bold bg-emerald-950 text-emerald-300 px-2.5 py-0.5 rounded-lg border border-emerald-500/30">
+                  Nível {user.preferences.cookingLevel}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap sm:flex-col gap-2 items-center sm:items-end w-full sm:w-auto justify-center">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  setName(user.name);
+                  setAge(user.age !== undefined && user.age !== null ? String(user.age) : '');
+                  setWeightKg(user.weightKg !== undefined && user.weightKg !== null ? String(user.weightKg) : '');
+                  setIsEditingProfile(true);
+                }}
+                leftIcon={<Edit3 className="w-3.5 h-3.5 text-emerald-400" />}
+                className="text-xs font-bold"
+              >
+                Editar perfil
+              </Button>
+
+              <Button
+                variant="danger"
+                size="sm"
+                onClick={onSignOut}
+                leftIcon={<LogOut className="w-3.5 h-3.5" />}
+                className="text-xs font-bold"
+              >
+                Sair da Conta
+              </Button>
             </div>
           </div>
-
-          <div className="flex-1 space-y-1">
-            <h3 className="text-lg font-bold text-white">{user.name}</h3>
-            <p className="text-xs text-emerald-300/70 flex items-center justify-center sm:justify-start gap-1.5">
-              <Mail className="w-3.5 h-3.5 text-emerald-400" />
-              {user.email}
-            </p>
-            <div className="pt-2 flex flex-wrap items-center justify-center sm:justify-start gap-2">
-              <span className="text-[11px] font-bold bg-[#092416] text-emerald-300 px-2.5 py-0.5 rounded-lg border border-emerald-500/20">
-                Plano Base • Demonstração
-              </span>
-              <span className="text-[11px] font-bold bg-emerald-950 text-emerald-300 px-2.5 py-0.5 rounded-lg border border-emerald-500/30">
-                Nível {user.preferences.cookingLevel}
-              </span>
+        ) : (
+          <form onSubmit={handleSaveProfile} className="space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-emerald-500/15">
+              <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                <Edit3 className="w-4 h-4 text-emerald-400" />
+                Editar Dados do Perfil
+              </h3>
+              <button
+                type="button"
+                onClick={handleCancelProfileEdit}
+                className="text-xs text-emerald-300/70 hover:text-white flex items-center gap-1"
+              >
+                <X className="w-3.5 h-3.5" /> Cancelar
+              </button>
             </div>
-          </div>
 
-          <Button
-            variant="danger"
-            size="sm"
-            onClick={onSignOut}
-            leftIcon={<LogOut className="w-3.5 h-3.5" />}
-            className="self-center sm:self-start text-xs font-bold"
-          >
-            Sair da Conta
-          </Button>
-        </div>
+            <div className="flex flex-col sm:flex-row items-center gap-5">
+              <div className="flex flex-col items-center gap-2">
+                <div className="relative">
+                  <img
+                    src={avatarPreview || user.avatarUrl}
+                    alt={name || user.name}
+                    referrerPolicy="no-referrer"
+                    className="w-20 h-20 rounded-3xl object-cover ring-2 ring-emerald-400/40 shadow-md"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-emerald-500 text-stone-950 flex items-center justify-center text-xs shadow-md hover:bg-emerald-400 transition"
+                    title="Trocar foto"
+                  >
+                    <Camera className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                  leftIcon={<Camera className="w-3.5 h-3.5" />}
+                  className="text-[11px] py-1 px-2.5"
+                >
+                  Trocar foto
+                </Button>
+              </div>
+
+              <div className="flex-1 w-full space-y-3">
+                <Input
+                  label="Nome"
+                  placeholder="Seu nome completo ou de chef"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <Input
+                    label="Idade (anos)"
+                    type="number"
+                    placeholder="Ex: 32"
+                    value={age}
+                    onChange={(e) => setAge(e.target.value)}
+                    min={1}
+                    max={120}
+                  />
+
+                  <Input
+                    label="Peso (kg)"
+                    type="number"
+                    step="0.1"
+                    placeholder="Ex: 72.5"
+                    value={weightKg}
+                    onChange={(e) => setWeightKg(e.target.value)}
+                    min={1}
+                    max={300}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {profileError && (
+              <div className="text-xs font-semibold text-rose-300 bg-rose-950/30 border border-rose-500/25 rounded-2xl p-3">
+                {profileError}
+              </div>
+            )}
+
+            <div className="flex justify-end gap-2 pt-2 border-t border-emerald-500/15">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={handleCancelProfileEdit}
+                disabled={isSavingProfile}
+                className="text-xs"
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="submit"
+                variant="primary"
+                size="sm"
+                isLoading={isSavingProfile}
+                className="text-xs font-bold"
+              >
+                Salvar Perfil
+              </Button>
+            </div>
+          </form>
+        )}
       </Card>
 
       {/* Credits Card */}

@@ -19,6 +19,8 @@
             "defaultServings": { "type": "number" }
           }
         },
+        "age": { "type": "number" },
+        "weightKg": { "type": "number" },
         "createdAt": { "type": "string" },
         "updatedAt": { "type": "string" }
       },
@@ -77,9 +79,21 @@
         "errorMessage": { "type": "string" }
       },
       "required": ["id", "userId", "timestamp", "status"]
+    },
+    "Admin": {
+      "title": "Admin",
+      "description": "Lista de administradores autorizados do sistema",
+      "type": "object",
+      "properties": {
+        "createdAt": { "type": "string" }
+      }
     }
   },
   "firestore": {
+    "admins/{adminId}": {
+      "schema": "Admin",
+      "description": "Documentos de autorização para administradores do sistema"
+    },
     "users/{userId}": {
       "schema": "UserProfile",
       "description": "Documento de dados e preferências do usuário autenticado"

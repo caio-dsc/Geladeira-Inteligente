@@ -72,6 +72,8 @@ export interface User {
   credits: number;
   preferences: UserPreferences;
   createdAt: string;
+  age?: number | null;
+  weightKg?: number | null;
 }
 
 export interface DetectedFoodItem {

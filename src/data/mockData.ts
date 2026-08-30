@@ -13,6 +13,8 @@ export const INITIAL_USER: User = {
     defaultServings: 2,
   },
   createdAt: '2025-01-15T10:00:00Z',
+  age: 28,
+  weightKg: 64,
 };
 
 export const INITIAL_FOOD_ITEMS: FoodItem[] = [

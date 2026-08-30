@@ -12,15 +12,25 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
+    // Validação de perfil de Administrador via whitelist na coleção /admins/{uid}
+    function isAdmin() {
+      return isAuthenticated() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
     // Coleção de teste para validação de conectividade
     match /test/{testId} {
       allow read: if true;
     }
 
-    // Documento principal do Usuário
-    match /users/{userId} {
+    // Coleção de Administradores (apenas leitura para checagem, escrita bloqueada para clientes)
+    match /admins/{adminId} {
       allow read: if isAuthenticated();
-      allow create, update: if isOwner(userId);
+      allow write: if false;
+    }
+
+    // Documento principal do Usuário (apenas o próprio usuário autenticado pode ler ou gravar)
+    match /users/{userId} {
+      allow read, create, update: if isOwner(userId);
       allow delete: if false;
 
       // Subcoleção: Itens do Inventário / Geladeira
@@ -34,10 +44,10 @@ service cloud.firestore {
       }
     }
 
-    // Coleção pública de Receitas
+    // Coleção pública de Receitas (leitura pública, escrita restrita a administradores)
     match /recipes/{recipeId} {
       allow read: if true;
-      allow write: if false;
+      allow write: if isAdmin();
     }
   }
 }

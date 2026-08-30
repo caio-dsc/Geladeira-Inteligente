@@ -90,11 +90,30 @@ export default function App() {
   }, [updateRecipeMatches]);
 
   // Auth Handlers
-  const handleLogin = async () => {
+  const handleLoginWithGoogle = async () => {
     const loggedUser = await authService.signInWithGoogle();
     setUser(loggedUser);
     setActiveTab('dashboard');
     showToast(`Bem-vindo, ${loggedUser.name}!`);
+  };
+
+  const handleLoginWithEmail = async (email: string, password: string) => {
+    const loggedUser = await authService.signInWithEmail(email, password);
+    setUser(loggedUser);
+    setActiveTab('dashboard');
+    showToast(`Bem-vindo, ${loggedUser.name}!`);
+  };
+
+  const handleSignUpWithEmail = async (name: string, email: string, password: string) => {
+    const loggedUser = await authService.signUpWithEmail(email, password, name);
+    setUser(loggedUser);
+    setActiveTab('dashboard');
+    showToast(`Conta criada! Bem-vindo, ${loggedUser.name}!`);
+  };
+
+  const handleResetPassword = async (email: string) => {
+    await authService.sendPasswordReset(email);
+    showToast('Enviamos um e-mail para redefinir sua senha (se o e-mail existir).');
   };
 
   const handleSignOut = async () => {
@@ -144,7 +163,14 @@ export default function App() {
 
   // If user is not logged in, display the LoginView
   if (!user) {
-    return <LoginView onLogin={handleLogin} />;
+    return (
+      <LoginView
+        onLoginWithGoogle={handleLoginWithGoogle}
+        onLoginWithEmail={handleLoginWithEmail}
+        onSignUpWithEmail={handleSignUpWithEmail}
+        onResetPassword={handleResetPassword}
+      />
+    );
   }
 
   return (

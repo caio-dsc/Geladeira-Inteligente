@@ -16,6 +16,40 @@ export interface StorageUploadResult {
 
 export class StorageService {
   /**
+   * Retorna a referência padrão para o avatar de um usuário:
+   * users/{userId}/avatar.jpg
+   */
+  public getAvatarImageRef(userId: string) {
+    const safePath = `users/${userId}/avatar.jpg`;
+    return ref(storage, safePath);
+  }
+
+  /**
+   * Faz upload da imagem de avatar do usuário para o Cloud Storage
+   * e retorna a downloadUrl pública/autenticada gerada.
+   */
+  public async uploadAvatarImage(
+    userId: string,
+    fileOrBlob: Blob | Uint8Array | ArrayBuffer | File,
+    metadata?: UploadMetadata
+  ): Promise<string> {
+    try {
+      const storageRef = this.getAvatarImageRef(userId);
+      const customMetadata: UploadMetadata = {
+        contentType: 'image/jpeg',
+        ...metadata,
+      };
+
+      const snapshot = await uploadBytes(storageRef, fileOrBlob, customMetadata);
+      const downloadUrl = await getDownloadURL(snapshot.ref);
+      return downloadUrl;
+    } catch (error: any) {
+      console.error('Erro ao realizar upload do avatar no Cloud Storage:', error);
+      throw new Error(`Falha no envio da foto de perfil: ${error?.message || 'Erro desconhecido'}`);
+    }
+  }
+
+  /**
    * Retorna a referência padrão para uma imagem de scan de um usuário.
    */
   public getScanImageRef(userId: string, scanId: string) {
