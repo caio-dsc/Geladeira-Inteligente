@@ -663,8 +663,6 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
 
   /*
    * Alterar quantidade via botões - e +.
-   *
-   * Nunca permitimos quantidade menor que 1.
    */
 
   const handleQuantityChange = (
@@ -686,7 +684,7 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
           );
         } else {
           const updated = parseFloat((item.quantity + delta).toFixed(2));
-          newQuantity = Math.max(1, updated);
+          newQuantity = Math.max(0.1, updated);
         }
 
         return {
@@ -725,7 +723,7 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
           parsed = isNaN(intVal) ? 1 : Math.max(1, intVal);
         } else {
           const floatVal = parseFloat(rawValue.replace(',', '.'));
-          parsed = isNaN(floatVal) ? 1 : Math.max(1, floatVal);
+          parsed = isNaN(floatVal) ? 0.1 : Math.max(0.1, floatVal);
         }
 
         return {
@@ -1189,6 +1187,10 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
                     item.state ===
                     'frozen';
 
+                  const isInt = isIntegerUnit(item.unit);
+                  const delta = isInt ? 1 : 0.1;
+                  const minQty = isInt ? 1 : 0.1;
+
                   return (
 
                     <div
@@ -1260,19 +1262,9 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
                               type="button"
                               onClick={(e) => {
                                 e.stopPropagation();
-
-                                setDetectedItems((prev) =>
-                                  prev.map((current) =>
-                                    current.id === item.id
-                                      ? {
-                                          ...current,
-                                          quantity: Math.max(1, current.quantity - 1),
-                                        }
-                                      : current
-                                  )
-                                );
+                                handleQuantityChange(item.id, -delta);
                               }}
-                              disabled={item.quantity <= 1}
+                              disabled={item.quantity <= minQty}
                               className="w-8 h-8 rounded-lg border border-emerald-500/30 bg-emerald-950 text-emerald-300 hover:bg-emerald-900 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center font-bold"
                               aria-label={`Diminuir quantidade de ${item.name}`}
                             >
@@ -1281,41 +1273,13 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
 
                             <input
                               type="number"
-                              min="1"
-                              step={
-                                item.unit === 'kg' ||
-                                item.unit === 'g' ||
-                                item.unit === 'L' ||
-                                item.unit === 'ml'
-                                  ? '0.1'
-                                  : '1'
-                              }
+                              min={minQty}
+                              step={isInt ? '1' : '0.1'}
                               value={item.quantity}
                               onClick={(e) => e.stopPropagation()}
                               onChange={(e) => {
                                 e.stopPropagation();
-
-                                const value = Number(e.target.value);
-
-                                if (!Number.isFinite(value) || value < 1) {
-                                  return;
-                                }
-
-                                setDetectedItems((prev) =>
-                                  prev.map((current) =>
-                                    current.id === item.id
-                                      ? {
-                                          ...current,
-                                          quantity:
-                                            item.unit === 'un' ||
-                                            item.unit === 'pct' ||
-                                            item.unit === 'fatias'
-                                              ? Math.floor(value)
-                                              : value,
-                                        }
-                                      : current
-                                  )
-                                );
+                                handleQuantityInputChange(item.id, e.target.value);
                               }}
                               className="w-14 h-8 rounded-lg border border-emerald-500/30 bg-[#05130b] text-white text-center text-sm font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                               aria-label={`Quantidade de ${item.name}`}
@@ -1325,17 +1289,7 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
                               type="button"
                               onClick={(e) => {
                                 e.stopPropagation();
-
-                                setDetectedItems((prev) =>
-                                  prev.map((current) =>
-                                    current.id === item.id
-                                      ? {
-                                          ...current,
-                                          quantity: current.quantity + 1,
-                                        }
-                                      : current
-                                  )
-                                );
+                                handleQuantityChange(item.id, delta);
                               }}
                               className="w-8 h-8 rounded-lg border border-emerald-500/30 bg-emerald-950 text-emerald-300 hover:bg-emerald-900 hover:text-white flex items-center justify-center font-bold"
                               aria-label={`Aumentar quantidade de ${item.name}`}

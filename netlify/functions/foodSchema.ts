@@ -1,5 +1,6 @@
 export const foodDetectionSchema = {
   type: "object",
+  additionalProperties: false,
 
   properties: {
     items: {
@@ -7,6 +8,7 @@ export const foodDetectionSchema = {
 
       items: {
         type: "object",
+        additionalProperties: false,
 
         properties: {
           name: {
