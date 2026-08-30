@@ -6,7 +6,7 @@ type Env = {
   ASSETS: { fetch: (request: Request) => Promise<Response> };
 };
 
-const MODEL = "google/gemma-3-4b-it:featherless-ai";
+const MODEL = "google/gemma-3-4b-it:fastest";
 
 function json(data: unknown, init: ResponseInit = {}) {
   return new Response(JSON.stringify(data), {
@@ -17,6 +17,53 @@ function json(data: unknown, init: ResponseInit = {}) {
       ...(init.headers || {}),
     },
   });
+}
+
+function isBusyError(data: any) {
+  const msg = data?.error?.message || "";
+  return typeof msg === "string" && msg.toLowerCase().includes("model is busy");
+}
+
+async function callHfWithRetry(env: any, payload: any, maxAttempts = 4) {
+  let last: { status: number; data: any; headers: Headers } | null = null;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const resp = await fetch("https://router.huggingface.co/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${env.HF_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await resp.json().catch(() => ({}));
+    last = { status: resp.status, data, headers: resp.headers };
+
+    // Sucesso
+    if (resp.ok) return last;
+
+    // Se estiver ocupado, tenta novamente com backoff
+    const retryable =
+      resp.status === 429 || resp.status === 503 || isBusyError(data);
+
+    if (!retryable || attempt === maxAttempts) return last;
+
+    // Backoff exponencial + jitter (0–250ms)
+    const base = 600; // ms
+    const delay = Math.min(4000, base * 2 ** (attempt - 1)) + Math.floor(Math.random() * 250);
+
+    // Cloudflare Workers: espera sem travar CPU
+    // @ts-ignore
+    if (typeof scheduler !== "undefined" && scheduler.wait) {
+      // @ts-ignore
+      await scheduler.wait(delay);
+    } else {
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+
+  return last!;
 }
 
 export default {
@@ -54,49 +101,40 @@ export default {
           );
         }
 
-        const hfResp = await fetch("https://router.huggingface.co/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${env.HF_TOKEN}`,
-            "Content-Type": "application/json",
+        const payload = {
+          model: MODEL,
+          messages: [
+            { role: "system", content: foodDetectionPrompt },
+            { role: "user", content: [{ type: "image_url", image_url: { url: image } }] },
+          ],
+          max_tokens: 800,
+          temperature: 0.1,
+          response_format: {
+            type: "json_schema",
+            json_schema: { name: "FoodDetection", schema: foodDetectionSchema, strict: true },
           },
-          body: JSON.stringify({
-            model: MODEL,
-            messages: [
-              { role: "system", content: foodDetectionPrompt },
-              {
-                role: "user",
-                content: [{ type: "image_url", image_url: { url: image } }],
-              },
-            ],
-            max_tokens: 1000,
-            temperature: 0.1,
-            response_format: {
-              type: "json_schema",
-              json_schema: {
-                name: "FoodDetection",
-                schema: foodDetectionSchema,
-                strict: true,
-              },
-            },
-          }),
-        });
+        };
 
-        const data: any = await hfResp.json();
+        const hf = await callHfWithRetry(env, payload, 4);
 
-        if (!hfResp.ok) {
+        if (!hf || hf.status < 200 || hf.status >= 300) {
+          // devolve 503 “ocupado” pra UI poder mostrar “tente novamente”
+          const busy = isBusyError(hf?.data);
           return json(
-            { success: false, error: "O Hugging Face recusou a solicitação.", details: data },
-            { status: hfResp.status }
+            {
+              success: false,
+              error: busy
+                ? "Servidor da IA está ocupado no momento. Tente novamente em alguns segundos."
+                : "O Hugging Face recusou a solicitação.",
+              details: hf?.data,
+            },
+            { status: busy ? 503 : (hf?.status || 502) }
           );
         }
 
-        const result = data?.choices?.[0]?.message?.content;
+        const result = hf.data?.choices?.[0]?.message?.content;
         if (!result) {
-          return json(
-            { success: false, error: "O Hugging Face não retornou uma resposta válida.", details: data },
-            { status: 502 }
-          );
+          return json({ success: false, error: "Resposta inválida do Hugging Face.", details: hf.data }, { status: 502 });
         }
 
         return json({ success: true, result, model: MODEL }, { status: 200 });

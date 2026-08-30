@@ -1,7 +1,7 @@
 import { foodDetectionSchema } from "../_ai/foodSchema";
 import { foodDetectionPrompt } from "../_ai/foodPrompt";
 
-const MODEL = "google/gemma-3-4b-it:featherless-ai";
+const MODEL = "google/gemma-3-4b-it:fastest";
 
 type Env = {
   HF_TOKEN: string;
