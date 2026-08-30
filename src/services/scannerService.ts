@@ -233,7 +233,7 @@ class HuggingFaceScannerService implements IScannerService {
 
     onProgress?.('Enviando imagem para análise...');
 
-    const response = await fetch('/.netlify/functions/scan', {
+    const response = await fetch('/api/scan', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
