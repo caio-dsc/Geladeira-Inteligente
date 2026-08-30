@@ -842,6 +842,10 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
 
           </div>
 
+          <div className="text-xs font-bold text-rose-300">
+            DEBUG SCANNER VERSION: 2026-08-29
+          </div>
+
           <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
             Escanear Geladeira
           </h1>
