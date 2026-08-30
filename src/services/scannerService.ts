@@ -245,7 +245,15 @@ class HuggingFaceScannerService implements IScannerService {
 
     onProgress?.('Analisando alimentos com IA...');
 
-    const data: HuggingFaceScanResponse = await response.json();
+    const raw = await response.text();
+
+    let data: HuggingFaceScanResponse;
+    try {
+      data = JSON.parse(raw);
+    } catch (e) {
+      console.error("Resposta não-JSON do /api/scan:", response.status, raw);
+      throw new Error(`Falha no Scan (HTTP ${response.status}). A API não retornou JSON.`);
+    }
 
     if (!response.ok || !data.success) {
       console.error('Erro retornado pela função scan:', data);
