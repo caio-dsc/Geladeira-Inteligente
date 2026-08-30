@@ -12,6 +12,7 @@ import {
   writeBatch,
   Unsubscribe,
   serverTimestamp,
+  limit,
 } from 'firebase/firestore';
 import { db } from './firebaseConfig';
 import { User, FoodItem, Recipe, ScanSession } from '../types';
@@ -172,13 +173,54 @@ export class FirestoreService {
   // SCANS / FOTOGRAFIAS (users/{userId}/scans)
   // ==========================================
 
+  public async getScans(userId: string, max = 10): Promise<ScanSession[]> {
+    try {
+      const scansRef = collection(db, 'users', userId, 'scans');
+      const q = query(scansRef, orderBy('timestamp', 'desc'), limit(max));
+      const snapshot = await getDocs(q);
+
+      const scans: ScanSession[] = [];
+      snapshot.forEach((docSnap) => {
+        scans.push({ id: docSnap.id, ...(docSnap.data() as Omit<ScanSession, 'id'>) });
+      });
+      return scans;
+    } catch (error) {
+      console.warn('Erro ao obter scans do Firestore:', error);
+      return [];
+    }
+  }
+
+  public subscribeScans(
+    userId: string,
+    max: number,
+    onUpdate: (scans: ScanSession[]) => void
+  ): Unsubscribe {
+    const scansRef = collection(db, 'users', userId, 'scans');
+    const q = query(scansRef, orderBy('timestamp', 'desc'), limit(max));
+
+    return onSnapshot(q, (snapshot) => {
+      const scans: ScanSession[] = [];
+      snapshot.forEach((docSnap) => {
+        scans.push({ id: docSnap.id, ...(docSnap.data() as Omit<ScanSession, 'id'>) });
+      });
+      onUpdate(scans);
+    });
+  }
+
+  public async deleteScanRecord(userId: string, scanId: string): Promise<void> {
+    const scanRef = doc(db, 'users', userId, 'scans', scanId);
+    await deleteDoc(scanRef);
+  }
+
   public async saveScanRecord(userId: string, scan: ScanSession): Promise<void> {
     try {
       const scanRef = doc(db, 'users', userId, 'scans', scan.id);
-      await setDoc(scanRef, {
+      const payload = JSON.parse(JSON.stringify({
         ...scan,
         savedAt: new Date().toISOString(),
-      });
+      }));
+
+      await setDoc(scanRef, payload, { merge: true });
     } catch (error) {
       console.error('Erro ao salvar registro de scan no Firestore:', error);
     }

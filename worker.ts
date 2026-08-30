@@ -94,9 +94,19 @@ export default {
           return json({ success: false, error: "A propriedade 'image' é obrigatória." }, { status: 400 });
         }
 
-        if (!image.startsWith("data:image/")) {
+        const isDataUrl = image.startsWith("data:image/");
+        let isHttpsUrl = false;
+
+        try {
+          const u = new URL(image);
+          isHttpsUrl = u.protocol === "https:";
+        } catch {
+          isHttpsUrl = false;
+        }
+
+        if (!isDataUrl && !isHttpsUrl) {
           return json(
-            { success: false, error: "Formato de imagem inválido. Esperado data:image/...;base64,..." },
+            { success: false, error: "Formato de imagem inválido. Use data:image/...;base64,... ou uma URL https pública." },
             { status: 400 }
           );
         }
@@ -118,17 +128,30 @@ export default {
         const hf = await callHfWithRetry(env, payload, 4);
 
         if (!hf || hf.status < 200 || hf.status >= 300) {
-          // devolve 503 “ocupado” pra UI poder mostrar “tente novamente”
           const busy = isBusyError(hf?.data);
+          if (busy) {
+            const retryAfterSeconds = 3; // ajuste como quiser (2–5 costuma ser bom)
+            return json(
+              {
+                success: false,
+                error: "Servidor da IA está ocupado no momento. Tente novamente em alguns segundos.",
+                retryAfterSeconds,
+                details: hf?.data,
+              },
+              {
+                status: 503,
+                headers: { "Retry-After": String(retryAfterSeconds) },
+              }
+            );
+          }
+
           return json(
             {
               success: false,
-              error: busy
-                ? "Servidor da IA está ocupado no momento. Tente novamente em alguns segundos."
-                : "O Hugging Face recusou a solicitação.",
+              error: "O Hugging Face recusou a solicitação.",
               details: hf?.data,
             },
-            { status: busy ? 503 : (hf?.status || 502) }
+            { status: hf?.status || 502 }
           );
         }
 

@@ -4,7 +4,8 @@ import { Button } from './Button';
 export interface EmptyStateProps {
   icon?: React.ReactNode;
   title: string;
-  description: string;
+  description?: string;
+  message?: string;
   actionLabel?: string;
   onAction?: () => void;
   actionIcon?: React.ReactNode;
@@ -14,10 +15,12 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   icon,
   title,
   description,
+  message,
   actionLabel,
   onAction,
   actionIcon,
 }) => {
+  const text = message || description || '';
   return (
     <div className="flex flex-col items-center justify-center p-8 sm:p-12 text-center rounded-3xl border border-dashed border-emerald-500/20 bg-[#081d12]/60 backdrop-blur-md">
       {icon && (
@@ -26,7 +29,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         </div>
       )}
       <h4 className="text-base font-bold text-white mb-1">{title}</h4>
-      <p className="text-xs sm:text-sm text-emerald-300/70 max-w-sm mb-5 leading-relaxed">{description}</p>
+      {text && <p className="text-xs sm:text-sm text-emerald-300/70 max-w-sm mb-5 leading-relaxed">{text}</p>}
       {actionLabel && onAction && (
         <Button onClick={onAction} size="sm" variant="primary" leftIcon={actionIcon}>
           {actionLabel}

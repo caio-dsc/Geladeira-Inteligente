@@ -1,6 +1,20 @@
 import { DetectedFoodItem } from '../types';
 import { SAMPLE_FRIDGE_IMAGES } from '../data/mockData';
 
+export class ScanServiceError extends Error {
+  status?: number;
+  retryAfterSeconds?: number;
+  retriable?: boolean;
+
+  constructor(message: string, opts?: { status?: number; retryAfterSeconds?: number; retriable?: boolean }) {
+    super(message);
+    this.name = "ScanServiceError";
+    this.status = opts?.status;
+    this.retryAfterSeconds = opts?.retryAfterSeconds;
+    this.retriable = opts?.retriable;
+  }
+}
+
 export interface IScannerService {
   simulateScan(
     imageUrl: string,
@@ -15,6 +29,8 @@ interface HuggingFaceScanResponse {
   success: boolean;
   result?: string;
   error?: string;
+  retryAfterSeconds?: number;
+  details?: any;
 }
 
 interface StructuredFoodDetection {
@@ -47,69 +63,88 @@ const ALLOWED_CATEGORIES: DetectedFoodItem['category'][] = [
 ];
 
 /*
- * Lista de termos e objetos não alimentícios para rejeição estrita (Regra 3).
+ * Lista de termos e palavras-chave não alimentícias para rejeição estrita (Regra 3).
+ * Se o nome contiver qualquer um desses termos, será sumariamente bloqueado.
  */
-const NON_FOOD_TERMS = [
+const NON_FOOD_KEYWORDS = [
   'objeto',
   'objetos',
-  'alimento',
-  'alimentos',
-  'cena',
-  'cores',
   'cor',
-  'cores e caracteristicas visuais',
-  'cores e características visuais',
-  'caracteristicas visuais',
-  'características visuais',
+  'cores',
+  'colorido',
   'caracteristica',
   'característica',
+  'cena',
+  'cenario',
+  'cenário',
   'fundo',
   'iluminacao',
   'iluminação',
+  'luz',
+  'sombra',
+  'ambiente',
   'mesa',
+  'mesas',
+  'balcao',
+  'balcão',
   'bancada',
-  'prato',
-  'prato vazio',
-  'bandeja',
-  'computador',
-  'celular',
-  'telefone',
-  'notebook',
-  'tablet',
-  'medicamentos',
-  'medicamento',
-  'remedio',
-  'remédio',
-  'embalagem',
-  'embalagens',
-  'embalagem vazia',
-  'pote',
-  'potes',
-  'pote vazio',
-  'recipiente',
-  'recipientes',
-  'recipiente vazio',
-  'frasco',
-  'frascos',
-  'frasco vazio',
-  'frasco de sal',
-  'frasco de pimenta',
-  'saleiro',
-  'pimenteiro',
-  'utensilio',
-  'utensílio',
-  'utensilios',
-  'utensílios',
+  'chao',
+  'chão',
+  'piso',
+  'parede',
+  'teto',
+  'prateleira',
+  'prateleiras',
   'geladeira',
   'freezer',
   'congelador',
-  'fogao',
-  'fogão',
-  'forno',
-  'microondas',
-  'micro-ondas',
-  'liquidificador',
-  'cafeteira',
+  'gaveta',
+  'gavetas',
+  'porta',
+  'portas',
+  'mao',
+  'mão',
+  'maos',
+  'mãos',
+  'dedo',
+  'dedos',
+  'braco',
+  'braço',
+  'humano',
+  'pessoa',
+  'pessoas',
+  'embalagem',
+  'embalagens',
+  'pacote vazio',
+  'pote',
+  'potes',
+  'recipiente',
+  'recipientes',
+  'frasco',
+  'frascos',
+  'garrafa vazia',
+  'caixa vazia',
+  'saco vazio',
+  'plastico',
+  'plástico',
+  'vidro',
+  'papelao',
+  'papelão',
+  'isopor',
+  'metal',
+  'aluminio',
+  'alumínio',
+  'prato',
+  'pratos',
+  'bandeja',
+  'bandejas',
+  'copo',
+  'copos',
+  'xicara',
+  'xícara',
+  'panela',
+  'panelas',
+  'frigideira',
   'talher',
   'talheres',
   'faca',
@@ -118,14 +153,85 @@ const NON_FOOD_TERMS = [
   'tabua',
   'tábua',
   'escorredor',
-  'escorredor de macarrao',
-  'escorredor de macarrão',
-  'caixa vazia',
-  'saco vazio',
-  'garrafa vazia',
   'lixeira',
   'pano',
   'guardanapo',
+  'computador',
+  'celular',
+  'telefone',
+  'notebook',
+  'tablet',
+  'medicamento',
+  'medicamentos',
+  'remedio',
+  'remédio',
+  'fogao',
+  'fogão',
+  'forno',
+  'microondas',
+  'micro-ondas',
+  'liquidificador',
+  'cafeteira',
+  'saleiro',
+  'pimenteiro',
+  'utensilio',
+  'utensílio',
+  'utensilios',
+  'utensílios',
+  'etiqueta',
+  'rotulo',
+  'rótulo',
+  'logo',
+  'marca',
+];
+
+/*
+ * Lista de termos genéricos que não especificam um alimento real e devem ser removidos.
+ */
+const GENERIC_FOOD_TERMS = [
+  'alimento',
+  'alimentos',
+  'comida',
+  'comidas',
+  'produto',
+  'produtos',
+  'item',
+  'itens',
+  'fruta',
+  'frutas',
+  'legume',
+  'legumes',
+  'verdura',
+  'verduras',
+  'vegetal',
+  'vegetais',
+  'laticinio',
+  'laticinios',
+  'bebida',
+  'bebidas',
+  'mantimento',
+  'mantimentos',
+  'condimento',
+  'condimentos',
+  'proteina',
+  'proteinas',
+  'frios',
+  'padaria',
+  'mercearia',
+  'hortifruti',
+  'hortifrúti',
+  'refeicao',
+  'refeição',
+  'mistura',
+  'coisa',
+  'coisas',
+  'diversos',
+  'varios',
+  'vários',
+  'sobremesa',
+  'sobremesas',
+  'snack',
+  'snacks',
 ];
 
 /**
@@ -182,7 +288,32 @@ function normalizeForComparison(str: string): string {
 }
 
 /**
- * Verifica se o nome corresponde a um objeto ou termo não alimentício proibido.
+ * Verifica se o nome corresponde a um termo alimentar genérico demais (ex: "alimentos", "frutas", "itens").
+ */
+export function isGenericFoodTerm(name: string): boolean {
+  const normalized = normalizeForComparison(cleanFoodName(name));
+  if (!normalized) {
+    return true;
+  }
+
+  // Verifica se é exatamente um termo genérico ou se é uma frase genérica (ex: "frutas diversas", "varios alimentos")
+  return GENERIC_FOOD_TERMS.some((generic) => {
+    const normalizedGeneric = normalizeForComparison(generic);
+    return (
+      normalized === normalizedGeneric ||
+      normalized === `${normalizedGeneric} diversos` ||
+      normalized === `${normalizedGeneric} diversas` ||
+      normalized === `varios ${normalizedGeneric}` ||
+      normalized === `varias ${normalizedGeneric}` ||
+      normalized === `itens de ${normalizedGeneric}` ||
+      normalized === `tipos de ${normalizedGeneric}`
+    );
+  });
+}
+
+/**
+ * Verifica se o nome corresponde a um objeto, parte do ambiente ou termo não alimentício proibido.
+ * Bloqueia qualquer item com name contendo: objeto, cor, embalagem, geladeira, prateleira, mão, mesa, etc.
  */
 export function isClearlyNonFood(name: string): boolean {
   const normalized = normalizeForComparison(cleanFoodName(name));
@@ -190,15 +321,78 @@ export function isClearlyNonFood(name: string): boolean {
     return true;
   }
 
-  return NON_FOOD_TERMS.some((blocked) => {
+  // Bloqueio se contiver qualquer palavra-chave não alimentícia
+  const containsNonFoodKeyword = NON_FOOD_KEYWORDS.some((blocked) => {
     const normalizedBlocked = normalizeForComparison(blocked);
+    // Casos: palavra exata, contida dentro da string ou como termo separado
     return (
       normalized === normalizedBlocked ||
-      normalized.startsWith(`${normalizedBlocked} `) ||
-      normalized.endsWith(` ${normalizedBlocked}`) ||
-      normalized.includes(` ${normalizedBlocked} `)
+      normalized.includes(normalizedBlocked)
     );
   });
+
+  if (containsNonFoodKeyword) {
+    return true;
+  }
+
+  // Bloqueio se for um termo genérico demais ("alimentos", "frutas", "itens")
+  if (isGenericFoodTerm(normalized)) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Normaliza uma chave de texto removendo acentuação, espaços e convertendo para minúsculo.
+ */
+export function normalizeKey(s: string): string {
+  return (s || '')
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
+
+/**
+ * Agrupa e mescla itens detectados repetidos pelo nome e unidade, somando quantidades e mantendo maior confiança.
+ */
+export function mergeDetectedItems(items: DetectedFoodItem[]): DetectedFoodItem[] {
+  const map = new Map<string, DetectedFoodItem>();
+
+  for (const item of items) {
+    const key = `${normalizeKey(item.name)}__${normalizeKey(item.unit)}`;
+
+    const prev = map.get(key);
+    if (!prev) {
+      map.set(key, { ...item });
+      continue;
+    }
+
+    // soma quantidades, mantém maior confidence
+    const mergedQty = (prev.quantity || 1) + (item.quantity || 1);
+    map.set(key, {
+      ...prev,
+      quantity: normalizeQty(mergedQty, prev.unit),
+      confidence: Math.max(prev.confidence ?? 0, item.confidence ?? 0),
+      selected: prev.selected || item.selected,
+    });
+  }
+
+  return Array.from(map.values());
+}
+
+/**
+ * Normaliza a quantidade garantindo números finitos válidos e inteiros para unidade "un" >= 1.
+ */
+export function normalizeQty(q: unknown, unit: string): number {
+  let n = typeof q === 'number' ? q : Number(q);
+  if (!Number.isFinite(n) || n <= 0) n = 1;
+
+  if (unit === 'un') n = Math.round(n);
+  if (n < 1) n = 1;
+
+  return n;
 }
 
 /**
@@ -255,27 +449,40 @@ class HuggingFaceScannerService implements IScannerService {
       throw new Error(`Falha no Scan (HTTP ${response.status}). A API não retornou JSON.`);
     }
 
+    const isBusy =
+      response.status === 503 ||
+      response.status === 429 ||
+      (typeof data?.error === 'string' &&
+        (data.error.toLowerCase().includes('ocupado') ||
+         data.error.toLowerCase().includes('busy') ||
+         data.error.toLowerCase().includes('overloaded') ||
+         data.error.toLowerCase().includes('loading')));
+
     if (!response.ok || !data.success) {
-      console.error('Erro retornado pela função scan:', data);
+      const retryAfterHeader = response.headers.get("Retry-After");
+      const retryAfterSeconds = retryAfterHeader ? Number(retryAfterHeader) : data?.retryAfterSeconds;
 
-      const details =
-        typeof data === 'object'
-          ? JSON.stringify(data, null, 2)
-          : '';
+      // 503 = ocupado/temporário (retriable)
+      if (response.status === 503 || isBusy) {
+        throw new ScanServiceError(
+          data?.error || "Servidor da IA está ocupado no momento. Tente novamente.",
+          { status: 503, retryAfterSeconds, retriable: true }
+        );
+      }
 
-      throw new Error(
-        `${data.error || 'Não foi possível analisar a imagem.'}${
-          details ? `\n\nDetalhes: ${details}` : ''
-        }`
-      );
+      // outros erros
+      throw new ScanServiceError(data?.error || "Não foi possível analisar a imagem.", {
+        status: response.status,
+        retryAfterSeconds,
+        retriable: response.status === 429, // opcional
+      });
     }
 
     if (!data.result) {
-      throw new Error('A IA não retornou nenhum resultado.');
+      throw new ScanServiceError('A IA não retornou nenhum resultado.', { status: 500, retriable: false });
     }
 
     onProgress?.('Processando alimentos identificados...');
-
     console.log('RESULTADO BRUTO DA IA:', data.result);
 
     return this.parseStructuredResult(data.result);
@@ -336,15 +543,9 @@ class HuggingFaceScannerService implements IScannerService {
         continue;
       }
 
-      // Validação de quantidade (preserva quantidade confiável > 0, default 1)
-      let finalQuantity = 1;
-      if (
-        typeof item.quantity === 'number' &&
-        Number.isFinite(item.quantity) &&
-        item.quantity > 0
-      ) {
-        finalQuantity = item.unit === 'un' ? Math.max(1, Math.round(item.quantity)) : Math.max(1, item.quantity);
-      }
+      const finalUnit = (item.unit as DetectedFoodItem['unit']) || 'un';
+      // Validação e normalização de quantidade (se unit for "un", força inteiro >= 1, se vazio/NaN vira 1)
+      const finalQuantity = normalizeQty(item.quantity, finalUnit);
 
       // Valores padrão seguros para campos ausentes ou parciais
       const finalConfidence =
@@ -357,7 +558,6 @@ class HuggingFaceScannerService implements IScannerService {
 
       const finalState = normalizeFreshness(item.state);
       const finalLocation = (item.location as DetectedFoodItem['location']) ?? null;
-      const finalUnit = (item.unit as DetectedFoodItem['unit']) || 'un';
       const finalCategory = item.category as DetectedFoodItem['category'];
 
       individualValidItems.push({
@@ -373,55 +573,24 @@ class HuggingFaceScannerService implements IScannerService {
     }
 
     /*
-     * ETAPA 2: AGRUPAMENTO DE ALIMENTOS IGUAIS (Regra 10)
-     * Exemplo: Banana (1), Banana (1), Banana (1), Banana (1) -> Banana (4)
-     * Preserva confiança máxima, categoria e unidade compatíveis.
+     * ETAPA 2: GERAÇÃO DOS ITENS INICIAIS E MESCLAGEM (mergeDetectedItems)
+     * Exemplo: Banana (1), Banana (1) -> Banana (2)
+     * Preserva confiança máxima, soma quantidades e normaliza unidades.
      */
-    const groupedMap = new Map<string, {
-      name: string;
-      category: DetectedFoodItem['category'];
-      quantity: number;
-      unit: DetectedFoodItem['unit'];
-      state: DetectedFoodItem['state'];
-      location: DetectedFoodItem['location'];
-      confidence: number;
-      expiryDate?: string;
-    }>();
+    const initialItems: DetectedFoodItem[] = individualValidItems.map((item) => ({
+      id: `det_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+      name: item.name,
+      category: item.category,
+      quantity: normalizeQty(item.quantity, item.unit),
+      unit: item.unit,
+      state: item.state,
+      location: item.location,
+      confidence: item.confidence,
+      expiryDate: item.expiryDate,
+      selected: true,
+    }));
 
-    for (const item of individualValidItems) {
-      // Chave de agrupamento por nome normalizado + unidade + estado
-      const groupKey = `${normalizeForComparison(item.name)}_${item.unit}_${item.state}`;
-
-      const existing = groupedMap.get(groupKey);
-      if (existing) {
-        existing.quantity += item.quantity;
-        existing.confidence = Math.max(existing.confidence, item.confidence);
-      } else {
-        groupedMap.set(groupKey, { ...item });
-      }
-    }
-
-    /*
-     * ETAPA 3: GERAÇÃO DO ARRAY FINAL PARA O FRONTEND
-     */
-    const validItems: DetectedFoodItem[] = [];
-
-    for (const [, item] of groupedMap) {
-      validItems.push({
-        id: `det_${Date.now()}_${Math.random()
-          .toString(36)
-          .substring(2, 7)}`,
-        name: item.name,
-        category: item.category,
-        quantity: item.quantity,
-        unit: item.unit,
-        state: item.state,
-        location: item.location,
-        confidence: item.confidence,
-        expiryDate: item.expiryDate,
-        selected: true,
-      });
-    }
+    const validItems = mergeDetectedItems(initialItems);
 
     // Regra 9: Se após o filtro não sobrar nenhum alimento, retornar array vazio []
     console.log('RESULTADO APÓS FILTRO:', validItems);
