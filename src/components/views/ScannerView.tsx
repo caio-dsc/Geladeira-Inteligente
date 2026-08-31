@@ -611,12 +611,19 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
       try {
         setProgressMessage('Salvando foto do scan...');
         const blob = storageService.dataUrlToBlob(imageToScan);
-        const up = await storageService.uploadScanImage(uid, scanId, blob);
+        
+        // Timeout de 6 segundos para não travar o app
+        const uploadPromise = storageService.uploadScanImage(uid, scanId, blob);
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Upload demorou muito')), 6000)
+        );
+        
+        const up = await Promise.race([uploadPromise, timeoutPromise]) as any;
         imageUrlForScan = up.downloadUrl;
         imageUrlForHistory = up.downloadUrl;
       } catch (e) {
-        // fallback: continua o scan, mas sem foto no histórico
-        console.warn('Upload falhou, continuando sem salvar foto no histórico:', e);
+        console.warn('Upload falhou ou demorou muito, continuando com imagem local:', e);
+        // Fallback: não trava o scan, só não salva a miniatura no histórico
         imageUrlForScan = imageToScan;
         imageUrlForHistory = '';
       }

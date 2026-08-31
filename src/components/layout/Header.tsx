@@ -8,6 +8,7 @@ import {
   UtensilsCrossed, 
   BookOpen, 
   User as UserIcon,
+  ShieldCheck,
   LogOut,
   Sparkles
 } from 'lucide-react';
@@ -33,6 +34,7 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'inventory' as NavigationTab, label: 'Minha Geladeira', icon: UtensilsCrossed },
     { id: 'recipes' as NavigationTab, label: 'Receitas', icon: BookOpen },
     { id: 'profile' as NavigationTab, label: 'Perfil', icon: UserIcon },
+    { id: 'admin' as NavigationTab, label: 'Admin', icon: ShieldCheck },
   ];
 
   return (

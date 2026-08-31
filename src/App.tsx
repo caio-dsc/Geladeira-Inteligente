@@ -20,6 +20,7 @@ import { ScannerView } from './components/views/ScannerView';
 import { InventoryView } from './components/views/InventoryView';
 import { RecipesView } from './components/views/RecipesView';
 import { ProfileView } from './components/views/ProfileView';
+import { AdminView } from './components/views/AdminView';
 
 import { FoodFormModal } from './components/food/FoodFormModal';
 import { RecipeDetailModal } from './components/recipe/RecipeDetailModal';
@@ -255,7 +256,12 @@ export default function App() {
             user={user}
             onSignOut={handleSignOut}
             onUpdateUser={setUser}
+            onNavigateTab={setActiveTab}
           />
+        )}
+
+        {activeTab === 'admin' && (
+          <AdminView />
         )}
       </main>
 

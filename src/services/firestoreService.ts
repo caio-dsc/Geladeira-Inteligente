@@ -48,8 +48,11 @@ export class FirestoreService {
   public async setUser(userId: string, userData: User): Promise<void> {
     try {
       const userRef = doc(db, 'users', userId);
+      const safeData = Object.fromEntries(
+        Object.entries(userData).filter(([_, v]) => v !== undefined)
+      );
       await setDoc(userRef, {
-        ...userData,
+        ...safeData,
         updatedAt: new Date().toISOString(),
       }, { merge: true });
     } catch (error) {
@@ -61,8 +64,11 @@ export class FirestoreService {
   public async updateUserFields(userId: string, fields: Partial<User>): Promise<void> {
     try {
       const userRef = doc(db, 'users', userId);
+      const safeFields = Object.fromEntries(
+        Object.entries(fields).filter(([_, v]) => v !== undefined)
+      );
       await updateDoc(userRef, {
-        ...fields,
+        ...safeFields,
         updatedAt: new Date().toISOString(),
       });
     } catch (error) {
@@ -135,10 +141,19 @@ export class FirestoreService {
     }
   }
 
-  public async updateInventoryItem(userId: string, itemId: string, updates: Partial<Omit<FoodItem, 'id'>>): Promise<void> {
+  public async updateInventoryItem(userId: string, itemId: string, updates: Partial<FoodItem>): Promise<void> {
     try {
       const itemRef = doc(db, 'users', userId, 'inventory', itemId);
-      await updateDoc(itemRef, updates);
+      
+      // Remove todos os campos que estiverem undefined para não quebrar o Firebase
+      const safeUpdates = Object.fromEntries(
+        Object.entries(updates).filter(([_, v]) => v !== undefined)
+      );
+
+      await updateDoc(itemRef, { 
+        ...safeUpdates, 
+        updatedAt: new Date().toISOString() 
+      });
     } catch (error) {
       console.error('Erro ao atualizar item do inventário:', error);
       throw error;

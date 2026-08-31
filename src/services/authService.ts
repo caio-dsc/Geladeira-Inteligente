@@ -23,6 +23,7 @@ export interface IAuthService {
   resetPassword(email: string): Promise<void>;
   signOut(): Promise<void>;
   updateUser(data: Partial<User>): Promise<User>;
+  updateUser(userId: string, data: Partial<User>): Promise<User>;
   deductCredit(amount?: number): Promise<number>;
   addCredits(amount: number): Promise<number>;
   subscribe(callback: (user: User | null) => void): () => void;
@@ -186,39 +187,62 @@ class FirebaseAuthService implements IAuthService {
     }
   }
 
-  public async updateUser(data: Partial<User>): Promise<User> {
-    if (!this.currentUser) throw new Error('Usuário não autenticado');
+  public async updateUser(userIdOrData: string | Partial<User>, optionalData?: Partial<User>): Promise<User> {
+    const rawUpdates: Partial<User> = typeof userIdOrData === 'string'
+      ? (optionalData || {})
+      : userIdOrData;
 
-    const updatedUser: User = {
-      ...this.currentUser,
-      ...data,
-      preferences: {
-        ...this.currentUser.preferences,
-        ...(data.preferences || {}),
-      },
-    };
+    const targetUserId = typeof userIdOrData === 'string'
+      ? userIdOrData
+      : (this.currentUser?.id || auth.currentUser?.uid);
 
-    this.currentUser = updatedUser;
-    this.notify();
+    if (!targetUserId && !this.currentUser) {
+      throw new Error('Usuário não autenticado');
+    }
 
-    if (auth.currentUser) {
-      // Sincroniza dados no Firestore
-      await firestoreService.setUser(auth.currentUser.uid, updatedUser);
+    // Remove campos undefined para não quebrar o Firestore
+    const safeUpdates = Object.fromEntries(
+      Object.entries(rawUpdates).filter(([_, v]) => v !== undefined)
+    ) as Partial<User>;
+
+    // Atualiza o usuário em memória
+    if (this.currentUser) {
+      const updatedPreferences = safeUpdates.preferences
+        ? { ...this.currentUser.preferences, ...safeUpdates.preferences }
+        : this.currentUser.preferences;
+
+      this.currentUser = {
+        ...this.currentUser,
+        ...safeUpdates,
+        preferences: updatedPreferences,
+      };
+      this.notify(); // Notifica os observadores do React
+    }
+
+    const effectiveUid = targetUserId || auth.currentUser?.uid;
+    if (effectiveUid) {
+      if (this.currentUser) {
+        await firestoreService.setUser(effectiveUid, this.currentUser);
+      } else {
+        await firestoreService.updateUserFields(effectiveUid, safeUpdates);
+      }
 
       // Sincroniza metadados do Firebase Auth se alterados
-      try {
-        const profileUpdates: { displayName?: string; photoURL?: string } = {};
-        if (data.name) profileUpdates.displayName = data.name;
-        if (data.avatarUrl) profileUpdates.photoURL = data.avatarUrl;
-        if (Object.keys(profileUpdates).length > 0) {
-          await updateProfile(auth.currentUser, profileUpdates);
+      if (auth.currentUser) {
+        try {
+          const profileUpdates: { displayName?: string; photoURL?: string } = {};
+          if (safeUpdates.name) profileUpdates.displayName = safeUpdates.name;
+          if (safeUpdates.avatarUrl) profileUpdates.photoURL = safeUpdates.avatarUrl;
+          if (Object.keys(profileUpdates).length > 0) {
+            await updateProfile(auth.currentUser, profileUpdates);
+          }
+        } catch (authErr) {
+          console.warn('Aviso ao sincronizar perfil no Firebase Auth:', authErr);
         }
-      } catch (authErr) {
-        console.warn('Aviso ao sincronizar perfil no Firebase Auth:', authErr);
       }
     }
 
-    return updatedUser;
+    return this.currentUser!;
   }
 
   public async deductCredit(amount: number = 1): Promise<number> {

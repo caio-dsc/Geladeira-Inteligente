@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { User } from '../../types';
+import { User, NavigationTab } from '../../types';
 import { authService } from '../../services/authService';
 import { storageService } from '../../services/storageService';
 import { Card } from '../common/Card';
@@ -19,6 +19,7 @@ import {
   Edit3,
   Calendar,
   Scale,
+  ShieldCheck,
   X
 } from 'lucide-react';
 
@@ -26,12 +27,14 @@ export interface ProfileViewProps {
   user: User;
   onSignOut: () => void;
   onUpdateUser: (user: User) => void;
+  onNavigateTab?: (tab: NavigationTab) => void;
 }
 
 export const ProfileView: React.FC<ProfileViewProps> = ({
   user,
   onSignOut,
   onUpdateUser,
+  onNavigateTab,
 }) => {
   // Profile info editing state
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -548,29 +551,28 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
         )}
       </Card>
 
-      {/* Cloud & Architecture Foundation Card */}
-      <div className="p-5 rounded-3xl bg-[#081e13]/90 border border-emerald-500/20 shadow-[0_4px_24px_rgba(0,0,0,0.4)] backdrop-blur-xl space-y-3">
-        <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-emerald-950 text-emerald-400 border border-emerald-500/30 flex items-center justify-center shadow-[0_0_10px_rgba(16,185,129,0.2)]">
-            <Database className="w-4.5 h-4.5" />
+      {/* Admin Panel Entry */}
+      {onNavigateTab && (
+        <Card className="flex items-center justify-between p-5 border-emerald-500/20 bg-[#081e13]/80">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-950 text-emerald-400 border border-emerald-500/30 flex items-center justify-center shadow-[0_0_12px_rgba(16,185,129,0.2)]">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-white">Painel Administrativo</h4>
+              <p className="text-xs text-emerald-300/70">Gerenciamento de receitas e base de dados</p>
+            </div>
           </div>
-          <div>
-            <h4 className="text-sm font-bold text-white">Fundação de Nuvem & Firebase</h4>
-            <p className="text-xs text-emerald-300/70">Arquitetura desacoplada e pronta para persistência segura</p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs text-emerald-300/70 pt-2">
-          <div className="p-3 bg-[#05140c]/80 rounded-2xl border border-emerald-500/15">
-            <span className="font-bold text-white block mb-0.5">Sem localStorage local</span>
-            Os dados fluem através de repositórios e serviços padronizados, sem acoplamento a chaves de storage locais.
-          </div>
-          <div className="p-3 bg-[#05140c]/80 rounded-2xl border border-emerald-500/15">
-            <span className="font-bold text-white block mb-0.5">Coleções Firestore Preparadas</span>
-            Estrutura mapeada para coleções <code className="text-emerald-400 font-mono">users</code>, <code className="text-emerald-400 font-mono">inventory</code>, <code className="text-emerald-400 font-mono">recipes</code> e <code className="text-emerald-400 font-mono">scans</code>.
-          </div>
-        </div>
-      </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onNavigateTab('admin')}
+            className="text-xs font-bold"
+          >
+            Abrir Painel
+          </Button>
+        </Card>
+      )}
     </div>
   );
 };

@@ -116,4 +116,4 @@ export interface ScanSession {
   errorMessage?: string;
 }
 
-export type NavigationTab = 'dashboard' | 'scanner' | 'inventory' | 'recipes' | 'profile';
+export type NavigationTab = 'dashboard' | 'scanner' | 'inventory' | 'recipes' | 'profile' | 'admin';
