@@ -6,7 +6,6 @@ import {
   CheckCircle2,
   RotateCcw,
   Image as ImageIcon,
-  ImageOff,
   CheckSquare,
   Square,
   Plus,
@@ -19,27 +18,19 @@ import {
   AlertCircle,
   Clock,
   RefreshCw,
-  Loader2,
-  History,
-  Trash2,
-  FolderOpen,
 } from 'lucide-react';
 
 import { Card } from '../common/Card';
 import { Button } from '../common/Button';
 import { Modal } from '../common/Modal';
 import { Input } from '../common/Input';
-import { FoodItem, DetectedFoodItem, CategoryType, FreshnessState, StorageLocation, ScanSession } from '../../types';
+import { FoodItem, DetectedFoodItem, CategoryType, FreshnessState, StorageLocation } from '../../types';
 import { foodService } from '../../services/foodService';
 import { scannerService, mergeDetectedItems } from '../../services/scannerService';
-import { firestoreService } from '../../services/firestoreService';
-import { storageService } from '../../services/storageService';
-import { auth } from '../../services/firebaseConfig';
 import {
   getCategoryIcon,
   getCategoryLabel,
 } from '../food/FoodCard';
-import { EmptyState } from '../common/EmptyState';
 import { ErrorState } from '../common/ErrorState';
 
 export interface ScannerViewProps {
@@ -82,27 +73,6 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
   const MAX_CLIENT_ATTEMPTS = 3;
   const [scanAttempt, setScanAttempt] = useState(0);
   const [retryIn, setRetryIn] = useState<number | null>(null);
-
-  const [scanHistory, setScanHistory] = useState<ScanSession[]>([]);
-  const [historyLoading, setHistoryLoading] = useState(true);
-
-  useEffect(() => {
-    const uid = auth.currentUser?.uid;
-    if (!uid) {
-      setHistoryLoading(false);
-      return;
-    }
-
-    const unsub = firestoreService.subscribeScans(uid, 10, (scans) => {
-      setScanHistory(scans);
-      setHistoryLoading(false);
-    });
-
-    return () => unsub();
-  }, []);
-
-  const makeScanId = () =>
-    `scan_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
   useEffect(() => {
     if (retryIn === null) return;
@@ -587,89 +557,30 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
   };
 
   const runScan = async (imageToScan: string) => {
-    const uid = auth.currentUser?.uid;
-    if (!uid) throw new Error('Usuário não autenticado.');
-
-    const scanId = makeScanId();
-    const timestamp = new Date().toISOString();
-
-    // 1) cria registro inicial (processing)
-    await firestoreService.saveScanRecord(uid, {
-      id: scanId,
-      imageUrl: '',           // vamos preencher depois
-      timestamp,
-      status: 'processing',
-      progressMessage: 'Preparando análise...',
-      detectedItems: [],
-    });
-
-    // 2) se for dataURL, faz upload para Storage e usa URL https (melhor pro histórico)
-    let imageUrlForScan = imageToScan;
-    let imageUrlForHistory = '';
-
-    if (imageToScan.startsWith('data:image/')) {
-      try {
-        setProgressMessage('Salvando foto do scan...');
-        const blob = storageService.dataUrlToBlob(imageToScan);
-        
-        // Timeout de 6 segundos para não travar o app
-        const uploadPromise = storageService.uploadScanImage(uid, scanId, blob);
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Upload demorou muito')), 6000)
-        );
-        
-        const up = await Promise.race([uploadPromise, timeoutPromise]) as any;
-        imageUrlForScan = up.downloadUrl;
-        imageUrlForHistory = up.downloadUrl;
-      } catch (e) {
-        console.warn('Upload falhou ou demorou muito, continuando com imagem local:', e);
-        // Fallback: não trava o scan, só não salva a miniatura no histórico
-        imageUrlForScan = imageToScan;
-        imageUrlForHistory = '';
-      }
-    } else {
-      // já é URL (reprocessar ou imagem de exemplo)
-      imageUrlForScan = imageToScan;
-      imageUrlForHistory = imageToScan;
-    }
-
-    // atualiza registro com imageUrl
-    await firestoreService.saveScanRecord(uid, {
-      id: scanId,
-      imageUrl: imageUrlForHistory,
-      timestamp,
-      status: 'processing',
-      progressMessage: 'Analisando alimentos com IA...',
-      detectedItems: [],
-    });
-
-    // 3) chama IA com retries do cliente
     let results: DetectedFoodItem[] | null = null;
 
     for (let attempt = 1; attempt <= MAX_CLIENT_ATTEMPTS; attempt++) {
       setScanAttempt(attempt);
 
       try {
-        setProgressMessage(`Tentativa ${attempt}/${MAX_CLIENT_ATTEMPTS} — Preparando análise...`);
+        setProgressMessage(`Tentativa ${attempt}/${MAX_CLIENT_ATTEMPTS} — Analisando...`);
 
         results = await scannerService.simulateScan(
-          imageUrlForScan,
+          imageToScan,
           (stage) => setProgressMessage(`Tentativa ${attempt}/${MAX_CLIENT_ATTEMPTS} — ${stage}`),
           simulatedErrorToggle
         );
 
-        break; // sucesso
+        break;
       } catch (err: any) {
         const isRetriable = err?.name === 'ScanServiceError' && err?.retriable;
-
         if (isRetriable && attempt < MAX_CLIENT_ATTEMPTS) {
           const waitSec = typeof err.retryAfterSeconds === 'number' ? err.retryAfterSeconds : 2;
           setProgressMessage(`Servidor ocupado. Tentando de novo em ${waitSec}s...`);
           await sleep(waitSec * 1000);
           continue;
         }
-
-        throw err; // erro final
+        throw err;
       }
     }
 
@@ -682,26 +593,14 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
       throw new Error('Nenhum alimento foi identificado com clareza. Tente uma foto mais próxima.');
     }
 
-    // 4) cobrar crédito no sucesso
     const deducted = await onDeductCredit(1);
     if (!deducted) {
       onOpenCreditsModal();
       throw new Error('Sem créditos para concluir a análise.');
     }
 
-    // 5) atualiza UI
     setDetectedItems(sanitized);
     setScanStatus('success');
-
-    // 6) salva sucesso no histórico
-    await firestoreService.saveScanRecord(uid, {
-      id: scanId,
-      imageUrl: imageUrlForHistory,
-      timestamp,
-      status: 'success',
-      progressMessage: 'Concluído',
-      detectedItems: sanitized,
-    });
   };
 
   const handleStartScan = async () => {
@@ -727,64 +626,7 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
 
       setScanStatus('error');
       setErrorMessage(err?.message || 'Falha ao processar imagem.');
-
-      const uid = auth.currentUser?.uid;
-      if (uid) {
-        await firestoreService.saveScanRecord(uid, {
-          id: makeScanId(),
-          imageUrl: '',
-          timestamp: new Date().toISOString(),
-          status: 'error',
-          progressMessage,
-          detectedItems: [],
-          errorMessage: err?.message || 'Falha ao processar imagem.',
-        });
-      }
     }
-  };
-
-  const handleOpenScan = (scan: ScanSession) => {
-    // Reusa a imagem no preview
-    if (scan.imageUrl) setSelectedImage(scan.imageUrl);
-
-    // Se o scan foi bem-sucedido, carrega os itens direto na tela de revisão
-    if (scan.status === 'success' && scan.detectedItems && scan.detectedItems.length > 0) {
-      setDetectedItems(scan.detectedItems);
-      setErrorMessage('');
-      setScanStatus('success');
-      return;
-    }
-
-    // Caso contrário, cai no reprocessar
-    handleReprocess(scan);
-  };
-
-  const handleReprocess = async (scan: ScanSession) => {
-    if (!scan.imageUrl) return;
-
-    // mostra a mesma foto no preview
-    setSelectedImage(scan.imageUrl);
-    setScanStatus('idle');
-    setDetectedItems([]);
-    setErrorMessage('');
-
-    // reprocessa usando a mesma imagem
-    try {
-      setScanStatus('scanning');
-      setProgressMessage('Reprocessando scan...');
-      await runScan(scan.imageUrl);
-    } catch (err: any) {
-      setScanStatus('error');
-      setErrorMessage(err?.message || 'Falha ao reprocessar.');
-    }
-  };
-
-  const handleDeleteScan = async (scanId: string) => {
-    const uid = auth.currentUser?.uid;
-    if (!uid) return;
-
-    await firestoreService.deleteScanRecord(uid, scanId);
-    await storageService.deleteScanImage(uid, scanId); // best-effort
   };
 
   /*
@@ -1085,45 +927,6 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
     detectedItems.every(
       (i) => i.selected
     );
-
-  const formatScanDate = (iso: string) => {
-    try {
-      const d = new Date(iso);
-      return d.toLocaleString('pt-BR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      });
-    } catch {
-      return iso;
-    }
-  };
-
-  const getStatusStyle = (status: ScanSession['status']) => {
-    switch (status) {
-      case 'success':
-        return {
-          label: 'Sucesso',
-          icon: <CheckCircle2 className="w-3.5 h-3.5" />,
-          className: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
-        };
-      case 'error':
-        return {
-          label: 'Erro',
-          icon: <XCircle className="w-3.5 h-3.5" />,
-          className: 'bg-rose-500/15 text-rose-300 border-rose-500/30',
-        };
-      case 'processing':
-      default:
-        return {
-          label: 'Processando',
-          icon: <Loader2 className="w-3.5 h-3.5 animate-spin" />,
-          className: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
-        };
-    }
-  };
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-24 md:pb-10 text-emerald-100 text-left">
@@ -1742,116 +1545,6 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
         </div>
 
       )}
-
-      <Card className="mt-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
-              <History className="w-4 h-4 text-white/80" />
-            </div>
-            <div>
-              <h3 className="text-base font-semibold text-white">Histórico de scans</h3>
-              <p className="text-xs text-white/50">Últimos 10 scans do seu usuário</p>
-            </div>
-          </div>
-        </div>
-
-        {historyLoading ? (
-          <div className="flex items-center justify-center py-10 text-white/60 gap-2">
-            <Loader2 className="w-4 h-4 animate-spin" />
-            <span className="text-sm">Carregando histórico...</span>
-          </div>
-        ) : scanHistory.length === 0 ? (
-          <EmptyState
-            title="Nenhum scan ainda"
-            message="Quando você fizer um scan, ele aparecerá aqui e poderá ser reaberto ou reprocessado."
-          />
-        ) : (
-          <ul className="divide-y divide-white/5">
-            {scanHistory.map((scan) => {
-              const status = getStatusStyle(scan.status);
-              const canOpen = scan.status === 'success' && (scan.detectedItems?.length ?? 0) > 0;
-              const canReprocess = !!scan.imageUrl;
-
-              return (
-                <li
-                  key={scan.id}
-                  className="py-3 flex items-center gap-3"
-                >
-                  {/* Thumbnail */}
-                  <div className="shrink-0 w-14 h-14 rounded-lg overflow-hidden bg-white/5 border border-white/10 flex items-center justify-center">
-                    {scan.imageUrl ? (
-                      <img
-                        src={scan.imageUrl}
-                        alt="Scan"
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                        referrerPolicy="no-referrer"
-                      />
-                    ) : (
-                      <ImageOff className="w-5 h-5 text-white/40" />
-                    )}
-                  </div>
-
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full border ${status.className}`}
-                      >
-                        {status.icon}
-                        {status.label}
-                      </span>
-                      <span className="text-xs text-white/50 truncate">
-                        {formatScanDate(scan.timestamp)}
-                      </span>
-                    </div>
-
-                    <div className="mt-1 text-sm text-white/80 truncate">
-                      {scan.status === 'success'
-                        ? `${scan.detectedItems?.length ?? 0} item(ns) identificado(s)`
-                        : scan.status === 'error'
-                        ? scan.errorMessage || 'Falha no scan'
-                        : scan.progressMessage || 'Processando...'}
-                    </div>
-                  </div>
-
-                  {/* Ações */}
-                  <div className="flex items-center gap-2 shrink-0">
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      onClick={() => handleOpenScan(scan)}
-                      disabled={!canOpen && !canReprocess}
-                      leftIcon={<FolderOpen className="w-3.5 h-3.5" />}
-                    >
-                      Abrir
-                    </Button>
-
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => handleReprocess(scan)}
-                      disabled={!canReprocess}
-                      leftIcon={<RotateCcw className="w-3.5 h-3.5" />}
-                    >
-                      Reprocessar
-                    </Button>
-
-                    <button
-                      onClick={() => handleDeleteScan(scan.id)}
-                      className="p-2 rounded-lg text-white/60 hover:text-rose-300 hover:bg-white/5 transition"
-                      title="Excluir scan"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </Card>
 
       {/* MODO DEMONSTRAÇÃO */}
 

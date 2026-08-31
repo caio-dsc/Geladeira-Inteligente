@@ -1,7 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { User, NavigationTab } from '../../types';
 import { authService } from '../../services/authService';
-import { storageService } from '../../services/storageService';
 import { Card } from '../common/Card';
 import { Button } from '../common/Button';
 import { Input } from '../common/Input';
@@ -22,6 +21,43 @@ import {
   ShieldCheck,
   X
 } from 'lucide-react';
+
+const fileToResizedJpegDataUrl = async (file: File, maxSize = 256, quality = 0.8): Promise<string> => {
+  const objectUrl = URL.createObjectURL(file);
+
+  try {
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const i = new Image();
+      i.onload = () => resolve(i);
+      i.onerror = () => reject(new Error('Não foi possível carregar a imagem.'));
+      i.src = objectUrl;
+    });
+
+    const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
+    const w = Math.max(1, Math.round(img.width * scale));
+    const h = Math.max(1, Math.round(img.height * scale));
+
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('Canvas não suportado.');
+
+    ctx.drawImage(img, 0, 0, w, h);
+
+    return canvas.toDataURL('image/jpeg', quality);
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
+};
+
+const withTimeout = async <T,>(p: Promise<T>, ms: number, msg: string): Promise<T> => {
+  return await Promise.race([
+    p,
+    new Promise<T>((_, reject) => setTimeout(() => reject(new Error(msg)), ms)),
+  ]);
+};
 
 export interface ProfileViewProps {
   user: User;
@@ -94,20 +130,28 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
       setIsSavingProfile(true);
       let newAvatarUrl = user.avatarUrl;
 
-      // Se houver novo arquivo selecionado, faz upload no Cloud Storage (users/{uid}/avatar.jpg)
+      // Se houver novo arquivo selecionado, gera uma imagem pequena para não estourar o doc do Firestore
       if (avatarFile) {
-        newAvatarUrl = await storageService.uploadAvatarImage(user.id, avatarFile);
+        newAvatarUrl = await withTimeout(
+          fileToResizedJpegDataUrl(avatarFile, 256, 0.8),
+          8000,
+          'A foto demorou demais para processar. Tente uma imagem menor.'
+        );
       }
 
       const parsedAge = age.trim() !== '' ? Math.max(0, parseInt(age, 10)) : null;
       const parsedWeight = weightKg.trim() !== '' ? Math.max(0, parseFloat(weightKg.replace(',', '.'))) : null;
 
-      const updated = await authService.updateUser({
-        name: name.trim(),
-        avatarUrl: newAvatarUrl,
-        age: parsedAge,
-        weightKg: parsedWeight,
-      });
+      const updated = await withTimeout(
+        authService.updateUser({
+          name: name.trim(),
+          avatarUrl: newAvatarUrl,
+          age: parsedAge,
+          weightKg: parsedWeight,
+        }),
+        8000,
+        'Salvar perfil demorou demais. Verifique sua conexão e tente novamente.'
+      );
 
       onUpdateUser(updated);
       setIsEditingProfile(false);
