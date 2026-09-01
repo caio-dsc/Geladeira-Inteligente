@@ -78,7 +78,8 @@ export default function App() {
         });
 
         unsubscribeFood = foodService.subscribe(async (items) => {
-          setInventory(items);
+          // garante nova referência para disparar o useEffect das receitas
+          setInventory(items.map((i) => ({ ...i })));
         });
       } catch (err) {
         console.error('Erro na inicialização:', err);
