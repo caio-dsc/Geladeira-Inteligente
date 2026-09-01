@@ -8,3 +8,5 @@ coverage/
 !.env.example
 scripts/_secrets/
 scripts/.env
+bun.lock
+bun.lockb
