@@ -1,10 +1,10 @@
-import { Recipe, RecipeMatch, FoodItem } from '../types';
+import { Recipe, RecipeMatch, FoodItem, UserPreferences } from '../types';
 import { MOCK_RECIPES } from '../data/mockData';
 import { firestoreService } from './firestoreService';
 
 export interface IRecipeService {
   getRecipes(): Promise<Recipe[]>;
-  getMatchingRecipes(inventory: FoodItem[]): Promise<RecipeMatch[]>;
+  getMatchingRecipes(inventory: FoodItem[], preferences?: UserPreferences): Promise<RecipeMatch[]>;
   getRecipeById(id: string, inventory?: FoodItem[]): Promise<RecipeMatch | null>;
 }
 
@@ -38,11 +38,14 @@ class RecipeService implements IRecipeService {
     return [...this.recipes];
   }
 
-  public async getMatchingRecipes(inventory: FoodItem[]): Promise<RecipeMatch[]> {
+  public async getMatchingRecipes(
+    inventory: FoodItem[],
+    preferences?: UserPreferences
+  ): Promise<RecipeMatch[]> {
     const recipes = await this.getRecipes();
     const inventoryNames = inventory.map((item) => this.normalizeString(item.name));
 
-    return recipes.map((recipe) => {
+    const matchedList = recipes.map((recipe) => {
       const matchedIngredients: string[] = [];
       const missingIngredients: string[] = [];
 
@@ -73,7 +76,70 @@ class RecipeService implements IRecipeService {
         matchPercentage,
         isReadyToCook,
       };
-    }).sort((a, b) => b.matchPercentage - a.matchPercentage);
+    });
+
+    // Filtra conforme as preferências e restrições alimentares do usuário
+    const filtered = matchedList.filter((recipe) => {
+      if (!preferences) return true;
+
+      // Filtro por Nível culinário
+      if (preferences.cookingLevel === 'Iniciante') {
+        if (recipe.difficulty && recipe.difficulty !== 'Fácil') return false;
+      } else if (preferences.cookingLevel === 'Intermediário') {
+        if (recipe.difficulty && recipe.difficulty === 'Avançado') return false;
+      }
+
+      // Filtro por Dietas / Restrições (caso a receita possua diet flags configuradas)
+      if (recipe.diet) {
+        const restrictions = (preferences.dietaryRestrictions || []).map((r) =>
+          this.normalizeString(r)
+        );
+
+        // Se usuário marcou "Sem Glúten" -> remove receita com diet.hasGluten
+        if (
+          restrictions.some((r) => r.includes('gluten')) &&
+          recipe.diet.hasGluten === true
+        ) {
+          return false;
+        }
+
+        // "Sem Lactose" -> remove com diet.hasLactose
+        if (
+          restrictions.some((r) => r.includes('lactose')) &&
+          recipe.diet.hasLactose === true
+        ) {
+          return false;
+        }
+
+        // "Vegetariano" -> remove com diet.hasMeat
+        if (
+          restrictions.some((r) => r.includes('vegetariano')) &&
+          recipe.diet.hasMeat === true
+        ) {
+          return false;
+        }
+
+        // "Vegano" -> remove se diet.vegan !== true
+        if (
+          restrictions.some((r) => r.includes('vegano')) &&
+          recipe.diet.vegan !== true
+        ) {
+          return false;
+        }
+
+        // "Sem Frituras" -> remove se diet.usesFrying === true
+        if (
+          restrictions.some((r) => r.includes('fritura')) &&
+          recipe.diet.usesFrying === true
+        ) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+
+    return filtered.sort((a, b) => b.matchPercentage - a.matchPercentage);
   }
 
   public async getRecipeById(id: string, inventory: FoodItem[] = []): Promise<RecipeMatch | null> {

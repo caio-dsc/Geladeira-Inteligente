@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { 
   NavigationTab, 
   User, 
+  UserPreferences,
   FoodItem, 
   RecipeMatch 
 } from './types';
@@ -49,15 +50,22 @@ export default function App() {
     }, 3500);
   };
 
-  // Re-calculate recipes match when inventory changes
-  const updateRecipeMatches = useCallback(async (currentInventory: FoodItem[]) => {
+  // Re-calculate recipes match when inventory or preferences change
+  const updateRecipeMatches = useCallback(async (currentInventory: FoodItem[], preferences?: UserPreferences) => {
     try {
-      const matches = await recipeService.getMatchingRecipes(currentInventory);
+      const matches = await recipeService.getMatchingRecipes(currentInventory, preferences);
       setRecipes(matches);
     } catch (e) {
       console.error('Erro ao calcular receitas:', e);
     }
   }, []);
+
+  // Update recipes whenever inventory or user preferences change
+  useEffect(() => {
+    if (inventory.length > 0 || user?.preferences) {
+      updateRecipeMatches(inventory, user?.preferences);
+    }
+  }, [inventory, user?.preferences, updateRecipeMatches]);
 
   // Initialize data subscriptions
   useEffect(() => {
@@ -73,7 +81,6 @@ export default function App() {
 
         unsubscribeFood = foodService.subscribe(async (items) => {
           setInventory(items);
-          await updateRecipeMatches(items);
         });
       } catch (err) {
         console.error('Erro na inicialização:', err);
@@ -88,7 +95,7 @@ export default function App() {
       if (unsubscribeAuth) unsubscribeAuth();
       if (unsubscribeFood) unsubscribeFood();
     };
-  }, [updateRecipeMatches]);
+  }, []);
 
   // Auth Handlers
   const handleLoginWithGoogle = async () => {

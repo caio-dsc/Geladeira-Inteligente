@@ -36,6 +36,27 @@ export interface RecipeIngredient {
   category?: CategoryType;
 }
 
+export type ServingsBucket = '1' | '2' | '3-4' | '5+' | 'unknown';
+
+export interface RecipeSource {
+  sourceId: 'themealdb' | 'wikilivros' | 'wikibooks' | 'custom';
+  url?: string;
+  externalId?: string;
+  license?: string;
+  attribution?: string;
+}
+
+export interface RecipeDietFlags {
+  usesFrying?: boolean;     // tem fritura?
+  hasMeat?: boolean;        // tem carne/peixe/frango?
+  hasGluten?: boolean;      // tem trigo/farinha/pão/massa?
+  hasLactose?: boolean;     // tem leite/queijo/manteiga/creme?
+  vegetarian?: boolean;
+  vegan?: boolean;
+  lowCarb?: boolean;
+  highProtein?: boolean;
+}
+
 export interface Recipe {
   id: string;
   title: string;
@@ -49,6 +70,13 @@ export interface Recipe {
   steps: string[];
   tags: string[];
   caloriesPerServing?: number;
+  canonicalKey?: string;      // chave normalizada para dedupe
+  aliases?: string[];         // variações do nome
+  servingsBucket?: ServingsBucket;
+  sources?: RecipeSource[];
+  diet?: RecipeDietFlags;     // aqui fica a “inteligência”
+  originArea?: string;        // ex: Brazilian
+  originCountry?: string;     // ex: Brazil
 }
 
 export interface RecipeMatch extends Recipe {
