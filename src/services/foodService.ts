@@ -81,16 +81,27 @@ class FoodService implements IFoodService {
   }
 
   public async addItem(itemData: Omit<FoodItem, 'id' | 'addedAt'>): Promise<FoodItem> {
+    const currentUid = auth.currentUser?.uid;
+    if (currentUid) {
+      await firestoreService.upsertInventoryByName(currentUid, {
+        ...itemData,
+        quantity: Math.max(1, Number(itemData.quantity) || 1),
+      });
+      const updated = await firestoreService.getInventory(currentUid);
+      this.items = updated;
+      this.notify();
+      const found = updated.find(
+        (i) => normalizeText(i.name) === normalizeText(itemData.name) && i.category === itemData.category
+      );
+      return found || updated[0];
+    }
+
     const newItem: FoodItem = {
       ...itemData,
       id: `food_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+      nameKey: normalizeText(itemData.name),
       addedAt: new Date().toISOString(),
     };
-
-    const currentUid = auth.currentUser?.uid;
-    if (currentUid) {
-      await firestoreService.addInventoryItem(currentUid, newItem);
-    }
 
     this.items.unshift(newItem);
     this.notify();
@@ -101,49 +112,22 @@ class FoodService implements IFoodService {
     const currentUid = auth.currentUser?.uid;
     if (!currentUid) return [];
 
-    // usa o cache atual (vem do subscribeInventory)
-    const existing = [...this.items];
-
-    const map = new Map<string, FoodItem>();
-    for (const it of existing) {
-      map.set(`${normalizeText(it.name)}__${it.category}`, it);
-    }
-
-    const toCreate: FoodItem[] = [];
-    const toUpdate: Array<{ id: string; quantity: number }> = [];
-
-    for (const data of itemsData) {
-      const key = `${normalizeText(data.name)}__${data.category}`;
-      const found = map.get(key);
-
-      if (found) {
-        const newQty = (Number(found.quantity) || 0) + (Number(data.quantity) || 0);
-        found.quantity = newQty;
-        toUpdate.push({ id: found.id, quantity: newQty });
-      } else {
-        const newItem: FoodItem = {
+    await Promise.all(
+      itemsData.map((data) =>
+        firestoreService.upsertInventoryByName(currentUid, {
           ...data,
-          id: `food_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
-          addedAt: new Date().toISOString(),
-        };
-        map.set(key, newItem);
-        toCreate.push(newItem);
-      }
-    }
+          // garanta defaults coerentes:
+          quantity: Math.max(1, Number(data.quantity) || 1),
+        })
+      )
+    );
 
-    // grava updates e creates
-    for (const u of toUpdate) {
-      await firestoreService.updateInventoryItem(currentUid, u.id, { quantity: u.quantity });
-    }
-    if (toCreate.length) {
-      await firestoreService.addMultipleInventoryItems(currentUid, toCreate);
-    }
-
-    // atualiza cache local
-    this.items = [...toCreate, ...existing];
+    // Recarrega inventário do Firestore atualizado
+    const updatedItems = await firestoreService.getInventory(currentUid);
+    this.items = updatedItems;
     this.notify();
 
-    return toCreate;
+    return updatedItems;
   }
 
   public async updateItem(id: string, updates: Partial<Omit<FoodItem, 'id'>>): Promise<FoodItem> {

@@ -18,6 +18,7 @@ export type StorageLocation = 'geladeira' | 'freezer' | 'gaveta_legumes' | 'port
 export interface FoodItem {
   id: string;
   name: string;
+  nameKey?: string;
   category: CategoryType;
   quantity: number;
   unit: 'un' | 'kg' | 'g' | 'L' | 'ml' | 'pct' | 'fatias';

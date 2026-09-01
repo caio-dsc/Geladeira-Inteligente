@@ -20,7 +20,7 @@ export const FoodFormModal: React.FC<FoodFormModalProps> = ({
 }) => {
   const [name, setName] = useState('');
   const [category, setCategory] = useState<CategoryType>('vegetables');
-  const [quantity, setQuantity] = useState<number>(1);
+  const [quantityText, setQuantityText] = useState('1');
   const [unit, setUnit] = useState<FoodItem['unit']>('un');
   const [state, setState] = useState<FreshnessState>('fresh');
   const [location, setLocation] = useState<StorageLocation>('geladeira');
@@ -29,11 +29,38 @@ export const FoodFormModal: React.FC<FoodFormModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
+  const onQuantityFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    // seleciona tudo -> qualquer digitação substitui o "1"
+    e.target.select();
+  };
+
+  const onQuantityChange = (raw: string) => {
+    // só dígitos (para unidades inteiras)
+    let v = raw.replace(/[^\d]/g, '');
+
+    // remove zeros à esquerda: "09" -> "9", "012" -> "12"
+    v = v.replace(/^0+(?=\d)/, '');
+
+    // permite vazio enquanto digita (não força 0)
+    setQuantityText(v);
+  };
+
+  const onQuantityBlur = () => {
+    // ao sair do campo: vazio vira 1
+    if (!quantityText.trim()) setQuantityText('1');
+  };
+
+  const getQuantityNumber = () => {
+    const n = Number(quantityText);
+    if (!Number.isFinite(n) || n <= 0) return 1;
+    return n;
+  };
+
   useEffect(() => {
     if (initialData) {
       setName(initialData.name);
       setCategory(initialData.category);
-      setQuantity(initialData.quantity);
+      setQuantityText(String(initialData.quantity || 1));
       setUnit(initialData.unit);
       setState(initialData.state);
       setLocation(initialData.location);
@@ -42,7 +69,7 @@ export const FoodFormModal: React.FC<FoodFormModalProps> = ({
     } else {
       setName('');
       setCategory('vegetables');
-      setQuantity(1);
+      setQuantityText('1');
       setUnit('un');
       setState('fresh');
       setLocation('geladeira');
@@ -58,6 +85,7 @@ export const FoodFormModal: React.FC<FoodFormModalProps> = ({
       setError('Por favor, informe o nome do alimento.');
       return;
     }
+    const quantity = getQuantityNumber();
     if (quantity <= 0) {
       setError('A quantidade deve ser maior que zero.');
       return;
@@ -69,7 +97,7 @@ export const FoodFormModal: React.FC<FoodFormModalProps> = ({
       await onSave({
         name: name.trim(),
         category,
-        quantity: Number(quantity),
+        quantity,
         unit,
         state,
         location,
@@ -170,11 +198,12 @@ export const FoodFormModal: React.FC<FoodFormModalProps> = ({
         <div className="grid grid-cols-2 gap-3.5">
           <Input
             label="Quantidade *"
-            type="number"
-            min="0.1"
-            step="any"
-            value={quantity}
-            onChange={(e) => setQuantity(parseFloat(e.target.value) || 0)}
+            type="text"
+            inputMode="numeric"
+            value={quantityText}
+            onFocus={onQuantityFocus}
+            onChange={(e) => onQuantityChange(e.target.value)}
+            onBlur={onQuantityBlur}
             required
           />
 

@@ -7,6 +7,7 @@ import {
   updateDoc,
   deleteDoc,
   query,
+  where,
   orderBy,
   onSnapshot,
   writeBatch,
@@ -159,11 +160,69 @@ export class FirestoreService {
     }
   }
 
+  public async upsertInventoryByName(
+    userId: string,
+    item: Omit<FoodItem, "id" | "addedAt">
+  ): Promise<void> {
+    const invRef = collection(db, "users", userId, "inventory");
+    const nameKey = normalizeText(item.name);
+
+    // busca por MESMO nomeKey + MESMA categoria
+    const q = query(invRef,
+      where("nameKey", "==", nameKey),
+      where("category", "==", item.category)
+    );
+
+    const snap = await getDocs(q);
+
+    // Se não achou nada, cria novo
+    if (snap.empty) {
+      const newRef = doc(invRef); // auto-id
+      const payload = JSON.parse(JSON.stringify({
+        ...item,
+        id: newRef.id,
+        nameKey,
+        addedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }));
+      const batch = writeBatch(db);
+      batch.set(newRef, payload);
+      await batch.commit();
+      return;
+    }
+
+    // Se achou 1 ou mais (duplicados antigos), consolida:
+    const docs = snap.docs;
+    const keep = docs[0];
+    const keepData = keep.data() as FoodItem;
+
+    const totalQty =
+      (Number(keepData.quantity) || 0) +
+      (Number(item.quantity) || 0) +
+      docs.slice(1).reduce((sum, d) => sum + (Number((d.data() as any).quantity) || 0), 0);
+
+    const batch = writeBatch(db);
+
+    batch.update(keep.ref, JSON.parse(JSON.stringify({
+      quantity: totalQty,
+      nameKey,
+      updatedAt: new Date().toISOString(),
+    })));
+
+    // apaga duplicados extras
+    for (const d of docs.slice(1)) {
+      batch.delete(d.ref);
+    }
+
+    await batch.commit();
+  }
+
   public async addInventoryItem(userId: string, item: FoodItem): Promise<void> {
     try {
       const itemRef = doc(db, 'users', userId, 'inventory', item.id);
       await setDoc(itemRef, {
         name: item.name,
+        nameKey: normalizeText(item.name),
         category: item.category,
         quantity: item.quantity,
         unit: item.unit,
@@ -186,6 +245,7 @@ export class FirestoreService {
         const itemRef = doc(db, 'users', userId, 'inventory', item.id);
         batch.set(itemRef, {
           name: item.name,
+          nameKey: normalizeText(item.name),
           category: item.category,
           quantity: item.quantity,
           unit: item.unit,
