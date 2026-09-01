@@ -4,7 +4,9 @@
   "type": "module",
   "scripts": {
     "import:themealdb:brazil": "tsx importThemealdbBrazil.ts",
-    "consolidate:canonical": "tsx consolidateRecipesCanonical.ts"
+    "import:wikilivros:br": "tsx importWikilivrosBrasil.ts",
+    "consolidate:canonical": "tsx consolidateRecipesCanonical.ts",
+    "backfill:diet": "tsx backfillDiet.ts"
   },
   "dependencies": {
     "firebase-admin": "^14.3.0",

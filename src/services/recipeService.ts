@@ -78,68 +78,91 @@ class RecipeService implements IRecipeService {
       };
     });
 
-    // Filtra conforme as preferências e restrições alimentares do usuário
-    const filtered = matchedList.filter((recipe) => {
-      if (!preferences) return true;
+    let matches = matchedList;
 
-      // Filtro por Nível culinário
-      if (preferences.cookingLevel === 'Iniciante') {
-        if (recipe.difficulty && recipe.difficulty !== 'Fácil') return false;
-      } else if (preferences.cookingLevel === 'Intermediário') {
-        if (recipe.difficulty && recipe.difficulty === 'Avançado') return false;
-      }
+    // Filtro por preferências do usuário
+    if (preferences?.dietaryRestrictions && preferences.dietaryRestrictions.length > 0) {
+      const prefs = preferences.dietaryRestrictions;
 
-      // Filtro por Dietas / Restrições (caso a receita possua diet flags configuradas)
-      if (recipe.diet) {
-        const restrictions = (preferences.dietaryRestrictions || []).map((r) =>
-          this.normalizeString(r)
-        );
+      matches = matches.filter((item) => {
+        const recipe = (item as any).recipe || item;
+        const d = recipe.diet;
+        if (!d) return true; // sem info de diet, não filtra
 
-        // Se usuário marcou "Sem Glúten" -> remove receita com diet.hasGluten
-        if (
-          restrictions.some((r) => r.includes('gluten')) &&
-          recipe.diet.hasGluten === true
-        ) {
-          return false;
+        for (const pref of prefs) {
+          switch (pref) {
+            case 'vegetariano':
+            case 'Vegetariano':
+              if (d.hasMeat === true) return false;
+              break;
+            case 'vegano':
+            case 'Vegano':
+              if (d.vegan === false || d.hasMeat === true || d.hasLactose === true || d.hasEgg === true)
+                return false;
+              break;
+            case 'sem_gluten':
+            case 'Sem Glúten':
+            case 'Sem Gluten':
+            case 'sem gluten':
+              if (d.hasGluten === true) return false;
+              break;
+            case 'sem_lactose':
+            case 'Sem Lactose':
+            case 'sem lactose':
+              if (d.hasLactose === true) return false;
+              break;
+            case 'sem_fritura':
+            case 'Sem Fritura':
+            case 'Sem Frituras':
+            case 'sem_frituras':
+            case 'sem fritura':
+            case 'sem frituras':
+              if (d.usesFrying === true) return false;
+              break;
+            case 'low_carb':
+            case 'Low Carb':
+            case 'low carb':
+              if (d.lowCarb === false) return false;
+              break;
+            case 'rico_em_proteina':
+            case 'Rico em Proteína':
+            case 'Rico em Proteina':
+            case 'rico em proteina':
+            case 'rico em proteína':
+              if (d.highProtein !== true) return false;
+              break;
+          }
         }
+        return true;
+      });
+    }
 
-        // "Sem Lactose" -> remove com diet.hasLactose
-        if (
-          restrictions.some((r) => r.includes('lactose')) &&
-          recipe.diet.hasLactose === true
-        ) {
-          return false;
-        }
+    // Filtro por nível culinário
+    if (preferences?.cookingLevel) {
+      const level = preferences.cookingLevel as string;
+      matches = matches.filter((item) => {
+        const recipe = (item as any).recipe || item;
+        if (level === 'beginner' || level === 'Iniciante') return recipe.difficulty === 'Fácil';
+        if (level === 'intermediate' || level === 'Intermediário') return recipe.difficulty === 'Fácil' || recipe.difficulty === 'Médio';
+        return true; // chef vê todas
+      });
+    }
 
-        // "Vegetariano" -> remove com diet.hasMeat
-        if (
-          restrictions.some((r) => r.includes('vegetariano')) &&
-          recipe.diet.hasMeat === true
-        ) {
-          return false;
-        }
+    // Filtro por porções (se o usuário definiu preferência)
+    if (preferences?.defaultServings) {
+      const s = preferences.defaultServings;
+      matches = matches.filter((item) => {
+        const recipe = (item as any).recipe || item;
+        const bucket = recipe.servingsBucket;
+        if (!bucket || bucket === 'unknown') return true;
+        if (s === 1) return bucket === '1';
+        if (s === 2) return bucket === '2';
+        if (s <= 4) return bucket === '3-4';
+        return bucket === '5+';
+      });
+    }
 
-        // "Vegano" -> remove se diet.vegan !== true
-        if (
-          restrictions.some((r) => r.includes('vegano')) &&
-          recipe.diet.vegan !== true
-        ) {
-          return false;
-        }
-
-        // "Sem Frituras" -> remove se diet.usesFrying === true
-        if (
-          restrictions.some((r) => r.includes('fritura')) &&
-          recipe.diet.usesFrying === true
-        ) {
-          return false;
-        }
-      }
-
-      return true;
-    });
-
-    return filtered.sort((a, b) => b.matchPercentage - a.matchPercentage);
+    return matches.sort((a, b) => b.matchPercentage - a.matchPercentage);
   }
 
   public async getRecipeById(id: string, inventory: FoodItem[] = []): Promise<RecipeMatch | null> {

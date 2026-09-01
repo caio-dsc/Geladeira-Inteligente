@@ -47,14 +47,15 @@ export interface RecipeSource {
 }
 
 export interface RecipeDietFlags {
-  hasGluten?: boolean;
-  hasLactose?: boolean;
   hasMeat?: boolean;
+  hasLactose?: boolean;
+  hasGluten?: boolean;
+  hasEgg?: boolean;
   vegetarian?: boolean;
   vegan?: boolean;
-  usesFrying?: boolean;
   lowCarb?: boolean;
   highProtein?: boolean;
+  usesFrying?: boolean;
 }
 
 export interface Recipe {
@@ -74,16 +75,7 @@ export interface Recipe {
   aliases?: string[];         // variações do nome
   servingsBucket?: ServingsBucket;
   sources?: RecipeSource[];
-  diet?: {
-    hasGluten?: boolean;
-    hasLactose?: boolean;
-    hasMeat?: boolean;
-    vegetarian?: boolean;
-    vegan?: boolean;
-    usesFrying?: boolean;
-    lowCarb?: boolean;
-    highProtein?: boolean;
-  };
+  diet?: RecipeDietFlags;
   originArea?: string;        // ex: Brazilian
   originCountry?: string;     // ex: Brazil
 }
