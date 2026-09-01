@@ -62,9 +62,7 @@ export default function App() {
 
   // Update recipes whenever inventory or user preferences change
   useEffect(() => {
-    if (inventory.length > 0 || user?.preferences) {
-      updateRecipeMatches(inventory, user?.preferences);
-    }
+    updateRecipeMatches(inventory, user?.preferences);
   }, [inventory, user?.preferences, updateRecipeMatches]);
 
   // Initialize data subscriptions

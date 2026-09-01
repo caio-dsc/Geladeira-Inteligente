@@ -47,12 +47,12 @@ export interface RecipeSource {
 }
 
 export interface RecipeDietFlags {
-  usesFrying?: boolean;     // tem fritura?
-  hasMeat?: boolean;        // tem carne/peixe/frango?
-  hasGluten?: boolean;      // tem trigo/farinha/pão/massa?
-  hasLactose?: boolean;     // tem leite/queijo/manteiga/creme?
+  hasGluten?: boolean;
+  hasLactose?: boolean;
+  hasMeat?: boolean;
   vegetarian?: boolean;
   vegan?: boolean;
+  usesFrying?: boolean;
   lowCarb?: boolean;
   highProtein?: boolean;
 }
@@ -74,7 +74,16 @@ export interface Recipe {
   aliases?: string[];         // variações do nome
   servingsBucket?: ServingsBucket;
   sources?: RecipeSource[];
-  diet?: RecipeDietFlags;     // aqui fica a “inteligência”
+  diet?: {
+    hasGluten?: boolean;
+    hasLactose?: boolean;
+    hasMeat?: boolean;
+    vegetarian?: boolean;
+    vegan?: boolean;
+    usesFrying?: boolean;
+    lowCarb?: boolean;
+    highProtein?: boolean;
+  };
   originArea?: string;        // ex: Brazilian
   originCountry?: string;     // ex: Brazil
 }

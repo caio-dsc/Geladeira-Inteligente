@@ -60,7 +60,8 @@
         "imageUrl": { "type": "string" },
         "ingredients": { "type": "array" },
         "steps": { "type": "array" },
-        "tags": { "type": "array" }
+        "tags": { "type": "array" },
+        "diet": { "type": "object" }
       },
       "required": ["id", "title", "prepTimeMinutes", "difficulty", "servings", "ingredients", "steps"]
     },

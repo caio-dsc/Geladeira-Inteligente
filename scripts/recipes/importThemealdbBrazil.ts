@@ -54,21 +54,34 @@ function computeDietFlags(ingredients: string[], steps: string[]) {
   const all = normalizeText([...ingredients, ...steps].join(' '));
 
   const hasMeat =
-    /(beef|pork|chicken|fish|shrimp|bacon|ham|sausage|carne|frango|porco|peixe|camarao|linguica)/.test(all);
+    /(beef|pork|chicken|fish|shrimp|bacon|ham|sausage|carne|frango|porco|peixe|camarao|linguica|presunto|costela|salmao|atum|bacalhau|peru|picanha)/.test(all);
 
   const hasLactose =
-    /(milk|cheese|butter|cream|yogurt|leite|queijo|manteiga|creme|iogurte)/.test(all);
+    /(milk|cheese|butter|cream|yogurt|leite|queijo|manteiga|creme|iogurte|requeijao|nata|parmesao|mozzarella|mussarela|condensado)/.test(all);
 
   const hasGluten =
-    /(wheat|flour|bread|pasta|noodle|farinha|trigo|pao|massa|macarrao)/.test(all);
+    /(wheat|flour|bread|pasta|noodle|farinha|trigo|pao|massa|macarrao|cevada|centeio|crosta|empanad)/.test(all);
 
   const usesFrying =
-    /(deep fry|fry\b|frying|frit|imersao|oleo quente)/.test(all);
+    /(deep fry|fry\b|frying|fried|frit|imersao|oleo quente|frigideira com oleo|dourar no oleo)/.test(all);
 
   const vegetarian = !hasMeat;
-  const vegan = vegetarian && !hasLactose && !/(egg|eggs|ovo|ovos|honey|mel)/.test(all);
+  const hasEggsOrHoney = /(egg|eggs|ovo|ovos|honey|mel)/.test(all);
+  const vegan = vegetarian && !hasLactose && !hasEggsOrHoney;
 
-  return { hasMeat, hasLactose, hasGluten, usesFrying, vegetarian, vegan };
+  const lowCarb = !hasGluten && !/(sugar|rice|potato|acucar|arroz|batata|mandioca|aipim|doce|mel)/.test(all);
+  const highProtein = hasMeat || /(egg|eggs|ovo|ovos|whey|tofu|lentilha|grao-de-bico|feijao|beans|proteina)/.test(all);
+
+  return {
+    hasGluten,
+    hasLactose,
+    hasMeat,
+    vegetarian,
+    vegan,
+    usesFrying,
+    lowCarb,
+    highProtein,
+  };
 }
 
 async function fetchJson(url: string) {

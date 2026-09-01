@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "import:themealdb:brazil": "tsx importThemealdbBrazil.ts"
+    "import:themealdb:brazil": "tsx importThemealdbBrazil.ts",
+    "consolidate:canonical": "tsx consolidateRecipesCanonical.ts"
   },
   "dependencies": {
     "firebase-admin": "^14.3.0",
