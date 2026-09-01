@@ -10,3 +10,7 @@ scripts/_secrets/
 scripts/.env
 bun.lock
 bun.lockb
+
+# Scripts de import (não vão para o Cloudflare)
+scripts/recipes/node_modules
+scripts/_secrets
