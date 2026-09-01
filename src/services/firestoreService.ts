@@ -26,6 +26,16 @@ import { User, FoodItem, Recipe, ScanSession } from '../types';
  * - recipes/{recipeId}
  */
 
+export const normalizeText = (s: string) =>
+  (s || "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, ""); // remove acentos
+
+export const inventoryMergeKey = (name: string, category: string) =>
+  `${normalizeText(name)}__${category}`;
+
 export class FirestoreService {
   // ==========================================
   // USUÁRIOS & PERFIL
@@ -80,6 +90,58 @@ export class FirestoreService {
   // ==========================================
   // INVENTÁRIO / GELADEIRA (users/{userId}/inventory)
   // ==========================================
+
+  public async consolidateInventoryDuplicates(userId: string): Promise<void> {
+    const items = await this.getInventory(userId);
+    if (items.length < 2) return;
+
+    const groups = new Map<string, FoodItem[]>();
+    for (const it of items) {
+      const key = `${normalizeText(it.name)}__${it.category}`;
+      const arr = groups.get(key) || [];
+      arr.push(it);
+      groups.set(key, arr);
+    }
+
+    const batch = writeBatch(db);
+    let ops = 0;
+
+    for (const [, arr] of groups) {
+      if (arr.length <= 1) continue;
+
+      // mantém o primeiro (lista vem ordenada por addedAt desc no getInventory)
+      const keep = arr[0];
+      const duplicates = arr.slice(1);
+
+      const totalQty = arr.reduce((sum, x) => sum + (Number(x.quantity) || 0), 0);
+
+      // mantém a validade mais cedo (segurança). Se nenhuma, fica null.
+      const expiryCandidates = arr.map(x => x.expiryDate).filter(Boolean) as string[];
+      const earliestExpiry = expiryCandidates.length ? expiryCandidates.sort()[0] : null;
+
+      const keepRef = doc(db, 'users', userId, 'inventory', keep.id);
+      batch.update(keepRef, {
+        quantity: totalQty,
+        expiryDate: earliestExpiry,
+        updatedAt: new Date().toISOString(),
+      });
+      ops++;
+
+      for (const d of duplicates) {
+        const dRef = doc(db, 'users', userId, 'inventory', d.id);
+        batch.delete(dRef);
+        ops++;
+      }
+
+      // segurança para não estourar limite de batch (500 ops)
+      if (ops >= 450) {
+        await batch.commit();
+        ops = 0;
+      }
+    }
+
+    if (ops > 0) await batch.commit();
+  }
 
   public async getInventory(userId: string): Promise<FoodItem[]> {
     try {

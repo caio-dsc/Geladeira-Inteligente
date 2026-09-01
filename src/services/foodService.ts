@@ -1,6 +1,6 @@
 import { FoodItem } from '../types';
 import { INITIAL_FOOD_ITEMS } from '../data/mockData';
-import { firestoreService } from './firestoreService';
+import { firestoreService, normalizeText } from './firestoreService';
 import { auth } from './firebaseConfig';
 
 export interface IFoodService {
@@ -35,7 +35,11 @@ class FoodService implements IFoodService {
           // Busca dados iniciais do Firestore
           const firestoreItems = await firestoreService.getInventory(firebaseUser.uid);
           if (firestoreItems.length > 0) {
-            this.items = firestoreItems;
+            // 1) limpa duplicados no banco (uma vez por login)
+            await firestoreService.consolidateInventoryDuplicates(firebaseUser.uid);
+
+            // 2) recarrega para garantir que this.items já venha “limpo”
+            this.items = await firestoreService.getInventory(firebaseUser.uid);
           } else {
             // Se o inventário estiver vazio no primeiro acesso, sincroniza os itens de demonstração
             await firestoreService.addMultipleInventoryItems(firebaseUser.uid, this.items);
@@ -94,20 +98,52 @@ class FoodService implements IFoodService {
   }
 
   public async addMultipleItems(itemsData: Array<Omit<FoodItem, 'id' | 'addedAt'>>): Promise<FoodItem[]> {
-    const addedItems: FoodItem[] = itemsData.map((data) => ({
-      ...data,
-      id: `food_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
-      addedAt: new Date().toISOString(),
-    }));
-
     const currentUid = auth.currentUser?.uid;
-    if (currentUid) {
-      await firestoreService.addMultipleInventoryItems(currentUid, addedItems);
+    if (!currentUid) return [];
+
+    // usa o cache atual (vem do subscribeInventory)
+    const existing = [...this.items];
+
+    const map = new Map<string, FoodItem>();
+    for (const it of existing) {
+      map.set(`${normalizeText(it.name)}__${it.category}`, it);
     }
 
-    this.items = [...addedItems, ...this.items];
+    const toCreate: FoodItem[] = [];
+    const toUpdate: Array<{ id: string; quantity: number }> = [];
+
+    for (const data of itemsData) {
+      const key = `${normalizeText(data.name)}__${data.category}`;
+      const found = map.get(key);
+
+      if (found) {
+        const newQty = (Number(found.quantity) || 0) + (Number(data.quantity) || 0);
+        found.quantity = newQty;
+        toUpdate.push({ id: found.id, quantity: newQty });
+      } else {
+        const newItem: FoodItem = {
+          ...data,
+          id: `food_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+          addedAt: new Date().toISOString(),
+        };
+        map.set(key, newItem);
+        toCreate.push(newItem);
+      }
+    }
+
+    // grava updates e creates
+    for (const u of toUpdate) {
+      await firestoreService.updateInventoryItem(currentUid, u.id, { quantity: u.quantity });
+    }
+    if (toCreate.length) {
+      await firestoreService.addMultipleInventoryItems(currentUid, toCreate);
+    }
+
+    // atualiza cache local
+    this.items = [...toCreate, ...existing];
     this.notify();
-    return addedItems;
+
+    return toCreate;
   }
 
   public async updateItem(id: string, updates: Partial<Omit<FoodItem, 'id'>>): Promise<FoodItem> {
