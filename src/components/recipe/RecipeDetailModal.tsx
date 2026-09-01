@@ -28,6 +28,12 @@ export const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
 
   const isFullMatch = recipe.matchPercentage === 100;
 
+  const tags = recipe.tags ?? [];
+  const instructions =
+    (recipe.steps && recipe.steps.length > 0
+      ? recipe.steps
+      : (recipe as any).instructions) ?? [];
+
   return (
     <Modal
       isOpen={isOpen}
@@ -72,7 +78,7 @@ export const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
           <div className="absolute bottom-4 left-4 right-4 text-white flex flex-wrap items-end justify-between gap-2">
             <div>
               <div className="flex flex-wrap items-center gap-2 mb-1">
-                {recipe.tags.map((tag) => (
+                {tags.map((tag) => (
                   <span key={tag} className="text-[11px] bg-emerald-950/80 border border-emerald-500/30 text-emerald-300 backdrop-blur-md px-2.5 py-0.5 rounded-md font-bold">
                     {tag}
                   </span>
@@ -151,7 +157,7 @@ export const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
                     <span className="font-semibold text-white">{ing.name}</span>
                   </div>
                   <span className="text-emerald-300/80 font-medium">
-                    {ing.quantity} {ing.unit}
+                    {ing.quantity}
                   </span>
                 </div>
               );
@@ -163,7 +169,7 @@ export const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
         <div className="space-y-3">
           <h4 className="text-sm font-bold text-white">Modo de Preparo</h4>
           <ol className="space-y-2.5">
-            {recipe.instructions.map((step, idx) => (
+            {instructions.map((step: string, idx: number) => (
               <li
                 key={idx}
                 className="flex items-start gap-3 p-3.5 rounded-2xl bg-[#081e13] border border-emerald-500/15 text-xs sm:text-sm text-emerald-100 leading-relaxed"
