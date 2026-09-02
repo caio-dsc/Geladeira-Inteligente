@@ -49,7 +49,9 @@ class RecipeService implements IRecipeService {
     preferences?: UserPreferences
   ): Promise<RecipeMatch[]> {
     const recipes = await this.getRecipes();
-    const inventoryNames = inventory.map((item) => this.normalizeString(item.name));
+    const inventoryNames = inventory
+      .filter((item) => Number(item.quantity) > 0)
+      .map((item) => this.normalizeString(item.name));
 
     const matchedList = recipes.map((recipe) => {
       const matchedIngredients: string[] = [];
@@ -176,7 +178,9 @@ class RecipeService implements IRecipeService {
     const recipe = recipes.find((r) => r.id === id);
     if (!recipe) return null;
 
-    const inventoryNames = inventory.map((item) => this.normalizeString(item.name));
+    const inventoryNames = inventory
+      .filter((item) => Number(item.quantity) > 0)
+      .map((item) => this.normalizeString(item.name));
     const matchedIngredients: string[] = [];
     const missingIngredients: string[] = [];
 

@@ -91,9 +91,14 @@ async function fetchJson(url: string) {
 }
 
 async function getBrazilianMealSummaries(): Promise<MealSummary[]> {
-  // filtro por área (documentado pela TheMealDB)
-  const data = await fetchJson(`${API_BASE}/filter.php?a=Brazilian`);
-  return data.meals || [];
+  // TheMealDB aceita 'Brazil' e em versões anteriores 'Brazilian'
+  try {
+    const data = await fetchJson(`${API_BASE}/filter.php?a=Brazil`);
+    if (data.meals && data.meals.length > 0) return data.meals;
+  } catch {}
+
+  const dataFallback = await fetchJson(`${API_BASE}/filter.php?a=Brazilian`);
+  return dataFallback.meals || [];
 }
 
 async function lookupMeal(idMeal: string): Promise<MealDetail | null> {
@@ -151,9 +156,9 @@ export async function main() {
       ],
     };
 
-    const docId = `themealdb_${meal.idMeal}`;
+    const docId = recipe.canonicalKey || `themealdb_${meal.idMeal}`;
     const ref = db.collection('recipes').doc(docId);
-    batch.set(ref, recipe, { merge: true });
+    batch.set(ref, { ...recipe, id: docId }, { merge: true });
   }
 
   await batch.commit();
