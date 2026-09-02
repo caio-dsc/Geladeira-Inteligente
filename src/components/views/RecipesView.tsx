@@ -63,6 +63,7 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
       const matchesSearch = 
         recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         recipe.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (recipe.aliases && recipe.aliases.some((a) => a.toLowerCase().includes(searchTerm.toLowerCase()))) ||
         recipe.ingredients.some((ing) => ing.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
       const matchesCategory = selectedCategory === 'all' || recipe.category === selectedCategory;

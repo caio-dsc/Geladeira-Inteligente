@@ -9,6 +9,8 @@
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
+    "recipes:generate": "tsx scripts/recipes/generateCatalog.ts",
+    "generate:catalog": "tsx scripts/recipes/generateCatalog.ts",
     "recipes:import": "tsx scripts/recipes/importThemealdbBrazil.ts",
     "import:recipes:themealdb:brazil": "tsx scripts/recipes/importThemealdbBrazil.ts"
   },

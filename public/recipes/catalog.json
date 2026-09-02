@@ -1,444 +1,4689 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-02T00:00:00.000Z",
+  "generatedAt": "2026-09-02T01:44:45.824Z",
+  "total": 35,
   "recipes": [
     {
-      "id": "omelete_simples",
-      "canonicalKey": "omelete",
-      "title": "Omelete Rápido com Queijo",
-      "description": "Omelete leve, fofo e dourado, recheado com queijo derretido.",
-      "prepTimeMinutes": 10,
-      "difficulty": "Fácil",
-      "servings": 1,
-      "servingsBucket": "1",
-      "category": "Café & Lanches",
-      "imageUrl": "https://images.unsplash.com/photo-1510693206972-df098062cb71?w=600&auto=format&fit=crop&q=80",
-      "caloriesPerServing": 240,
-      "tags": ["Rápido", "Proteico", "Sem Glúten"],
-      "ingredients": [
-        { "name": "Ovo", "quantity": "2 un", "required": true, "category": "proteins" },
-        { "name": "Manteiga", "quantity": "1 colher de chá", "required": true, "category": "dairy" },
-        { "name": "Queijo Muçarela", "quantity": "50g", "required": false, "category": "dairy" },
-        { "name": "Sal", "quantity": "a gosto", "required": false, "category": "condiments" }
-      ],
-      "steps": [
-        "Quebre os ovos em uma tigela, tempere com uma pitada de sal e bata com um garfo até espumar levemente.",
-        "Aqueça uma frigideira antiaderente em fogo médio e derreta a manteiga.",
-        "Despeje os ovos batidos e deixe firmar as bordas por cerca de 1 a 2 minutos.",
-        "Adicione o queijo em uma das metades, dobre a outra por cima e sirva imediatamente."
-      ],
-      "diet": {
-        "hasGluten": false,
-        "hasLactose": true,
-        "hasMeat": false,
-        "hasEgg": true,
-        "vegetarian": true,
-        "vegan": false,
-        "usesFrying": false
-      }
-    },
-    {
-      "id": "arroz_branco",
-      "canonicalKey": "arroz_branco",
-      "title": "Arroz Branco Soltinho",
-      "description": "Arroz tradicional brasileiro, soltinho e bem temperado com alho e cebola.",
-      "prepTimeMinutes": 20,
-      "difficulty": "Fácil",
-      "servings": 4,
-      "servingsBucket": "3-4",
-      "category": "Acompanhamentos",
-      "imageUrl": "https://images.unsplash.com/photo-1516684732162-798a0062be99?w=600&auto=format&fit=crop&q=80",
-      "caloriesPerServing": 180,
-      "tags": ["Clássico", "Vegano", "Sem Glúten"],
-      "ingredients": [
-        { "name": "Arroz", "quantity": "1 xícara", "required": true, "category": "pantry" },
-        { "name": "Alho", "quantity": "2 dentes picados", "required": true, "category": "vegetables" },
-        { "name": "Cebola", "quantity": "1/2 unidade picada", "required": false, "category": "vegetables" },
-        { "name": "Óleo", "quantity": "1 colher de sopa", "required": true, "category": "pantry" },
-        { "name": "Sal", "quantity": "1 colher de chá", "required": false, "category": "condiments" }
-      ],
-      "steps": [
-        "Em uma panela, aqueça o óleo e refogue a cebola e o alho até dourarem levemente.",
-        "Adicione o arroz e mexa bem por 1 minuto para fritar os grãos.",
-        "Acrescente 2 xícaras de água fervente e o sal.",
-        "Cozinhe em fogo médio com a tampa entreaberta até a água secar e os grãos ficarem macios (aprox. 15 minutos)."
-      ],
-      "diet": {
-        "hasGluten": false,
-        "hasLactose": false,
-        "hasMeat": false,
-        "hasEgg": false,
-        "vegetarian": true,
-        "vegan": true,
-        "usesFrying": false
-      }
-    },
-    {
-      "id": "feijao_carioca",
-      "canonicalKey": "feijao_carioca",
-      "title": "Feijão Carioca Caseiro",
-      "description": "Feijão com caldo encorpado, temperado com alho, louro e azeite.",
-      "prepTimeMinutes": 45,
+      "id": "feijoada-completa-tradicional",
+      "title": "Feijoada Completa Tradicional",
+      "description": "Clássica feijoada brasileira com feijão preto, carnes nobres defumadas e tempero generoso de alho e louro.",
+      "prepTimeMinutes": 90,
       "difficulty": "Médio",
-      "servings": 4,
-      "servingsBucket": "3-4",
-      "category": "Acompanhamentos",
-      "imageUrl": "https://images.unsplash.com/photo-1547496502-affa22d38842?w=600&auto=format&fit=crop&q=80",
-      "caloriesPerServing": 160,
-      "tags": ["Rico em Fibras", "Vegano", "Tradicional"],
+      "servings": 6,
+      "category": "Almoço & Jantar",
+      "imageUrl": "https://images.unsplash.com/photo-1543339308-43e59d6b73a6?auto=format&fit=crop&w=1000&q=80",
       "ingredients": [
-        { "name": "Feijão Carioca", "quantity": "1 xícara", "required": true, "category": "pantry" },
-        { "name": "Alho", "quantity": "3 dentes picados", "required": true, "category": "vegetables" },
-        { "name": "Cebola", "quantity": "1/2 unidade", "required": false, "category": "vegetables" },
-        { "name": "Azeite", "quantity": "1 colher de sopa", "required": true, "category": "pantry" },
-        { "name": "Sal", "quantity": "a gosto", "required": false, "category": "condiments" }
+        {
+          "name": "Feijão Preto",
+          "quantity": "500g",
+          "required": true,
+          "category": "pantry"
+        },
+        {
+          "name": "Carne Seca",
+          "quantity": "300g",
+          "required": true,
+          "category": "proteins"
+        },
+        {
+          "name": "Costelinha de Porco",
+          "quantity": "300g",
+          "required": true,
+          "category": "proteins"
+        },
+        {
+          "name": "Linguiça Calabresa",
+          "quantity": "200g",
+          "required": true,
+          "category": "proteins"
+        },
+        {
+          "name": "Bacon",
+          "quantity": "150g",
+          "required": false,
+          "category": "proteins"
+        },
+        {
+          "name": "Alho",
+          "quantity": "5 dentes",
+          "required": true,
+          "category": "vegetables"
+        },
+        {
+          "name": "Cebola",
+          "quantity": "2 unidades",
+          "required": true,
+          "category": "vegetables"
+        },
+        {
+          "name": "Folhas de Louro",
+          "quantity": "3 folhas",
+          "required": false,
+          "category": "condiments"
+        }
       ],
       "steps": [
-        "Deixe o feijão de molho em água por pelo menos 4 horas antes do preparo.",
-        "Cozinhe na panela de pressão com água limpa e folha de louro por 20 minutos após pegar pressão.",
-        "Em outra frigideira, doure o alho e a cebola no azeite.",
-        "Adicione uma concha do feijão cozido na frigideira, amasse com a concha para engrossar o caldo e devolva tudo à panela.",
-        "Ferva em fogo baixo por 5 minutos para apurar o tempero."
+        "Dessalgue as carnes em água fria na geladeira por pelo menos 12 horas trocando a água.",
+        "Cozinhe o feijão preto com as carnes mais duras na panela de pressão por cerca de 30 minutos.",
+        "Adicione as linguiças e o bacon fatiados e cozinhe por mais 15 minutos até tudo ficar macio.",
+        "Em uma frigideira à parte, doure o alho e a cebola picada no azeite.",
+        "Adicione uma concha do feijão à frigideira, amasse para engrossar e devolva à panela principal.",
+        "Deixe apurar em fogo baixo por 10 minutos com o louro até o caldo encorpar."
       ],
+      "tags": [
+        "Prato Típico",
+        "Carnes",
+        "Tradicional",
+        "Fim de Semana"
+      ],
+      "caloriesPerServing": 520,
+      "canonicalKey": "feijoada-completa-tradicional",
+      "servingsBucket": "5+",
+      "originArea": "Brazilian",
+      "originCountry": "Brazil",
       "diet": {
-        "hasGluten": false,
-        "hasLactose": false,
-        "hasMeat": false,
-        "hasEgg": false,
-        "vegetarian": true,
-        "vegan": true,
-        "usesFrying": false
-      }
-    },
-    {
-      "id": "frango_grelhado",
-      "canonicalKey": "frango_grelhado",
-      "title": "Filé de Frango Grelhado com Ervas",
-      "description": "Peito de frango suculento marinado com alho, limão e azeite.",
-      "prepTimeMinutes": 15,
-      "difficulty": "Fácil",
-      "servings": 2,
-      "servingsBucket": "2",
-      "category": "Pratos Principais",
-      "imageUrl": "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=600&auto=format&fit=crop&q=80",
-      "caloriesPerServing": 220,
-      "tags": ["High Protein", "Low Carb", "Sem Glúten"],
-      "ingredients": [
-        { "name": "Peito de Frango", "quantity": "400g em filés", "required": true, "category": "proteins" },
-        { "name": "Alho", "quantity": "2 dentes amassados", "required": true, "category": "vegetables" },
-        { "name": "Limão", "quantity": "1/2 unidade", "required": false, "category": "fruits" },
-        { "name": "Azeite", "quantity": "1 colher de sopa", "required": true, "category": "pantry" },
-        { "name": "Sal", "quantity": "a gosto", "required": false, "category": "condiments" }
-      ],
-      "steps": [
-        "Tempere os filés de frango com o alho, suco de limão, sal e um fio de azeite.",
-        "Aqueça uma frigideira ou grelha em fogo alto.",
-        "Grelhe os filés por 3 a 4 minutos de cada lado até ficarem dourados por fora e cozidos por dentro.",
-        "Deixe descansar por 2 minutos antes de fatiar para reter a suculência."
-      ],
-      "diet": {
-        "hasGluten": false,
-        "hasLactose": false,
         "hasMeat": true,
+        "hasLactose": false,
+        "hasGluten": false,
         "hasEgg": false,
         "vegetarian": false,
         "vegan": false,
+        "lowCarb": false,
         "highProtein": true,
-        "lowCarb": true,
         "usesFrying": false
-      }
+      },
+      "sources": [
+        {
+          "sourceId": "custom",
+          "license": "Public Domain / CC0",
+          "attribution": "Geladeira Inteligente Catalog"
+        }
+      ],
+      "aliases": [
+        "Feijoada Completa Tradicional"
+      ]
     },
     {
-      "id": "salada_fresca",
-      "canonicalKey": "salada_fresca",
-      "title": "Salada Colorida com Tomate e Cenoura",
-      "description": "Salada refrescante e crocante com alface, tomate fresco e cenoura ralada.",
-      "prepTimeMinutes": 8,
-      "difficulty": "Fácil",
-      "servings": 2,
-      "servingsBucket": "2",
-      "category": "Saladas",
-      "imageUrl": "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=600&auto=format&fit=crop&q=80",
-      "caloriesPerServing": 75,
-      "tags": ["Leve", "Vegano", "Rápido"],
-      "ingredients": [
-        { "name": "Alface Americana", "quantity": "1/2 maço", "required": true, "category": "vegetables" },
-        { "name": "Tomates Maduros", "quantity": "2 unidades", "required": true, "category": "vegetables" },
-        { "name": "Cenouras", "quantity": "1 unidade ralada", "required": true, "category": "vegetables" },
-        { "name": "Azeite", "quantity": "1 colher de sopa", "required": false, "category": "pantry" },
-        { "name": "Limão", "quantity": "1/2 unidade", "required": false, "category": "fruits" }
-      ],
-      "steps": [
-        "Lave bem as folhas de alface e seque.",
-        "Corte os tomates em gomos e rale a cenoura finamente.",
-        "Monte em uma saladeira com as folhas na base e os legumes por cima.",
-        "Tempere na hora de servir com azeite, limão e uma pitada de sal."
-      ],
-      "diet": {
-        "hasGluten": false,
-        "hasLactose": false,
-        "hasMeat": false,
-        "hasEgg": false,
-        "vegetarian": true,
-        "vegan": true,
-        "usesFrying": false
-      }
-    },
-    {
-      "id": "macarrao_alho_oleo",
-      "canonicalKey": "macarrao_alho_oleo",
-      "title": "Macarrão Alho e Óleo com Tomates",
-      "description": "Prato clássico e saboroso preparado em menos de 15 minutos.",
-      "prepTimeMinutes": 15,
-      "difficulty": "Fácil",
-      "servings": 2,
-      "servingsBucket": "2",
-      "category": "Massas",
-      "imageUrl": "https://images.unsplash.com/photo-1621996346565-e3d5d62817d2?w=600&auto=format&fit=crop&q=80",
-      "caloriesPerServing": 340,
-      "tags": ["Massa", "Rápido", "Vegetariano"],
-      "ingredients": [
-        { "name": "Macarrão", "quantity": "200g", "required": true, "category": "pantry" },
-        { "name": "Alho", "quantity": "4 dentes laminados", "required": true, "category": "vegetables" },
-        { "name": "Azeite", "quantity": "3 colheres de sopa", "required": true, "category": "pantry" },
-        { "name": "Tomates Maduros", "quantity": "1 unidade em cubos", "required": false, "category": "vegetables" },
-        { "name": "Sal", "quantity": "a gosto", "required": false, "category": "condiments" }
-      ],
-      "steps": [
-        "Cozinhe o macarrão em bastante água fervente com sal até ficar al dente.",
-        "Em uma frigideira grande, aqueça o azeite e doure as lâminas de alho lentamente em fogo brando.",
-        "Adicione os tomates picados e refogue rapidamente.",
-        "Junte o macarrão escorrido diretamente na frigideira, misture bem e sirva."
-      ],
-      "diet": {
-        "hasGluten": true,
-        "hasLactose": false,
-        "hasMeat": false,
-        "hasEgg": false,
-        "vegetarian": true,
-        "vegan": true,
-        "usesFrying": false
-      }
-    },
-    {
-      "id": "pao_de_queijo",
-      "canonicalKey": "pao_de_queijo",
-      "title": "Pão de Queijo Mineiro",
-      "description": "Pão de queijo caseiro com casquinha crocante e interior elástico e saboroso.",
+      "id": "pao-de-queijo-mineiro",
+      "title": "Pão de Queijo Mineiro Crocante",
+      "description": "Autêntico pão de queijo com polvilho azedo e queijo Minas curado, casquinha crocante e miolo puxa-puxa.",
       "prepTimeMinutes": 35,
-      "difficulty": "Médio",
-      "servings": 6,
-      "servingsBucket": "5+",
-      "category": "Café & Lanches",
-      "imageUrl": "https://images.unsplash.com/photo-1598142981504-20b784a92357?w=600&auto=format&fit=crop&q=80",
-      "caloriesPerServing": 180,
-      "tags": ["Sem Glúten", "Brasileiro", "Tradicional"],
+      "difficulty": "Fácil",
+      "servings": 4,
+      "category": "Acompanhamentos",
+      "imageUrl": "https://images.unsplash.com/photo-1598142981313-0973a213e4b7?auto=format&fit=crop&w=1000&q=80",
       "ingredients": [
-        { "name": "Polvilho Doce", "quantity": "250g", "required": true, "category": "pantry" },
-        { "name": "Queijo Muçarela", "quantity": "150g ralado", "required": true, "category": "dairy" },
-        { "name": "Leite Integral", "quantity": "100ml", "required": true, "category": "dairy" },
-        { "name": "Ovo", "quantity": "1 unidade", "required": true, "category": "proteins" },
-        { "name": "Óleo", "quantity": "50ml", "required": true, "category": "pantry" },
-        { "name": "Sal", "quantity": "1 colher de chá", "required": false, "category": "condiments" }
+        {
+          "name": "Polvilho Azedo",
+          "quantity": "500g",
+          "required": true,
+          "category": "pantry"
+        },
+        {
+          "name": "Queijo Minas ou Meia Cura",
+          "quantity": "300g ralado",
+          "required": true,
+          "category": "dairy"
+        },
+        {
+          "name": "Ovos",
+          "quantity": "3 unidades",
+          "required": true,
+          "category": "proteins"
+        },
+        {
+          "name": "Leite",
+          "quantity": "1 xícara",
+          "required": true,
+          "category": "dairy"
+        },
+        {
+          "name": "Óleo",
+          "quantity": "1/2 xícara",
+          "required": true,
+          "category": "pantry"
+        },
+        {
+          "name": "Sal",
+          "quantity": "1 colher de chá",
+          "required": false,
+          "category": "condiments"
+        }
       ],
       "steps": [
-        "Ferva o leite com o óleo e o sal.",
-        "Escalde o polvilho em uma tigela grande misturando bem até amornar.",
-        "Acrescente o ovo e amasse com as mãos.",
-        "Incorpore o queijo ralado até formar uma massa homogênea.",
-        "Faça bolinhas e asse em forno pré-aquecido a 200°C por 25 a 30 minutos até dourarem."
+        "Ferva o leite com o óleo e o sal em uma panela pequena.",
+        "Despeje a mistura fervente sobre o polvilho em uma tigela grande para escaldar, misturando com uma colher.",
+        "Deixe a massa amornar e acrescente os ovos um a um, sovando bem.",
+        "Incorpore o queijo ralado até formar uma massa homogênea e maleável.",
+        "Modele bolinhas com as mãos untadas e disponha em assadeira.",
+        "Asse em forno pré-aquecido a 200°C por 25 a 30 minutos até dourarem."
       ],
+      "tags": [
+        "Sem Glúten",
+        "Mineiro",
+        "Café da Manhã",
+        "Lanche"
+      ],
+      "caloriesPerServing": 240,
+      "canonicalKey": "pao-de-queijo-mineiro",
+      "servingsBucket": "3-4",
+      "originArea": "Brazilian",
+      "originCountry": "Brazil",
       "diet": {
+        "hasMeat": false,
+        "hasLactose": true,
         "hasGluten": false,
-        "hasLactose": true,
-        "hasMeat": false,
         "hasEgg": true,
         "vegetarian": true,
         "vegan": false,
+        "lowCarb": false,
+        "highProtein": false,
         "usesFrying": false
-      }
+      },
+      "sources": [
+        {
+          "sourceId": "custom",
+          "license": "Public Domain / CC0",
+          "attribution": "Geladeira Inteligente Catalog"
+        }
+      ],
+      "aliases": [
+        "Pão de Queijo Mineiro Crocante"
+      ]
     },
     {
-      "id": "bolo_cenoura_chocolate",
-      "canonicalKey": "bolo_cenoura",
-      "title": "Bolo de Cenoura com Calda de Chocolate",
-      "description": "Bolo fofinho de cenoura com cobertura cremosa e brilhante de chocolate.",
-      "prepTimeMinutes": 45,
-      "difficulty": "Médio",
-      "servings": 8,
-      "servingsBucket": "5+",
-      "category": "Sobremesas",
-      "imageUrl": "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=600&auto=format&fit=crop&q=80",
-      "caloriesPerServing": 290,
-      "tags": ["Doce", "Brasileiro", "Café da Tarde"],
+      "id": "moqueca-baiana-de-peixe",
+      "title": "Moqueca Baiana com Leite de Coco e Dendê",
+      "description": "Peixe branco cozido lentamente com pimentões coloridos, tomate fresco, azeite de dendê e leite de coco cremoso.",
+      "prepTimeMinutes": 40,
+      "difficulty": "Fácil",
+      "servings": 4,
+      "category": "Almoço & Jantar",
+      "imageUrl": "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=1000&q=80",
       "ingredients": [
-        { "name": "Cenouras", "quantity": "3 unidades médias", "required": true, "category": "vegetables" },
-        { "name": "Ovo", "quantity": "3 unidades", "required": true, "category": "proteins" },
-        { "name": "Óleo", "quantity": "1/2 xícara", "required": true, "category": "pantry" },
-        { "name": "Açúcar", "quantity": "1 e 1/2 xícara", "required": true, "category": "pantry" },
-        { "name": "Farinha de Trigo", "quantity": "2 xícaras", "required": true, "category": "pantry" },
-        { "name": "Fermento em Pó", "quantity": "1 colher de sopa", "required": true, "category": "pantry" },
-        { "name": "Chocolate em Pó", "quantity": "4 colheres de sopa", "required": false, "category": "pantry" },
-        { "name": "Manteiga", "quantity": "1 colher de sopa", "required": false, "category": "dairy" },
-        { "name": "Leite Integral", "quantity": "1/2 xícara", "required": false, "category": "dairy" }
+        {
+          "name": "Filé de Peixe Branco",
+          "quantity": "600g",
+          "required": true,
+          "category": "proteins"
+        },
+        {
+          "name": "Pimentão Vermelho",
+          "quantity": "1 unidade em rodelas",
+          "required": true,
+          "category": "vegetables"
+        },
+        {
+          "name": "Pimentão Amarelo",
+          "quantity": "1 unidade em rodelas",
+          "required": false,
+          "category": "vegetables"
+        },
+        {
+          "name": "Tomate",
+          "quantity": "2 unidades em rodelas",
+          "required": true,
+          "category": "vegetables"
+        },
+        {
+          "name": "Cebola",
+          "quantity": "1 grande em rodelas",
+          "required": true,
+          "category": "vegetables"
+        },
+        {
+          "name": "Leite de Coco",
+          "quantity": "200ml",
+          "required": true,
+          "category": "pantry"
+        },
+        {
+          "name": "Azeite de Dendê",
+          "quantity": "2 colheres de sopa",
+          "required": true,
+          "category": "condiments"
+        },
+        {
+          "name": "Coentro",
+          "quantity": "a gosto",
+          "required": false,
+          "category": "condiments"
+        },
+        {
+          "name": "Limão",
+          "quantity": "1 unidade",
+          "required": true,
+          "category": "fruits"
+        }
       ],
       "steps": [
-        "No liquidificador, bata as cenouras picadas, os ovos e o óleo até ficar bem homogêneo.",
-        "Em uma tigela, misture o açúcar e a farinha. Despeje a mistura do liquidificador e incorpore.",
-        "Adicione o fermento por último, misturando delicadamente.",
-        "Despeje em fôrma untada e asse a 180°C por cerca de 40 minutos.",
-        "Para a calda: ferva em fogo baixo o chocolate, a manteiga, o açúcar e o leite até engrossar, e cubra o bolo ainda morno."
+        "Tempere as postas de peixe com suco de limão, sal e alho amassado. Deixe marinar por 15 minutos.",
+        "Em uma panela de barro ou fundo grosso, monte camadas intercaladas de cebola, pimentões, tomate e peixe.",
+        "Regue com o leite de coco e o azeite de dendê.",
+        "Tampe e leve ao fogo médio por cerca de 20 minutos sem mexer para não desmanchar o peixe.",
+        "Finalize salpicando coentro fresco picado e sirva bem quente com arroz branco."
       ],
+      "tags": [
+        "Sem Glúten",
+        "Sem Lactose",
+        "Frutos do Mar",
+        "Baiana"
+      ],
+      "caloriesPerServing": 350,
+      "canonicalKey": "moqueca-baiana-de-peixe",
+      "servingsBucket": "3-4",
+      "originArea": "Brazilian",
+      "originCountry": "Brazil",
       "diet": {
-        "hasGluten": true,
-        "hasLactose": true,
+        "hasMeat": true,
+        "hasLactose": false,
+        "hasGluten": false,
+        "hasEgg": false,
+        "vegetarian": false,
+        "vegan": false,
+        "lowCarb": true,
+        "highProtein": true,
+        "usesFrying": false
+      },
+      "sources": [
+        {
+          "sourceId": "custom",
+          "license": "Public Domain / CC0",
+          "attribution": "Geladeira Inteligente Catalog"
+        }
+      ],
+      "aliases": [
+        "Moqueca Baiana com Leite de Coco e Dendê"
+      ]
+    },
+    {
+      "id": "omelete-rapido-com-legumes",
+      "title": "Omelete Rápido com Ervas e Queijo",
+      "description": "Preparo rápido e proteico, perfeito para aproveitar ovos frescos e queijo da geladeira em poucos minutos.",
+      "prepTimeMinutes": 10,
+      "difficulty": "Fácil",
+      "servings": 1,
+      "category": "Almoço & Jantar",
+      "imageUrl": "https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=1000&q=80",
+      "ingredients": [
+        {
+          "name": "Ovos",
+          "quantity": "2 a 3 unidades",
+          "required": true,
+          "category": "proteins"
+        },
+        {
+          "name": "Mussarela ou Queijo Branco",
+          "quantity": "50g fatiado",
+          "required": false,
+          "category": "dairy"
+        },
+        {
+          "name": "Tomate",
+          "quantity": "1/2 unidade em cubos",
+          "required": false,
+          "category": "vegetables"
+        },
+        {
+          "name": "Cebola",
+          "quantity": "2 colheres de sopa picada",
+          "required": false,
+          "category": "vegetables"
+        },
+        {
+          "name": "Azeite ou Manteiga",
+          "quantity": "1 colher de chá",
+          "required": true,
+          "category": "condiments"
+        },
+        {
+          "name": "Sal e Pimenta",
+          "quantity": "a gosto",
+          "required": false,
+          "category": "condiments"
+        }
+      ],
+      "steps": [
+        "Bata os ovos vigorosamente em uma tigela com um garfo até espumar levemente.",
+        "Tempere com uma pitada de sal, pimenta-do-reino e orégano.",
+        "Aqueça a frigideira antiaderente untada com azeite ou manteiga em fogo médio.",
+        "Despeje os ovos batidos e, quando a base começar a firmar, adicione o tomate e o queijo em uma das metades.",
+        "Dobre o omelete ao meio com o auxílio de uma espátula e deixe dourar por 1 minuto de cada lado."
+      ],
+      "tags": [
+        "Rápido",
+        "Low Carb",
+        "Sem Glúten",
+        "Proteico",
+        "Vegetariano"
+      ],
+      "caloriesPerServing": 220,
+      "canonicalKey": "omelete-rapido-com-legumes",
+      "servingsBucket": "1",
+      "originArea": "Brazilian",
+      "originCountry": "Brazil",
+      "diet": {
         "hasMeat": false,
+        "hasLactose": true,
+        "hasGluten": false,
         "hasEgg": true,
         "vegetarian": true,
         "vegan": false,
+        "lowCarb": true,
+        "highProtein": true,
         "usesFrying": false
-      }
+      },
+      "sources": [
+        {
+          "sourceId": "custom",
+          "license": "Public Domain / CC0",
+          "attribution": "Geladeira Inteligente Catalog"
+        }
+      ],
+      "aliases": [
+        "Omelete Rápido com Ervas e Queijo"
+      ]
     },
     {
-      "id": "brigadeiro_tradicional",
-      "canonicalKey": "brigadeiro",
+      "id": "brigadeiro-gourmet-brasileiro",
       "title": "Brigadeiro Gourmet Tradicional",
-      "description": "O doce mais amado do Brasil, feito com leite condensado, cacau e manteiga.",
+      "description": "O doce mais amado do Brasil, feito com leite condensado, manteiga e cacau em pó 50% enrolado no confeito de chocolate.",
       "prepTimeMinutes": 20,
       "difficulty": "Fácil",
       "servings": 6,
-      "servingsBucket": "5+",
       "category": "Sobremesas",
-      "imageUrl": "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=600&auto=format&fit=crop&q=80",
-      "caloriesPerServing": 150,
-      "tags": ["Doce", "Festa", "Clássico"],
+      "imageUrl": "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=1000&q=80",
       "ingredients": [
-        { "name": "Leite Condensado", "quantity": "1 lata (395g)", "required": true, "category": "pantry" },
-        { "name": "Chocolate em Pó", "quantity": "3 colheres de sopa", "required": true, "category": "pantry" },
-        { "name": "Manteiga", "quantity": "1 colher de sopa", "required": true, "category": "dairy" },
-        { "name": "Granulado de Chocolate", "quantity": "50g", "required": false, "category": "pantry" }
+        {
+          "name": "Leite Condensado",
+          "quantity": "1 lata (395g)",
+          "required": true,
+          "category": "pantry"
+        },
+        {
+          "name": "Cacau ou Chocolate em Pó",
+          "quantity": "4 colheres de sopa",
+          "required": true,
+          "category": "pantry"
+        },
+        {
+          "name": "Manteiga",
+          "quantity": "1 colher de sopa",
+          "required": true,
+          "category": "dairy"
+        },
+        {
+          "name": "Chocolate Granulado",
+          "quantity": "100g para confeitar",
+          "required": false,
+          "category": "pantry"
+        }
       ],
       "steps": [
-        "Em uma panela de fundo grosso, coloque o leite condensado, o chocolate em pó e a manteiga.",
-        "Cozinhe em fogo baixo, mexendo sem parar com espátula de silicone.",
-        "Quando a massa engrossar e desgrudar completamente do fundo da panela, desligue o fogo.",
-        "Transfira para um prato untado, deixe esfriar, enrole as bolinhas e passe no granulado."
+        "Em uma panela de fundo grosso, junte o leite condensado, a manteiga e o cacau em pó.",
+        "Misture bem antes de levar ao fogo para dissolver o chocolate.",
+        "Cozinhe em fogo médio-baixo, mexendo continuamente com uma espátula sem parar.",
+        "O ponto ideal é quando a massa desgrudar totalmente do fundo e laterais da panela (ponto de brigadeiro).",
+        "Transfira para um prato untado com manteiga e deixe esfriar completamente.",
+        "Unte as mãos com manteiga, enrole as bolinhas e passe no confeito granulado."
       ],
+      "tags": [
+        "Sobremesa",
+        "Doce Típico",
+        "Sem Glúten",
+        "Vegetariano"
+      ],
+      "caloriesPerServing": 180,
+      "canonicalKey": "brigadeiro-gourmet-brasileiro",
+      "servingsBucket": "5+",
+      "originArea": "Brazilian",
+      "originCountry": "Brazil",
       "diet": {
-        "hasGluten": false,
-        "hasLactose": true,
         "hasMeat": false,
+        "hasLactose": true,
+        "hasGluten": false,
         "hasEgg": false,
         "vegetarian": true,
         "vegan": false,
+        "lowCarb": false,
+        "highProtein": false,
         "usesFrying": false
-      }
+      },
+      "sources": [
+        {
+          "sourceId": "custom",
+          "license": "Public Domain / CC0",
+          "attribution": "Geladeira Inteligente Catalog"
+        }
+      ],
+      "aliases": [
+        "Brigadeiro Gourmet Tradicional"
+      ]
     },
     {
-      "id": "panqueca_simples",
-      "canonicalKey": "panqueca",
-      "title": "Panqueca Leve com Frutas e Mel",
-      "description": "Massa suave e macia para recheios doces ou salgados.",
+      "id": "baiao-de-dois-cearense",
+      "title": "Baião de Dois Cremoso com Queijo Coalho",
+      "description": "Combinação clássica nordestina de arroz e feijão de corda cozidos juntos com carne seca, linguiça e queijo coalho tostado.",
+      "prepTimeMinutes": 45,
+      "difficulty": "Médio",
+      "servings": 4,
+      "category": "Almoço & Jantar",
+      "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=1000&q=80",
+      "ingredients": [
+        {
+          "name": "Arroz Branco",
+          "quantity": "2 xícaras",
+          "required": true,
+          "category": "pantry"
+        },
+        {
+          "name": "Feijão Fradinho ou de Corda",
+          "quantity": "1 xícara e 1/2 cozido",
+          "required": true,
+          "category": "pantry"
+        },
+        {
+          "name": "Queijo Coalho",
+          "quantity": "200g em cubos",
+          "required": true,
+          "category": "dairy"
+        },
+        {
+          "name": "Carne Seca Dessalgada",
+          "quantity": "200g desfiada",
+          "required": true,
+          "category": "proteins"
+        },
+        {
+          "name": "Bacon",
+          "quantity": "100g picado",
+          "required": false,
+          "category": "proteins"
+        },
+        {
+          "name": "Manteiga de Garrafa",
+          "quantity": "2 colheres de sopa",
+          "required": true,
+          "category": "dairy"
+        },
+        {
+          "name": "Coentro e Cebolinha",
+          "quantity": "a gosto",
+          "required": false,
+          "category": "condiments"
+        }
+      ],
+      "steps": [
+        "Em uma panela grande, doure o bacon e a carne seca na manteiga de garrafa.",
+        "Adicione o arroz cru e refogue até ficar brilhante.",
+        "Acrescente o feijão de corda cozido com parte do caldo do cozimento e água suficiente.",
+        "Cozinhe em fogo brando com a panela semi-tampada até o arroz secar e ficar macio.",
+        "Em uma frigideira separada, toste os cubos de queijo coalho até dourarem.",
+        "Misture o queijo coalho e o cheiro-verde ao arroz e sirva fumegante."
+      ],
+      "tags": [
+        "Nordestino",
+        "Sem Glúten",
+        "Prato Único",
+        "Carnes"
+      ],
+      "caloriesPerServing": 480,
+      "canonicalKey": "baiao-de-dois-cearense",
+      "servingsBucket": "3-4",
+      "originArea": "Brazilian",
+      "originCountry": "Brazil",
+      "diet": {
+        "hasMeat": true,
+        "hasLactose": true,
+        "hasGluten": false,
+        "hasEgg": false,
+        "vegetarian": false,
+        "vegan": false,
+        "lowCarb": false,
+        "highProtein": true,
+        "usesFrying": false
+      },
+      "sources": [
+        {
+          "sourceId": "custom",
+          "license": "Public Domain / CC0",
+          "attribution": "Geladeira Inteligente Catalog"
+        }
+      ],
+      "aliases": [
+        "Baião de Dois Cremoso com Queijo Coalho"
+      ]
+    },
+    {
+      "id": "salada-tropical-completa",
+      "title": "Salada Tropical Refrescante com Manga",
+      "description": "Mix colorido de folhas frescas, manga palmer em cubos, tomatinhos doces e molho leve de azeite e limão.",
       "prepTimeMinutes": 15,
       "difficulty": "Fácil",
       "servings": 2,
+      "category": "Saladas",
+      "imageUrl": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1000&q=80",
+      "ingredients": [
+        {
+          "name": "Alface Americana ou Crespa",
+          "quantity": "1 maço lavado",
+          "required": true,
+          "category": "vegetables"
+        },
+        {
+          "name": "Manga Palmer",
+          "quantity": "1 unidade em cubos",
+          "required": true,
+          "category": "fruits"
+        },
+        {
+          "name": "Tomate Cereja",
+          "quantity": "1 xícara cortados ao meio",
+          "required": true,
+          "category": "vegetables"
+        },
+        {
+          "name": "Pepino Japonês",
+          "quantity": "1 unidade em rodelas",
+          "required": false,
+          "category": "vegetables"
+        },
+        {
+          "name": "Azeite de Oliva Extra Virgem",
+          "quantity": "3 colheres de sopa",
+          "required": true,
+          "category": "condiments"
+        },
+        {
+          "name": "Limão",
+          "quantity": "1 unidade",
+          "required": true,
+          "category": "fruits"
+        }
+      ],
+      "steps": [
+        "Higienize as folhas, seque bem e rasgue com as mãos em uma saladeira funda.",
+        "Distribua os cubos de manga, os tomatinhos e o pepino sobre a cama de folhas.",
+        "Em um potinho, emulsione o azeite, o suco de limão, sal e pimenta-do-reino moída na hora.",
+        "Regue a salada com o molho imediatamente antes de servir para manter a crocância."
+      ],
+      "tags": [
+        "Vegano",
+        "Sem Glúten",
+        "Sem Lactose",
+        "Low Carb",
+        "Leve"
+      ],
+      "caloriesPerServing": 130,
+      "canonicalKey": "salada-tropical-completa",
       "servingsBucket": "2",
-      "category": "Café & Lanches",
-      "imageUrl": "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&auto=format&fit=crop&q=80",
-      "caloriesPerServing": 210,
-      "tags": ["Café da Manhã", "Vegetariano", "Rápido"],
-      "ingredients": [
-        { "name": "Ovo", "quantity": "1 unidade", "required": true, "category": "proteins" },
-        { "name": "Leite Integral", "quantity": "1 xícara", "required": true, "category": "dairy" },
-        { "name": "Farinha de Trigo", "quantity": "1 xícara", "required": true, "category": "pantry" },
-        { "name": "Manteiga", "quantity": "1 colher de sopa", "required": false, "category": "dairy" },
-        { "name": "Sal", "quantity": "1 pitada", "required": false, "category": "condiments" }
-      ],
-      "steps": [
-        "Bata o ovo, o leite, a farinha e o sal no liquidificador ou com um batedor até ficar homogêneo.",
-        "Aqueça uma frigideira antiaderente levemente untada com manteiga.",
-        "Despeje uma concha pequena de massa e gire a frigideira para espalhar fino.",
-        "Doure por 1 minuto, vire com espátula e doure o outro lado.",
-        "Sirva com frutas frescas, queijo ou recheio de sua preferência."
-      ],
+      "originArea": "Brazilian",
+      "originCountry": "Brazil",
       "diet": {
-        "hasGluten": true,
-        "hasLactose": true,
         "hasMeat": false,
-        "hasEgg": true,
-        "vegetarian": true,
-        "vegan": false,
-        "usesFrying": false
-      }
-    },
-    {
-      "id": "tapioca_recheada",
-      "canonicalKey": "tapioca",
-      "title": "Tapioca Quentinha com Queijo e Manteiga",
-      "description": "Tapioca típica do Nordeste, rápida, crocante por fora e macia por dentro.",
-      "prepTimeMinutes": 8,
-      "difficulty": "Fácil",
-      "servings": 1,
-      "servingsBucket": "1",
-      "category": "Café & Lanches",
-      "imageUrl": "https://images.unsplash.com/photo-1598142981504-20b784a92357?w=600&auto=format&fit=crop&q=80",
-      "caloriesPerServing": 190,
-      "tags": ["Sem Glúten", "Rápido", "Típico"],
-      "ingredients": [
-        { "name": "Goma de Tapioca", "quantity": "4 colheres de sopa", "required": true, "category": "pantry" },
-        { "name": "Queijo Muçarela", "quantity": "2 fatias", "required": true, "category": "dairy" },
-        { "name": "Manteiga", "quantity": "1 colher de chá", "required": false, "category": "dairy" }
-      ],
-      "steps": [
-        "Peneire a goma de tapioca diretamente em uma frigideira fria ou levemente aquecida.",
-        "Espalhe formando um disco uniforme com o auxílio de uma colher.",
-        "Ligue o fogo médio e deixe unir por cerca de 1 a 2 minutos até soltar da borda.",
-        "Coloque as fatias de queijo em uma metade, passe um toque de manteiga, dobre e deixe o queijo derreter."
-      ],
-      "diet": {
-        "hasGluten": false,
-        "hasLactose": true,
-        "hasMeat": false,
-        "hasEgg": false,
-        "vegetarian": true,
-        "vegan": false,
-        "usesFrying": false
-      }
-    },
-    {
-      "id": "creme_abacate",
-      "canonicalKey": "creme_abacate",
-      "title": "Creme de Abacate com Limão",
-      "description": "Sobremesa ou lanche refrescante, aveludado e cheio de gorduras boas.",
-      "prepTimeMinutes": 5,
-      "difficulty": "Fácil",
-      "servings": 2,
-      "servingsBucket": "2",
-      "category": "Sobremesas",
-      "imageUrl": "https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=600&auto=format&fit=crop&q=80",
-      "caloriesPerServing": 160,
-      "tags": ["Sem Glúten", "Rápido", "Vegano"],
-      "ingredients": [
-        { "name": "Abacate", "quantity": "1 unidade madura", "required": true, "category": "fruits" },
-        { "name": "Limão", "quantity": "1 unidade espremida", "required": true, "category": "fruits" },
-        { "name": "Açúcar", "quantity": "2 colheres de sopa", "required": false, "category": "pantry" },
-        { "name": "Leite Integral", "quantity": "50ml", "required": false, "category": "dairy" }
-      ],
-      "steps": [
-        "Retire a polpa do abacate maduro com uma colher.",
-        "Coloque no liquidificador ou mixer junto com o suco de limão e o açúcar (ou mel).",
-        "Bata até obter um creme sedoso e brilhante.",
-        "Leve à geladeira por 15 minutos antes de servir bem gelado."
-      ],
-      "diet": {
-        "hasGluten": false,
         "hasLactose": false,
-        "hasMeat": false,
+        "hasGluten": false,
         "hasEgg": false,
         "vegetarian": true,
         "vegan": true,
+        "lowCarb": true,
+        "highProtein": false,
         "usesFrying": false
-      }
+      },
+      "sources": [
+        {
+          "sourceId": "custom",
+          "license": "Public Domain / CC0",
+          "attribution": "Geladeira Inteligente Catalog"
+        }
+      ],
+      "aliases": [
+        "Salada Tropical Refrescante com Manga"
+      ]
+    },
+    {
+      "id": "themealdb_52834",
+      "title": "Strogonoff",
+      "description": "Beef • Russian",
+      "prepTimeMinutes": 35,
+      "difficulty": "Fácil",
+      "servings": 2,
+      "servingsBucket": "2",
+      "category": "Almoço & Jantar",
+      "imageUrl": "https://www.themealdb.com/images/media/meals/svprys1511176755.jpg/medium",
+      "ingredients": [
+        {
+          "name": "filé mignon, contra-filé ou alcatra --",
+          "quantity": "1 kg",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de manteiga",
+          "quantity": "4 colher",
+          "required": true
+        },
+        {
+          "name": "Sal e pimenta a gosto",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "cebola picada",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "conhaque",
+          "quantity": "1/2  xícara (chá)",
+          "required": true
+        },
+        {
+          "name": "ramas de cogumelos frescos, picados",
+          "quantity": "200 g",
+          "required": true
+        },
+        {
+          "name": "tomates, sem pele e sem sementes, ( ou 3 colheres (sopa) de purê de tomate)",
+          "quantity": "3",
+          "required": true
+        },
+        {
+          "name": "mostarda",
+          "quantity": "1 colher (sopa)",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de catchup",
+          "quantity": "2 colher",
+          "required": true
+        },
+        {
+          "name": "ata de creme de leite.",
+          "quantity": "1 l",
+          "required": true
+        },
+        {
+          "name": "Corte 1/2 kg de filé mignon, em tirinhas, tempere com:  –",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "Sal, pimenta, a gosto; e frite em:",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "manteiga.",
+          "quantity": "1 colher (sopa)",
+          "required": true
+        },
+        {
+          "name": "cebola batida --",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "tomates, sem pele e sem sementes",
+          "quantity": "4",
+          "required": true
+        },
+        {
+          "name": "ata de creme de leite (tire o soro)",
+          "quantity": "1 l",
+          "required": true
+        },
+        {
+          "name": "maisena",
+          "quantity": "1 colher (sopa)",
+          "required": true
+        },
+        {
+          "name": "carne bovina (ou frango desfiado) ou camarão",
+          "quantity": "1 kg",
+          "required": true
+        },
+        {
+          "name": "dose de conhaque",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "catchup",
+          "quantity": "1 colher (sopa)",
+          "required": true
+        },
+        {
+          "name": "Leite para dissolver a maisena",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "molho inglês.",
+          "quantity": "1 colher (sopa)",
+          "required": true
+        }
+      ],
+      "steps": [
+        "Pique a carne em tirinhas finas.",
+        "Derreta 3 colheres (sopa) de manteiga numa frigideira grande e vá fritando a carne, aos poucos, em fogo alto, sem deixar juntar suco.",
+        "Retire a carne, junte mais 1 colher (sopa) de manteiga e frite aí a cebola. Junte a carne novamente e despeje conhaque, deixe aquecer e incline levemente a frigideira para que o conhaque incendeie. Deve flambar até acabar a chama, junte os cogumelos, tampe a frigideira e deixe por alguns minutos.",
+        "Acrescente os tomates picados (ou o purê de tomate), torne a tampar a panela e deixe por mais 5 minutos.",
+        "Acrescente a mostarda e o catchup. Mexa bem, deixando no fogo baixo.",
+        "No momento de servir junte o creme de leite, misture-o bem e retire do fogo antes de ferver.",
+        "À parte, doure uma cebola pequena ralada em 1 colher (sopa) de manteiga. Após, coloque na carne.",
+        "3 tomates batidos no liquidificador --",
+        "1 colher (sopa) de Ketchup;",
+        "7 colheres de conhaque.",
+        "Refoga-se a carne, o milho verde e a maisena dissolvida no leite.",
+        "Colocar, por último, o creme de leite (sem o soro).",
+        "Categoria:Strogonoff|",
+        "Categoria:Carne bovina, receitas com|"
+      ],
+      "tags": [
+        "Beef",
+        "TheMealDB",
+        "Almoço & Jantar",
+        "Tradicional",
+        "Wikilivros"
+      ],
+      "caloriesPerServing": 380,
+      "canonicalKey": "estrogonofe",
+      "aliases": [
+        "Beef stroganoff",
+        "Strogonoff"
+      ],
+      "originArea": "Russian",
+      "originCountry": "Brazil",
+      "diet": {
+        "hasMeat": true,
+        "hasLactose": true,
+        "hasGluten": false,
+        "hasEgg": false,
+        "vegetarian": false,
+        "vegan": false,
+        "lowCarb": true,
+        "highProtein": true,
+        "usesFrying": true
+      },
+      "sources": [
+        {
+          "sourceId": "themealdb",
+          "externalId": "52834",
+          "url": "https://www.themealdb.com/meal/52834",
+          "license": "TheMealDB Free API",
+          "attribution": "TheMealDB.com Open Recipe Database"
+        },
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FStrogonoff",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Strogonoff\""
+        }
+      ]
+    },
+    {
+      "id": "themealdb_53481",
+      "title": "Moqueca de peixe e camarão",
+      "description": "Seafood • Culinária Brasileira",
+      "prepTimeMinutes": 35,
+      "difficulty": "Fácil",
+      "servings": 2,
+      "servingsBucket": "2",
+      "category": "Almoço & Jantar",
+      "imageUrl": "https://www.themealdb.com/images/media/meals/e2kcut1782591669.jpg/medium",
+      "ingredients": [
+        {
+          "name": "dourado ou pintado --",
+          "quantity": "1 kg",
+          "required": true
+        },
+        {
+          "name": "ramas de batata",
+          "quantity": "500 g",
+          "required": true
+        },
+        {
+          "name": "leite de coco",
+          "quantity": "200 ml",
+          "required": true
+        },
+        {
+          "name": "tomates",
+          "quantity": "3",
+          "required": true
+        },
+        {
+          "name": "pimentão verde",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "pimentão vermelho",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "cebola",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "imões",
+          "quantity": "2 l",
+          "required": true
+        },
+        {
+          "name": "cheiro verde",
+          "quantity": "1 xícara (chá)",
+          "required": true
+        },
+        {
+          "name": "Azeite, louro, colorau, pimenta verde, extrato de tomate, molho tipo shoyu e sal a gosto.",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "pedaços de peixe (Surubim, dourado ou pintado) --",
+          "quantity": "5",
+          "required": true
+        },
+        {
+          "name": "cebola pequena",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "pimentão",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "tomate",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "corante ou coloral",
+          "quantity": "1/2 colher",
+          "required": true
+        },
+        {
+          "name": "es de leite de coco",
+          "quantity": "2 colher",
+          "required": true
+        },
+        {
+          "name": "es de extrato de tomate",
+          "quantity": "3 colher",
+          "required": true
+        },
+        {
+          "name": "Sal a gosto",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "Cebolinha com salsa, a gosto.",
+          "quantity": "a gosto",
+          "required": true
+        }
+      ],
+      "steps": [
+        "Levar uma frigideira ao fogo com 1 xícara (chá) de goma fresca ou de polvilho doce, levemente umedecido com água, até levantar as bordas (“arrebitar”).",
+        "Virar do outro lado, até ficar assado. O processo dura cerca de 2 minutos. Reservar.",
+        "Misturar a água (fora do fogo) com 750 gramas do coco ralado e o açúcar; e em seguida, jogar sobre os beijus, para umedecer.",
+        "Colocar um pouco de coco por dentro, enrolar e depois colocar mais coco por fora.",
+        "Pôr as folhas de bananeira na chapa quente ou na frigideira, para amaciá-las.",
+        "O processo dura um minuto e elas vão ficar amarelas.",
+        "Limpar bem com água e secar com um pano.",
+        "Colocar o beiju na folha de bananeira, enrolar (compridinho, parecendo uma pamonha) e amarrar as pontas com barbante.",
+        "Aparar com tesoura as laterais.",
+        "Levar ao forno em temperatura média, durante 10 minutos.",
+        "Virar a moqueca várias vezes, no forno, para assar totalmente.",
+        "Categoria:Polvilho doce, receitas com|",
+        "Categoria:Coco, receitas com|",
+        "Categoria:Açúcar, receitas com|",
+        "Categoria:Outras Quitandas|",
+        "Categoria:Quitandas|"
+      ],
+      "tags": [
+        "Seafood",
+        "TheMealDB",
+        "Almoço & Jantar",
+        "Tradicional",
+        "Wikilivros"
+      ],
+      "caloriesPerServing": 380,
+      "canonicalKey": "moqueca-baiana",
+      "aliases": [
+        "Moqueca de peixe e camarão",
+        "Moqueca à Bomjepe",
+        "Moqueca de siri",
+        "Moqueca de peixe",
+        "Bahia-style Moqueca prawn stew"
+      ],
+      "originArea": "Brazilian",
+      "originCountry": "Brazil",
+      "diet": {
+        "hasMeat": true,
+        "hasLactose": true,
+        "hasGluten": true,
+        "hasEgg": false,
+        "vegetarian": false,
+        "vegan": false,
+        "lowCarb": false,
+        "highProtein": true,
+        "usesFrying": false
+      },
+      "sources": [
+        {
+          "sourceId": "themealdb",
+          "externalId": "53481",
+          "url": "https://www.themealdb.com/meal/53481",
+          "license": "TheMealDB Free API",
+          "attribution": "TheMealDB.com Open Recipe Database"
+        },
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FMoqueca_de_peixe",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Moqueca de peixe\""
+        },
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FMoqueca_de_peixe_e_camar%C3%A3o",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Moqueca de peixe e camarão\""
+        },
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FMoqueca_de_siri",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Moqueca de siri\""
+        },
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FMoqueca_%C3%A0_Bomjepe",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Moqueca à Bomjepe\""
+        }
+      ]
+    },
+    {
+      "id": "themealdb_53482",
+      "title": "Black bean & meat stew - feijoada",
+      "description": "Beef • Culinária Brasileira",
+      "prepTimeMinutes": 35,
+      "difficulty": "Médio",
+      "servings": 2,
+      "servingsBucket": "2",
+      "category": "Almoço & Jantar",
+      "imageUrl": "https://www.themealdb.com/images/media/meals/xrxz7h1782592711.jpg/medium",
+      "ingredients": [
+        {
+          "name": "Black Beans",
+          "quantity": "250g",
+          "required": true
+        },
+        {
+          "name": "Bacon",
+          "quantity": "100g",
+          "required": true
+        },
+        {
+          "name": "Pork Back Ribs",
+          "quantity": "500g",
+          "required": true
+        },
+        {
+          "name": "Chorizo",
+          "quantity": "3",
+          "required": true
+        },
+        {
+          "name": "Pork Shoulder",
+          "quantity": "500g",
+          "required": true
+        },
+        {
+          "name": "Onion",
+          "quantity": "3 chopped",
+          "required": true
+        },
+        {
+          "name": "Garlic",
+          "quantity": "4 Cloves Chopped",
+          "required": true
+        },
+        {
+          "name": "Chilli Flakes",
+          "quantity": "Pinch",
+          "required": true
+        },
+        {
+          "name": "Oil",
+          "quantity": "Drizzle",
+          "required": true
+        },
+        {
+          "name": "Bay Leaf",
+          "quantity": "2",
+          "required": true
+        }
+      ],
+      "steps": [
+        "step 1",
+        "Heat a large heavy-based saucepan with a fitted lid, add the bacon and fry until crisp. Remove and keep the oil in the pan. In batches sear the ribs, sausages and pork shoulder. Season each batch with salt and pepper.",
+        "step 2",
+        "Remove the meat and set aside. Add the onion, garlic and chilli to the pan. Pour in a little olive oil if it needs more. Season with salt and pepper and fry for 8 mins or until soft.",
+        "step 3",
+        "Add the meat, bay leaves, white wine vinegar and drained beans. Cover with just enough water to cover, about 650ml. Bring to a boil and reduce the heat to a low simmer. Cover and cook for 2 hrs, or until the beans are soft and the meat is tender. If there is too much liquid in the pot take the lid off in the last hr. You can also use a slow cooker on the short method (4 hr) or make a quick version using a pressure cooker in batches for 30 mins each. Another method is to cook it in the oven for 3-4 hrs at 160C/140C fan/gas 3.",
+        "step 4",
+        "Serve with rice, a sprinkle of parsley or coriander, hot pepper sauce and orange slices."
+      ],
+      "tags": [
+        "Beef",
+        "TheMealDB"
+      ],
+      "caloriesPerServing": 380,
+      "canonicalKey": "black-bean-meat-stew-feijoada",
+      "aliases": [
+        "Black bean & meat stew - feijoada"
+      ],
+      "originArea": "Brazilian",
+      "originCountry": "Brazil",
+      "diet": {
+        "hasMeat": true,
+        "hasLactose": false,
+        "hasGluten": false,
+        "hasEgg": false,
+        "vegetarian": false,
+        "vegan": false,
+        "lowCarb": false,
+        "highProtein": true,
+        "usesFrying": true
+      },
+      "sources": [
+        {
+          "sourceId": "themealdb",
+          "externalId": "53482",
+          "url": "https://www.themealdb.com/meal/53482",
+          "license": "TheMealDB Free API",
+          "attribution": "TheMealDB.com Open Recipe Database"
+        }
+      ]
+    },
+    {
+      "id": "wikilivros_acaraje",
+      "title": "Acarajé",
+      "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
+      "prepTimeMinutes": 90,
+      "difficulty": "Médio",
+      "servings": 4,
+      "servingsBucket": "3-4",
+      "category": "Almoço & Jantar",
+      "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d3/Bahia_acaraje.jpg/960px-Bahia_acaraje.jpg?utm_source=pt.wikibooks.org&utm_campaign=api&utm_content=thumbnail",
+      "ingredients": [
+        {
+          "name": "ramas de feijão fradinho, cru",
+          "quantity": "500 g",
+          "required": true
+        },
+        {
+          "name": "ramas de cebola",
+          "quantity": "200 g",
+          "required": true
+        },
+        {
+          "name": "Sal a gosto",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "cebola pequena, com casca",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "óleo",
+          "quantity": "500 ml",
+          "required": true
+        },
+        {
+          "name": "azeite de dendê",
+          "quantity": "500 ml",
+          "required": true
+        },
+        {
+          "name": "s (chá) de vatapá",
+          "quantity": "2 xícara",
+          "required": true
+        },
+        {
+          "name": "ramas de camarão seco.",
+          "quantity": "150 g",
+          "required": true
+        },
+        {
+          "name": "feijão fradinho",
+          "quantity": "2 kg",
+          "required": true
+        },
+        {
+          "name": "alho",
+          "quantity": "3 dentes",
+          "required": true
+        },
+        {
+          "name": "Azeite de dendê para fritar",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "Sal a gosto",
+          "quantity": "a gosto",
+          "required": true
+        }
+      ],
+      "steps": [
+        "Coloque os feijões inteiros num processador de alimentos e bata por alguns segundos para quebrar os grãos. Cuidado para não esmigalhar.",
+        "Coloque os feijões num recipiente e cubra com água. Deixe de molho por no mínimo doze horas. Agite os feijões com uma colher e com uma peneirinha vá retirando todas as cascas que se desprenderem dos feijões.",
+        "Depois de retirar bastante as cascas, lave os feijões sob água corrente continue retirando o “olhinho” e o restante das cascas. Retire o máximo possível. Reserve.",
+        "Descasque as 200 gramas de cebolas. Corte em pedaços. Reserve.",
+        "Num processador, coloque os feijões e as cebolas. Bata por três minutos, ou até obter uma pasta lisa e uniforme. Retire toda a pasta do processador e coloque dentro de uma panela grande e funda.",
+        "Com uma colher de pau, bata a massa do acarajé até que a massa triplique de volume. Este processo é bastante demorado, mas é importantíssimo para a fermentação.",
+        "Coloque o óleo, o azeite de dendê, e a cebola com casca numa panela média e leve ao fogo alto para esquentar.",
+        "Com duas colheres de sopa, modele os acarajés: encha uma das colheres com a massa, passe de uma colher para a outra até que a massa fique com formato de bolinho.",
+        "Coloque os bolinhos no óleo bem quente e frite por três minutos de um lado. Com uma escumadeira, vire os bolinhos e deixe fritar até que fiquem dourados. Regule a temperatura do óleo. Se for necessário, abaixe a chama do fogo para que o óleo não queime.",
+        "Retire os bolinhos com uma escumadeira e coloque sobre papel absorvente.",
+        "Corte ao meio e recheie com vatapá.",
+        "Coloque o camarão seco dentro do acarajé e feche. Sirva a seguir.",
+        "Coloque o feijão fradinho de molho em água fria por 4 horas.",
+        "Quando o feijão começar a inchar, lave-o com água fria até soltar toda a casca.",
+        "Moer o feijão sem casca (em moinho especial ou processador) até formar uma massa branca espessa e acrescente o alho previamente moído.",
+        "Aquecer frigideira ou tacho com quantidade suficiente de azeite de dendê para cobrir os bolinhos de acarajé enquanto são fritos.",
+        "Os bolinhos devem ser feitos com uma colher (quantidade de massa que é retirada com uma colher do recipiente).",
+        "Frite em azeite bem quente virando-os uma única vez. Os bolinhos devem ficar com uma tonalidade avermelhada por fora e claro por dentro.",
+        "Sirva com pimenta, vatapá, caruru, camarão seco e salada de tomate verde, cebola e coentro.",
+        "reprodução autorizada por: [http://www.rotadoacaraje.com.br/Receitas_baianas/receita_acaraje.htm Rota do Acarajé]",
+        "Categoria:Culinária do Brasil|"
+      ],
+      "tags": [
+        "Almoço & Jantar",
+        "Tradicional",
+        "Wikilivros"
+      ],
+      "caloriesPerServing": 620,
+      "canonicalKey": "acaraje",
+      "originArea": "Brazilian",
+      "originCountry": "Brazil",
+      "diet": {
+        "hasMeat": true,
+        "hasLactose": false,
+        "hasGluten": false,
+        "hasEgg": false,
+        "vegetarian": false,
+        "vegan": false,
+        "lowCarb": false,
+        "highProtein": true,
+        "usesFrying": true
+      },
+      "sources": [
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FAcaraj%C3%A9",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Acarajé\""
+        }
+      ],
+      "aliases": [
+        "Acarajé"
+      ]
+    },
+    {
+      "id": "wikilivros_barreado",
+      "title": "Barreado",
+      "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
+      "prepTimeMinutes": 68,
+      "difficulty": "Médio",
+      "servings": 4,
+      "servingsBucket": "3-4",
+      "category": "Almoço & Jantar",
+      "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+      "ingredients": [
+        {
+          "name": "carne, sem osso, nervos ou sebo",
+          "quantity": "5 kg",
+          "required": true
+        },
+        {
+          "name": "a  maços de cheiro verde",
+          "quantity": "3",
+          "required": true
+        },
+        {
+          "name": "macinho de alfavaca",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "macinho de salsa miúda",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "ramas de toucinho fresco",
+          "quantity": "500 g",
+          "required": true
+        },
+        {
+          "name": "alho",
+          "quantity": "3 dentes",
+          "required": true
+        },
+        {
+          "name": "s de cominho",
+          "quantity": "6 pitada",
+          "required": true
+        },
+        {
+          "name": "s de pimenta-do-reino",
+          "quantity": "6 pitada",
+          "required": true
+        },
+        {
+          "name": "a 4 folhas de louro",
+          "quantity": "3",
+          "required": true
+        },
+        {
+          "name": "Sal a gosto.",
+          "quantity": "a gosto",
+          "required": true
+        }
+      ],
+      "steps": [
+        "Corte a carne em pedaços e, o toucinho, em fatias bem finas.",
+        "Revista a parte interna da panela de barro (lateral e fundo) com toucinho.",
+        "Coloque a carne e temperos em camadas sucessivas até 3/4 da panela.",
+        "Tampe a panela e \"barreie\" (vede a tampa) para não deixar escapar o vapor.",
+        "Deixe cozinhar por no mínimo 12 horas.",
+        "Rendimento: 10 pessoas, aproximadamente."
+      ],
+      "tags": [
+        "Almoço & Jantar",
+        "Tradicional",
+        "Wikilivros"
+      ],
+      "caloriesPerServing": 550,
+      "canonicalKey": "barreado",
+      "originArea": "Brazilian",
+      "originCountry": "Brazil",
+      "diet": {
+        "hasMeat": true,
+        "hasLactose": false,
+        "hasGluten": false,
+        "hasEgg": false,
+        "vegetarian": false,
+        "vegan": false,
+        "lowCarb": true,
+        "highProtein": true,
+        "usesFrying": false
+      },
+      "sources": [
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FBarreado",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Barreado\""
+        }
+      ],
+      "aliases": [
+        "Barreado"
+      ]
+    },
+    {
+      "id": "wikilivros_bolo-de-pinhao",
+      "title": "Bolo de Pinhão",
+      "description": "Receita tradicional brasileira do Wikilivros • Sobremesas",
+      "prepTimeMinutes": 50,
+      "difficulty": "Médio",
+      "servings": 4,
+      "servingsBucket": "3-4",
+      "category": "Sobremesas",
+      "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+      "ingredients": [
+        {
+          "name": "s (chá) de pinhão cozido e moído",
+          "quantity": "2 xícara",
+          "required": true
+        },
+        {
+          "name": "manteiga sem sal",
+          "quantity": "1 xícara (chá)",
+          "required": true
+        },
+        {
+          "name": "ata de leite condensado",
+          "quantity": "1 l",
+          "required": true
+        },
+        {
+          "name": "emas",
+          "quantity": "4 g",
+          "required": true
+        },
+        {
+          "name": "farinha de trigo",
+          "quantity": "1 xícara (chá)",
+          "required": true
+        },
+        {
+          "name": "claras batidas em neve",
+          "quantity": "4",
+          "required": true
+        },
+        {
+          "name": "fermento em pó",
+          "quantity": "1 colher (chá)",
+          "required": true
+        },
+        {
+          "name": "sal",
+          "quantity": "1 colher (chá)",
+          "required": true
+        },
+        {
+          "name": "Açúcar a gosto.",
+          "quantity": "a gosto",
+          "required": true
+        }
+      ],
+      "steps": [
+        "Bata a manteiga até obter um creme. Adicione o leite condensado e continue a bater. Junte as gemas, uma a uma. Misture o sal e, depois, o pinhão.",
+        "Em seguida, misture lentamente a farinha de trigo peneirada com o fermento, mexa e por último, acrescente as claras.",
+        "Unte uma fôrma com manteiga e polvinhe-a farinha.",
+        "Despeje a massa e asse em forno moderado de 30 a 40 minutos."
+      ],
+      "tags": [
+        "Sobremesas",
+        "Tradicional",
+        "Wikilivros"
+      ],
+      "caloriesPerServing": 515,
+      "canonicalKey": "bolo-de-pinhao",
+      "originArea": "Brazilian",
+      "originCountry": "Brazil",
+      "diet": {
+        "hasMeat": false,
+        "hasLactose": true,
+        "hasGluten": true,
+        "hasEgg": true,
+        "vegetarian": true,
+        "vegan": false,
+        "lowCarb": false,
+        "highProtein": true,
+        "usesFrying": false
+      },
+      "sources": [
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FBolo_de_Pinh%C3%A3o",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Bolo de Pinhão\""
+        }
+      ],
+      "aliases": [
+        "Bolo de Pinhão"
+      ]
+    },
+    {
+      "id": "wikilivros_cuscuz-de-mandipuva",
+      "title": "Cuscuz de Mandipuva",
+      "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
+      "prepTimeMinutes": 66,
+      "difficulty": "Médio",
+      "servings": 4,
+      "servingsBucket": "3-4",
+      "category": "Almoço & Jantar",
+      "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+      "ingredients": [
+        {
+          "name": "(ou mais) de raízes de mandioca fresca",
+          "quantity": "4 kg",
+          "required": true
+        },
+        {
+          "name": "Sal a gosto",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "Erva-doce",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "Canela em pó",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "Cravo.",
+          "quantity": "a gosto",
+          "required": true
+        }
+      ],
+      "steps": [
+        "Apanhe as raízes de mandioca, corte as pontas e abra cortes longitudinais na casca.",
+        "Coloque-as no \"lago\" (buraco feito com areia) e deixe de \"banho\", de 4 a 5 dias.",
+        "Depois que a mandioca ficar mole (fermentar), tire a casca e esprema o produto num saco de algodão.",
+        "Depois de enxuta e seca, soque-a num pilão até virar farinha.",
+        "Coloque a farinha em um recipiente, de preferência uma gamela, e adicione sal, canela, cravo e erva-doce.",
+        "Faça uma massa, coloque em uma cuscuzeira e cozinhe em banho-maria (no vapor).",
+        "Deixe cozinhar de 25 a 30 minutos e estará pronto."
+      ],
+      "tags": [
+        "Almoço & Jantar",
+        "Tradicional",
+        "Wikilivros"
+      ],
+      "caloriesPerServing": 375,
+      "canonicalKey": "cuscuz-de-mandipuva",
+      "originArea": "Brazilian",
+      "originCountry": "Brazil",
+      "diet": {
+        "hasMeat": false,
+        "hasLactose": false,
+        "hasGluten": false,
+        "hasEgg": false,
+        "vegetarian": true,
+        "vegan": true,
+        "lowCarb": false,
+        "highProtein": false,
+        "usesFrying": false
+      },
+      "sources": [
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FCuscuz_de_Mandipuva",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Cuscuz de Mandipuva\""
+        }
+      ],
+      "aliases": [
+        "Cuscuz de Mandipuva"
+      ]
+    },
+    {
+      "id": "wikilivros_vatapa",
+      "title": "Vatapá",
+      "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
+      "prepTimeMinutes": 90,
+      "difficulty": "Médio",
+      "servings": 4,
+      "servingsBucket": "3-4",
+      "category": "Almoço & Jantar",
+      "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+      "ingredients": [
+        {
+          "name": "pães frescos ou amanhecidos",
+          "quantity": "6",
+          "required": true
+        },
+        {
+          "name": "ramas de amendoim torrado e sem casca",
+          "quantity": "200 g",
+          "required": true
+        },
+        {
+          "name": "ramas de castanha de caju torrada",
+          "quantity": "200 g",
+          "required": true
+        },
+        {
+          "name": "cebola",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "alho ",
+          "quantity": "2 dentes",
+          "required": true
+        },
+        {
+          "name": "ramas de camarão defumado ou seco dessalgado",
+          "quantity": "200 g",
+          "required": true
+        },
+        {
+          "name": "Sal a gosto",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "pedaço de gengibre",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "coco seco ralado, separando o leite do coco em um pano e um pouco de água",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "azeite de dendê",
+          "quantity": "50 ml",
+          "required": true
+        },
+        {
+          "name": "pimenta malagueta pequena (opcional)",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "Farinha de trigo, se necessário",
+          "quantity": "a gosto",
+          "required": true
+        }
+      ],
+      "steps": [
+        "Coloque o pão de molho na metade do leite de coco e reserve a outra metade.",
+        "Coloque no liquidificador os ingredientes, o amendoim, a castanha de caju, a gengibre, as cebolas, o camarão seco e o sal. Triture todos os ingredientes, acrescente o pão que estava de molho aos poucos.",
+        "Leve ao fogo e vá adicionando aos poucos o coco ralado, o restante do leite de coco e o azeite de dendê, acerte o sal. Não pare de mexer, terá que atingir o ponto de consistência de uma pasta firme.",
+        "Se ficar ralo acrescente um pouco de farinha de trigo.",
+        "Categoria:Outros Pratos Principais|",
+        "Categoria:Camarão, receitas com|",
+        "Categoria:Amendoim, receitas com|",
+        "Categoria:Castanha de caju, receitas com|",
+        "Categoria:Culinária do Brasil|"
+      ],
+      "tags": [
+        "Almoço & Jantar",
+        "Tradicional",
+        "Wikilivros"
+      ],
+      "caloriesPerServing": 620,
+      "canonicalKey": "vatapa",
+      "originArea": "Brazilian",
+      "originCountry": "Brazil",
+      "diet": {
+        "hasMeat": true,
+        "hasLactose": true,
+        "hasGluten": true,
+        "hasEgg": false,
+        "vegetarian": false,
+        "vegan": false,
+        "lowCarb": false,
+        "highProtein": true,
+        "usesFrying": false
+      },
+      "sources": [
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FVatap%C3%A1",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Vatapá\""
+        }
+      ],
+      "aliases": [
+        "Vatapá"
+      ]
+    },
+    {
+      "id": "wikilivros_estrogonofe-de-frango",
+      "title": "Strogonoff de frango",
+      "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
+      "prepTimeMinutes": 90,
+      "difficulty": "Médio",
+      "servings": 4,
+      "servingsBucket": "3-4",
+      "category": "Almoço & Jantar",
+      "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+      "ingredients": [
+        {
+          "name": "peito de frango --",
+          "quantity": "1 kg",
+          "required": true
+        },
+        {
+          "name": "Sal e pimenta a gosto",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de manteiga ou margarina",
+          "quantity": "4 colher",
+          "required": true
+        },
+        {
+          "name": "cebolas picadas",
+          "quantity": "2",
+          "required": true
+        },
+        {
+          "name": "tomates picados (sem peles e sem sementes)",
+          "quantity": "3",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de ketchup",
+          "quantity": "3 colher",
+          "required": true
+        },
+        {
+          "name": "ata de milho verde",
+          "quantity": "1 l",
+          "required": true
+        },
+        {
+          "name": "Cheiro verde picado",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "ata de creme de leite.",
+          "quantity": "1 l",
+          "required": true
+        },
+        {
+          "name": "sopa de mostarda",
+          "quantity": "1 colher",
+          "required": true
+        },
+        {
+          "name": "peito de frango --",
+          "quantity": "1 kg",
+          "required": true
+        },
+        {
+          "name": "Sal. alho e pimenta a gosto",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de manteiga ou margarina",
+          "quantity": "4 colher",
+          "required": true
+        },
+        {
+          "name": "cebolas picadas",
+          "quantity": "2",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de catchup",
+          "quantity": "3 colher",
+          "required": true
+        },
+        {
+          "name": "cogumelos",
+          "quantity": "1 copo",
+          "required": true
+        },
+        {
+          "name": "ata de creme de leite.",
+          "quantity": "1 l",
+          "required": true
+        },
+        {
+          "name": "sopa de mostarda",
+          "quantity": "1 colher",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de farinha de trigo",
+          "quantity": "2 colher",
+          "required": true
+        },
+        {
+          "name": "itro de leite.",
+          "quantity": "1/2 l",
+          "required": true
+        }
+      ],
+      "steps": [
+        "Derreta 3 colheres de manteiga numa panela e frite os peitos de frango aos poucos para não formar muito suco.",
+        "Retire a carne, junte mais 1 colher (sopa)  de manteiga e frite as cebolas. Junte os tomates e o milho verde), tampe e deixe ferver por mais 1 minuto no fogo brando.",
+        "Adicione a carne ao molho.",
+        "Junte a mostarda, o catchup e deixe por mais  5  minutos, e prove.",
+        "Desligue o fogo e junte o creme de leite.",
+        "Frite o frango na manteiga e frite os cubos de frango até dourar. Reserve.",
+        "Em outra panela prepare um molho bechamel ou branco como é normalmente conhecido. Doure as cebolas picadinhas, na margarina, junte o alho e doure mais um pouco, acrescente a farinha de trigo, e deixe refogar um pouco, junte o leite , ponha o ketchup e a mostarda e continue mexendo, até engrossar, ponha o creme de leite,  tempere com um pouco de pimenta-do-reino, e noz moscada. Está pronto o creme, Junte o frango dourado na manteiga e mexa bem. Sirva e bom apetite",
+        "Categoria:Strogonoff|",
+        "Categoria:Aves|",
+        "Categoria:Peito de frango, receitas com|",
+        "Categoria:Cogumelo, receitas com|",
+        "Categoria:Milho verde, receitas com|",
+        "Categoria:Tomate, receitas com|",
+        "Categoria:Creme de leite, receitas com|"
+      ],
+      "tags": [
+        "Almoço & Jantar",
+        "Tradicional",
+        "Wikilivros"
+      ],
+      "caloriesPerServing": 900,
+      "canonicalKey": "estrogonofe-de-frango",
+      "originArea": "Brazilian",
+      "originCountry": "Brazil",
+      "diet": {
+        "hasMeat": true,
+        "hasLactose": true,
+        "hasGluten": true,
+        "hasEgg": false,
+        "vegetarian": false,
+        "vegan": false,
+        "lowCarb": false,
+        "highProtein": true,
+        "usesFrying": true
+      },
+      "sources": [
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FStrogonoff_de_frango",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Strogonoff de frango\""
+        },
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FStrogonoff_de_peito_de_frango",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Strogonoff de peito de frango\""
+        }
+      ],
+      "aliases": [
+        "Strogonoff de frango",
+        "Strogonoff de peito de frango"
+      ]
+    },
+    {
+      "id": "wikilivros_estrogonofe-de-legumes",
+      "title": "Strogonoff de legumes",
+      "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
+      "prepTimeMinutes": 80,
+      "difficulty": "Médio",
+      "servings": 4,
+      "servingsBucket": "3-4",
+      "category": "Almoço & Jantar",
+      "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+      "ingredients": [
+        {
+          "name": "cebola em cubos",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "maionese",
+          "quantity": "1/2 xícara (chá)",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de farinha de trigo",
+          "quantity": "4 colher",
+          "required": true
+        },
+        {
+          "name": "1/2 xícara (chá) de leite",
+          "quantity": "2",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de Ketchup",
+          "quantity": "3 colher",
+          "required": true
+        },
+        {
+          "name": "mostarda",
+          "quantity": "1 colher (sopa)",
+          "required": true
+        },
+        {
+          "name": "s (chá) de legumes em cubos e cozidos (batata, cenoura, brócolis e etc)",
+          "quantity": "3 xícara",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de conhaque.",
+          "quantity": "2 colher",
+          "required": true
+        }
+      ],
+      "steps": [
+        "Refogue a cebola em 2 colheres (sopa) de maionese, adicione farinha de trigo e frite.",
+        "Acrescente o leite aos poucos, misturando sempre até obter um creme liso, coloque o ketchup e a mostarda.",
+        "Junte os legumes, o conhaque e o restante da maionese mexendo sempre até levantar fervura e retire do fogo.",
+        "Rendimento: de 4 a 6 porções.",
+        "Categoria:Strogonoff|",
+        "Categoria:Batata, receitas com|",
+        "Categoria:Cenoura, receitas com|",
+        "Categoria:Brócolis, receitas com|"
+      ],
+      "tags": [
+        "Almoço & Jantar",
+        "Tradicional",
+        "Wikilivros"
+      ],
+      "caloriesPerServing": 480,
+      "canonicalKey": "estrogonofe-de-legumes",
+      "originArea": "Brazilian",
+      "originCountry": "Brazil",
+      "diet": {
+        "hasMeat": false,
+        "hasLactose": true,
+        "hasGluten": true,
+        "hasEgg": true,
+        "vegetarian": true,
+        "vegan": false,
+        "lowCarb": false,
+        "highProtein": false,
+        "usesFrying": true
+      },
+      "sources": [
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FStrogonoff_de_legumes",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Strogonoff de legumes\""
+        }
+      ],
+      "aliases": [
+        "Strogonoff de legumes"
+      ]
+    },
+    {
+      "id": "wikilivros_coxinha",
+      "title": "Coxinha de frango com batata",
+      "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
+      "prepTimeMinutes": 90,
+      "difficulty": "Médio",
+      "servings": 4,
+      "servingsBucket": "3-4",
+      "category": "Almoço & Jantar",
+      "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+      "ingredients": [
+        {
+          "name": "(15 ml) de óleo --",
+          "quantity": "1 colher (sopa)",
+          "required": true
+        },
+        {
+          "name": "(15 gramas) de cebola picada",
+          "quantity": "1 colher (sopa)",
+          "required": true
+        },
+        {
+          "name": "sobrecoxas de frango ou galinha",
+          "quantity": "1 kg",
+          "required": true
+        },
+        {
+          "name": "e 1/2  xícara (360 ml) de caldo de galinha",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "maço de salsa",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "es (sopa) (45 gramas) de manteiga",
+          "quantity": "3 colher",
+          "required": true
+        },
+        {
+          "name": "(50 gramas) de cebola picada",
+          "quantity": "1/3  xícara",
+          "required": true
+        },
+        {
+          "name": "es (sopa) (30 gramas) de purê de tomate",
+          "quantity": "2 colher",
+          "required": true
+        },
+        {
+          "name": "e 1/2  xícaras (chá) de leite",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "s (300 gramas) de farinha de trigo",
+          "quantity": "2 xícara",
+          "required": true
+        },
+        {
+          "name": "sal",
+          "quantity": "1 colher (chá)",
+          "required": true
+        },
+        {
+          "name": "Pimenta do Reino a gosto",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "Farinha de rosca torrada para polvilhar e envolver",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "ovos levemente batidos para envolver",
+          "quantity": "2",
+          "required": true
+        },
+        {
+          "name": "Óleo para fritar.",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "filé de frango --",
+          "quantity": "1 kg",
+          "required": true
+        },
+        {
+          "name": "Suco de 1 limão para temperar",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "cebola pequena ralada",
+          "quantity": "1/2",
+          "required": true
+        },
+        {
+          "name": "Sal e pimenta do reino a gosto.",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "(americano) de leite",
+          "quantity": "2 copos",
+          "required": true
+        },
+        {
+          "name": "emas",
+          "quantity": "4 g",
+          "required": true
+        },
+        {
+          "name": "sopa creme de queijo em pó",
+          "quantity": "1/2 pacote",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de farinha de trigo",
+          "quantity": "4 colher",
+          "required": true
+        },
+        {
+          "name": "(americano) de caldo de frango",
+          "quantity": "1 copo",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de margarina",
+          "quantity": "2 colher",
+          "required": true
+        },
+        {
+          "name": "Ovo batido e farinha de rosca para empanar.",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "e 1/2 litro de água --",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "itro de leite",
+          "quantity": "1/2 l",
+          "required": true
+        },
+        {
+          "name": "farinha de trigo",
+          "quantity": "1 kg",
+          "required": true
+        },
+        {
+          "name": "Caldo Knorr à vontade",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "e 1/2 copo (americano) de óleo",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "Sal.",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "Dissolva 3 tabletes de caldo de galinha (Knor) em 5 copos (americano) de água fervendo --",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "(americano) de farinha de trigo --",
+          "quantity": "5 copos",
+          "required": true
+        },
+        {
+          "name": "emas",
+          "quantity": "5 g",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de manteiga ou margarina.",
+          "quantity": "5 colher",
+          "required": true
+        },
+        {
+          "name": "s (chá) de caldo de galinha --",
+          "quantity": "4 xícara",
+          "required": true
+        },
+        {
+          "name": "s (chá) de batatas cozidas e esprimidas",
+          "quantity": "2 xícara",
+          "required": true
+        },
+        {
+          "name": "óleo",
+          "quantity": "1 colher (sopa)",
+          "required": true
+        },
+        {
+          "name": "s (chá) de farinha de trigo",
+          "quantity": "3 xícara",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de margarina",
+          "quantity": "2 colher",
+          "required": true
+        },
+        {
+          "name": "cebola picada.",
+          "quantity": "1",
+          "required": true
+        }
+      ],
+      "steps": [
+        "Numa panela, coloque o óleo, leve ao fogo médio e deixe aquecer.",
+        "Junte 1 colher de cebola picada e frite, mexendo com uma colher de pau, até ficar macia.",
+        "Acrescente as sobrecoxas e frite, virando os pedaços com um garfo de cabo comprido, até ficarem dourados.",
+        "Junte o caldo de galinha e a salsa, deixe ferver, reduza o fogo, tampe a panela e cozinhe por cerca de  30  minutos ou até a carne ficar macia.",
+        "Tire as sobrecoxas da panela (reserve o líquido de cozimento) e elimine a salsa. Retire a pele e os ossos e, com um garfo, desfie a carne e pique bem fininho.",
+        "À parte, numa panela, aqueça 1 colher (sopa) de manteiga, frite a cebola picada. Junte a carne desfiada e o purê de tomate e deixe por mais 5 minutos. Reserve.",
+        "Se preferir, acrescente  1/2  colher (chá) de caril (curry)  ao recheio.",
+        "Coe o líquido do cozimento numa peneira, meça 1 e 1/2  xícaras (chá) (se tiver menos, complete com água), passe para uma panela, acrescente a manteiga restante, o leite e a farinha de trigo, misture e cozinhe em fogo médio, mexendo com a colher de pau, até formar uma bola que se desprenda do fundo da panela.",
+        "Prove e tempere com sal e pimenta do reino a gosto.",
+        "Retire do Fogo.",
+        "Coloque a massa sobre uma superfície de trabalho polvilhada com farinha de rosca e deixe esfriar um pouco.",
+        "Vá retirando porções da massa com uma colher de sopa e abrindo na palma da mão.",
+        "Coloque 1/2 colher (sopa) de recheio no centro da massa.",
+        "Enrole a massa sobre o recheio dando o formato de uma coxinha.",
+        "Passe a coxinha na farinha de rosca, no ovo batido e novamente na farinha de rosca, envolvendo-a bem.  Proceda dessa maneira até preparar todas as coxinhas.",
+        "Rendimento: cerca de 40  coxinhas).",
+        "Numa panela, coloque óleo em quantidade suficiente para mergulhar as coxinhas, leve ao fogo médio e deixe ficar bem quente, mas não fumegante.",
+        "Frite as coxinhas aos poucos, virando de vez em quando, até ficarem douradas por igual.",
+        "Retire-as com uma escumadeira, coloque as coxinhas sobre toalhas de papel absorvente enquanto frita as restantes.",
+        "Passe as coxinhas para uma travessa e sirva.",
+        "Corte o filé de frango em cubinhos e tempere.",
+        "Deixe descansar por uma hora.",
+        "Espete os cubinhos de frangos em palitos.",
+        "Em uma panela alta, frite os espetinhos em óleo quente até dourar.",
+        "Bata no liquidificador o leite, as gemas, o caldo de frango, a sopa creme de queijo e a farinha de trigo.",
+        "Leve ao fogo brando, mexendo até formar um creme grosso.",
+        "Tire do fogo e acrescente a margarina, mexendo bem.",
+        "Passe os cunhos de frango nesse creme.",
+        "Modele as coxinhas, coloque-as em assadeira untada com margarina e leve ao freezer por uma hora.",
+        "Empane as coxinhas passando-as no ovo batido e em farinha de rosca.",
+        "Depois de empanadas, estarão prontas e poderão ser congeladas ou fritas em óleo quente.",
+        "Rendimento:  50 unidades.",
+        "Levar a água, o leite, o óleo e o sal ao fogo. Quando estiver morno, coloca-se a farinha de trigo e mexe até desgrudar da panela.",
+        "Deixe esfriar.",
+        "Abre-se a massa, coloca-se o recheio, passa-se no ovo batido e na farinha de rosca.",
+        "Frita-se em óleo quente.",
+        "Bater os ingredientes da vasilha funda muito bem.",
+        "Acrescente a massa acima ao caldo frio e misture.",
+        "Leve ao fogo, mexendo até despregar do fundo da panela.",
+        "Faz-se as coxinhas e coloque o recheio que preferir.",
+        "Passe as coxinhas em ovo batido, e depois,  na farinha de rosca.",
+        "Frite em óleo bem quente.",
+        "Quando o caldo estiver fervendo colocar a farinha e, em seguida, os demais ingredientes.",
+        "Retirar do fogo e sovar bem (muito) a massa.",
+        "Fazer as coxinhas e recheá-las.",
+        "Passe na clara e depois na farinha de rosca.",
+        "Categoria:Frango, receitas com|",
+        "Categoria:Farinha de trigo, receitas com|",
+        "Categoria:Caldo de galinha, receitas com|",
+        "Categoria:Batata, receitas com|",
+        "Categoria:Ovo, receitas com|",
+        "Categoria:Leite, receitas com|",
+        "Categoria:Coxinhas|",
+        "Categoria:Salgados, Lanches e Sanduíches|"
+      ],
+      "tags": [
+        "Almoço & Jantar",
+        "Tradicional",
+        "Wikilivros"
+      ],
+      "caloriesPerServing": 725,
+      "canonicalKey": "coxinha",
+      "originArea": "Brazilian",
+      "originCountry": "Brazil",
+      "diet": {
+        "hasMeat": true,
+        "hasLactose": true,
+        "hasGluten": true,
+        "hasEgg": true,
+        "vegetarian": false,
+        "vegan": false,
+        "lowCarb": false,
+        "highProtein": true,
+        "usesFrying": true
+      },
+      "sources": [
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FCoxinha_de_frango_com_batata",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Coxinha de frango com batata\""
+        },
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FCoxinha_de_galinha",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Coxinha de galinha\""
+        },
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FCoxinhas_de_frango",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Coxinhas de frango\""
+        }
+      ],
+      "aliases": [
+        "Coxinha de frango com batata",
+        "Coxinhas de frango",
+        "Coxinha de galinha"
+      ]
+    },
+    {
+      "id": "wikilivros_brigadeiro",
+      "title": "Brigadeiro",
+      "description": "Receita tradicional brasileira do Wikilivros • Sobremesas",
+      "prepTimeMinutes": 90,
+      "difficulty": "Médio",
+      "servings": 4,
+      "servingsBucket": "3-4",
+      "category": "Sobremesas",
+      "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a4/Brigadeiro.jpg/960px-Brigadeiro.jpg?utm_source=pt.wikibooks.org&utm_campaign=api&utm_content=thumbnail",
+      "ingredients": [
+        {
+          "name": "ata de leite condensado",
+          "quantity": "1 l",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de chocolate em pó",
+          "quantity": "4 colher",
+          "required": true
+        },
+        {
+          "name": "manteiga",
+          "quantity": "1/2 colher (sopa)",
+          "required": true
+        },
+        {
+          "name": "chocolate granulado para enfeitar.",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "ata de leite condensado",
+          "quantity": "1 l",
+          "required": true
+        },
+        {
+          "name": "ata (medir na lata acima) de leite de vaca",
+          "quantity": "1 l",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de chocolate em pó",
+          "quantity": "2 colher",
+          "required": true
+        },
+        {
+          "name": "manteiga.",
+          "quantity": "1 colher (sopa)",
+          "required": true
+        },
+        {
+          "name": "(tipo americano) de leite em pó",
+          "quantity": "1 copo",
+          "required": true
+        },
+        {
+          "name": "(tipo americano) de água",
+          "quantity": "1/2 copo",
+          "required": true
+        },
+        {
+          "name": "(tipo americano) de açúcar.",
+          "quantity": "1 copo",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de achocolatado em pó",
+          "quantity": "4 colher",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de manteiga",
+          "quantity": "2 colher",
+          "required": true
+        },
+        {
+          "name": "ata de leite condensado.",
+          "quantity": "1 l",
+          "required": true
+        },
+        {
+          "name": "ata de leite condensado",
+          "quantity": "1 l",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de chocolate",
+          "quantity": "3 colher",
+          "required": true
+        },
+        {
+          "name": "manteiga.",
+          "quantity": "1 colher (sopa)",
+          "required": true
+        },
+        {
+          "name": "ata de leite condensado",
+          "quantity": "1 l",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de manteiga",
+          "quantity": "2 colher",
+          "required": true
+        },
+        {
+          "name": "es de (sopa) achocolatado em pó",
+          "quantity": "2 colher",
+          "required": true
+        },
+        {
+          "name": "ramas de bolacha maria ou maisena.",
+          "quantity": "200 g",
+          "required": true
+        },
+        {
+          "name": "ata de leite condensado",
+          "quantity": "1 l",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de chocolate em pó",
+          "quantity": "2 colher",
+          "required": true
+        },
+        {
+          "name": "emas",
+          "quantity": "2 g",
+          "required": true
+        },
+        {
+          "name": "manteiga.",
+          "quantity": "1 colher (sopa)",
+          "required": true
+        },
+        {
+          "name": "es de chocolate em pó",
+          "quantity": "3 colher",
+          "required": true
+        },
+        {
+          "name": "manteiga ou margarina",
+          "quantity": "1 colher (chá)",
+          "required": true
+        },
+        {
+          "name": "maisena",
+          "quantity": "1/2 colher",
+          "required": true
+        },
+        {
+          "name": "s de açúcar",
+          "quantity": "2 xícara",
+          "required": true
+        },
+        {
+          "name": "ata de leite condensado",
+          "quantity": "1 l",
+          "required": true
+        },
+        {
+          "name": "granulado.",
+          "quantity": "1 pacote",
+          "required": true
+        },
+        {
+          "name": "ata de leite condensado",
+          "quantity": "1 l",
+          "required": true
+        },
+        {
+          "name": "sopa de manteiga",
+          "quantity": "1 colher",
+          "required": true
+        },
+        {
+          "name": "es de sopa de achocolatado em pó",
+          "quantity": "2 colher",
+          "required": true
+        },
+        {
+          "name": "sopa de nutella",
+          "quantity": "1 colher",
+          "required": true
+        },
+        {
+          "name": "ranulado a gosto",
+          "quantity": "1 g",
+          "required": true
+        }
+      ],
+      "steps": [
+        "Derreta a manteiga em uma panela, despeje o leite condensado e o chocolate em pó. Misture sempre em fogo médio a baixo até obter fervura, engrossar e soltar do fundo.",
+        "Retire do fogo e deixe amornar.",
+        "Unte as mãos com manteiga e vá enrolando a mistura (mais ou menos uma colher de sopa) em bolinhas.",
+        "Passe as bolinhas pelo chocolate granulado.",
+        "Se desejar, coloque-as em forminhas de papel.",
+        "Coloque numa panela, leve ao fogo e vá mexendo até o ponto de puxar, nem muito mole e nem muito duro.",
+        "Faça as bolinhas, passe-as no chocolate granulado e coloque-as em forminhas.",
+        "Observação: Não precisa de açúcar!",
+        "Bater tudo no liquidificador, levar ao fogo brando, adicionando os ingredientes abaixo:",
+        "# Duas colheres (sopa) de manteiga;",
+        "# Duas colheres (sopa) de achocolatado em pó.",
+        "O ponto é quando desgrudar do fundo da panela.",
+        "Coloque numa panela, leve ao fogo brando e vá mexendo até o ponto de puxar, nem muito mole e nem muito duro.",
+        "O ponto é quando desgrudar do fundo da panela.",
+        "Recheie-os com passas embebidas em rum.",
+        "Tudo frio, mexa tudo; depois ligue o fogo e por 10 minutos (mais ou menos) vá mexendo até desgrudar do fundo.",
+        ";Observação: No micro-ondas são 3 minutos na potência máxima, e mexer a cada minuto; dê pausa no micro-ondas quando for mexer",
+        "Leve tudo ao fogo (exceto as bolachas) e mexa até desgrudar da panela.",
+        "Tire do fogo e misture as bolachas, picadinhas.",
+        "Despeje numa fôrma, pique e passe-os no açúcar refinado.",
+        "Leve ao fogo brando e mexa até desprender dos lados da panela.",
+        "Despeje em um prato untado com manteiga e deixa esfriar.",
+        "Enrole depois de frio e com as mãos untadas com manteiga.",
+        "Passe os brigadeiros em chocolate granulado.",
+        "Misture o leite condensado e a manteiga em uma panela pequena e coloque ao fogo alto.",
+        "Coloque o açúcar e a maisena na panela e coloque as colheres de chocolate.",
+        "Mexa sem parar para não engrossar e quando  começar a ferver deixe por 30 segundos",
+        "Desligue o fogo e despeje num recipiente grande",
+        "Coloque na geladeira por 5 minutos.",
+        "Quando tirar, despeje o granulado.",
+        "Coloque a manteiga até derreter.",
+        "Acrescente o leite condensado na panela, a nutella e o achocolatado em pó.",
+        "Mexa bem até desgrudar do fundo da panela.",
+        "Deixe esfriar e depois enrole.",
+        "Passe no granulado e esta pronto.",
+        "[http://www.brigadeirissimo.com.br/sabores.html Brigadeiríssimo] - Para outras ideias além das receitas tradicionais;",
+        "[http://www.mariabrigadeiro.com.br Maria Brigadeiro] - Para outras ideias além das receitas tradicionais;",
+        "[http://www.brigadeirodoce.com Brigadeiro Doce ] - Para outras ideias além das receitas tradicionais em Portugal.",
+        "[https://www.cursodocesgourmet.info/ Curso Doces Gourmet] - Para outras ideias além das receitas tradicionais;",
+        "Categoria:Achocolatado em pó, receitas com|",
+        "Categoria:Leite condensado, receitas com|",
+        "Categoria:Manteiga, receitas com|",
+        "Categoria:Bolacha, receitas com|",
+        "Categoria:Leite, receitas com|",
+        "Categoria:Brigadeiros|",
+        "Categoria:Doces|"
+      ],
+      "tags": [
+        "Sobremesas",
+        "Tradicional",
+        "Wikilivros"
+      ],
+      "caloriesPerServing": 1460,
+      "canonicalKey": "brigadeiro",
+      "originArea": "Brazilian",
+      "originCountry": "Brazil",
+      "diet": {
+        "hasMeat": false,
+        "hasLactose": true,
+        "hasGluten": true,
+        "hasEgg": false,
+        "vegetarian": true,
+        "vegan": false,
+        "lowCarb": false,
+        "highProtein": false,
+        "usesFrying": false
+      },
+      "sources": [
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FBrigadeiro",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Brigadeiro\""
+        },
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FBrigadeiro_de_caf%C3%A9",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Brigadeiro de café\""
+        },
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FBrigadeiro_de_caf%C3%A9_sol%C3%BAvel",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Brigadeiro de café solúvel\""
+        },
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FBrigadeiro_de_mandioca",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Brigadeiro de mandioca\""
+        }
+      ],
+      "aliases": [
+        "Brigadeiro",
+        "Brigadeiro de mandioca",
+        "Brigadeiro de café solúvel",
+        "Brigadeiro de café"
+      ]
+    },
+    {
+      "id": "wikilivros_feijoada",
+      "title": "Feijoada brasileira completa",
+      "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
+      "prepTimeMinutes": 90,
+      "difficulty": "Médio",
+      "servings": 4,
+      "servingsBucket": "3-4",
+      "category": "Almoço & Jantar",
+      "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+      "ingredients": [
+        {
+          "name": "feijão preto",
+          "quantity": "1 kg",
+          "required": true
+        },
+        {
+          "name": "carne de porco salgada",
+          "quantity": "1/2 kg",
+          "required": true
+        },
+        {
+          "name": "carne-seca",
+          "quantity": "1/2 kg",
+          "required": true
+        },
+        {
+          "name": "pé (chispe)",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "orelha",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "focinho",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "rabinho",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "carne bovina fresca (ponta de agulha ou braço)",
+          "quantity": "1/2 kg",
+          "required": true
+        },
+        {
+          "name": "lingüiça calabresa",
+          "quantity": "1/2 kg",
+          "required": true
+        },
+        {
+          "name": "osso de presunto",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "paio",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "ramas de toucinho fumeiro (bacon defumado)",
+          "quantity": "100 g",
+          "required": true
+        },
+        {
+          "name": "lombo de porco fresco (ou costeletas de porco)",
+          "quantity": "1/2 kg",
+          "required": true
+        },
+        {
+          "name": "cebola",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "óleo",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "folhas de louro",
+          "quantity": "5",
+          "required": true
+        },
+        {
+          "name": "alho",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "cheiro-verde",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "couve",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "molho carioca",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "laranjas.",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "Duas colheres (sopa) bem cheias de pimenta cumari ou Pimenta malagueta, bem curtidas",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "Uma porção de salsa picada, bem fininha",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "Uma pitada de sal",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "Caldo de limão galego.",
+          "quantity": "a gosto",
+          "required": true
+        }
+      ],
+      "steps": [
+        "Na véspera, colocar de molho a carne de porco salgada, a carne-seca, o pé, a orelha, o rabinho e o focinho de porco salgados.",
+        "No dia seguinte, de manhã, levar ao fogo o feijão preto em caldeirão com bastante água.",
+        "Em outra panela, ferver os ingredientes postos de molho.",
+        "Depois de cozer o feijão uma hora, juntar as carner fervidas, o louro e acrescentar a carne bovina, a linguiça, o osso de presunto, o paio, o toucinho (bacon), as costeletas de porco (ou o meio quilo de lombo de porco fresco).",
+        "Quando tudo já estiver cozido, juntar o refogado, feito à parte, com cebola picada, uma colher (sopa) de óleo, alho pisado e cheiro-verde. Provar o sal e deixar ferver, até bem cozido, em fogo brando, para não grudar no fundo do caldeirão.",
+        "Para servir, colocar os ingredientes numa travessa, arrumando com jeito (o feijão será levado à mesa numa sopeira ou grande tigela de barro).",
+        "Servir com o molho carioca* e laranjas doces, picadas e polvilhadas (ou não) de sal fino.",
+        "Servir com couve frita em alho e óleo, e arroz ou com farinha de mandioca, torresmo, mandioca frita. Pode ser condimentada com pimenta malagueta a gosto (à mesa, por cada comensal).",
+        "Amasse bem as pimentas e junte a salsa e o sal.",
+        "Coloque numa molheira e cubra tudo com o caldo de limão galego."
+      ],
+      "tags": [
+        "Almoço & Jantar",
+        "Tradicional",
+        "Wikilivros"
+      ],
+      "caloriesPerServing": 1075,
+      "canonicalKey": "feijoada",
+      "originArea": "Brazilian",
+      "originCountry": "Brazil",
+      "diet": {
+        "hasMeat": true,
+        "hasLactose": false,
+        "hasGluten": false,
+        "hasEgg": false,
+        "vegetarian": false,
+        "vegan": false,
+        "lowCarb": false,
+        "highProtein": true,
+        "usesFrying": true
+      },
+      "sources": [
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FFeijoada_brasileira_completa",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Feijoada brasileira completa\""
+        },
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FFeijoada_francesa",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Feijoada francesa\""
+        }
+      ],
+      "aliases": [
+        "Feijoada brasileira completa",
+        "Feijoada francesa"
+      ]
+    },
+    {
+      "id": "wikilivros_pao-de-queijo",
+      "title": "Pão de queijo",
+      "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
+      "prepTimeMinutes": 90,
+      "difficulty": "Médio",
+      "servings": 4,
+      "servingsBucket": "3-4",
+      "category": "Almoço & Jantar",
+      "imageUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3f/Pao_de_queijo.jpg/960px-Pao_de_queijo.jpg?utm_source=pt.wikibooks.org&utm_campaign=api&utm_content=thumbnail",
+      "ingredients": [
+        {
+          "name": "polvilho",
+          "quantity": "1 kg",
+          "required": true
+        },
+        {
+          "name": "ramas de fubá canjica",
+          "quantity": "200 g",
+          "required": true
+        },
+        {
+          "name": "ramas de queijo ralado",
+          "quantity": "200 g",
+          "required": true
+        },
+        {
+          "name": "ovos",
+          "quantity": "4",
+          "required": true
+        },
+        {
+          "name": "sal",
+          "quantity": "1 colher (sopa)",
+          "required": true
+        },
+        {
+          "name": "itro de leite",
+          "quantity": "1/2 l",
+          "required": true
+        },
+        {
+          "name": "gordura.",
+          "quantity": "1 xícara (chá)",
+          "required": true
+        },
+        {
+          "name": "(americano) de óleo, pelo vinco",
+          "quantity": "2 copo",
+          "required": true
+        },
+        {
+          "name": "(americano) de água, pelo vinco",
+          "quantity": "1 copo",
+          "required": true
+        },
+        {
+          "name": "(americano) de leite, pelo vinco",
+          "quantity": "1 copo",
+          "required": true
+        },
+        {
+          "name": "sal",
+          "quantity": "1 colher",
+          "required": true
+        },
+        {
+          "name": "(americano) de polvilho doce",
+          "quantity": "4 copos",
+          "required": true
+        },
+        {
+          "name": "ovos (mais ou menos), dependendo do tamanho deles",
+          "quantity": "4",
+          "required": true
+        },
+        {
+          "name": "e 1/2 copos (americano) de queijo ralado.",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "(americano) de polvilho",
+          "quantity": "6 copos",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de farinha de milho",
+          "quantity": "3 colher",
+          "required": true
+        },
+        {
+          "name": "ovos a 3 ovos",
+          "quantity": "2",
+          "required": true
+        },
+        {
+          "name": "(americano) de água morna",
+          "quantity": "1 copo",
+          "required": true
+        },
+        {
+          "name": "(americano) de óleo quente",
+          "quantity": "1 copo",
+          "required": true
+        },
+        {
+          "name": "sal",
+          "quantity": "1 colher",
+          "required": true
+        },
+        {
+          "name": "s (chá) de queijo ralado.",
+          "quantity": "2 xícara",
+          "required": true
+        },
+        {
+          "name": "prato fundo de polvilho",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "prato fundo de queijo ralado",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "e 1/2  conchas de banha (a banha deve estar quente para escaldar o polvilho)",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "água com sal",
+          "quantity": "1 xícara (chá)",
+          "required": true
+        },
+        {
+          "name": "leite",
+          "quantity": "1 xícara (chá)",
+          "required": true
+        },
+        {
+          "name": "ovos.",
+          "quantity": "3",
+          "required": true
+        },
+        {
+          "name": "itros de polvilho",
+          "quantity": "2 l",
+          "required": true
+        },
+        {
+          "name": "prato cheio de queijo ralado",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "ovos a 7 ovos (conforme o tamanho)",
+          "quantity": "6",
+          "required": true
+        },
+        {
+          "name": "itro de leite",
+          "quantity": "1 l",
+          "required": true
+        },
+        {
+          "name": "prato raso de gordura",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "prato raso de água",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "Sal a vontade.",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "polvilho azedo",
+          "quantity": "1 kg",
+          "required": true
+        },
+        {
+          "name": "ovos",
+          "quantity": "8",
+          "required": true
+        },
+        {
+          "name": "ramas de queijo parmesão ou Minas",
+          "quantity": "800 g",
+          "required": true
+        },
+        {
+          "name": ", rasa, de sal",
+          "quantity": "1 colher (sopa)",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de margarina",
+          "quantity": "4 colher",
+          "required": true
+        },
+        {
+          "name": "(americano) de água quente.",
+          "quantity": "1 copo",
+          "required": true
+        }
+      ],
+      "steps": [
+        "Põe-se o leite e a gordura para ferver.",
+        "Enquanto isso, sova-se o polvilho com a salmoura e o fubá.",
+        "Escalde com o leite e gordura ferventes.",
+        "Depois põe os ovos e amolece com leite até o ponto de enrolar.",
+        "Enrole os pães de queijo, fazendo bolinhas, passando-se óleo nas mãos.",
+        "Coloque em fôrma untada e asse em forno quente, preaquecido.",
+        "Coloque o óleo, a água e leite para ferverem juntos.",
+        "Em seguida, escaldar o polvilho doce.",
+        "Quando estiver morno, quase frio, ir colocando os ovos, mais ou menos, sovar bastante.",
+        "E, por último, colocar o queijo ralado.",
+        "Tornar a sovar muito.",
+        "Enrolar com as mãos untadas em óleo e colocá-los em fôrma untada.",
+        "Assar em forno quente, previamente aquecido.",
+        "Sove o polvilho com o copo de água morna, escalde com óleo quente e sove assim que ficar morno.",
+        "Colocam-se num prato: Os ovos, a farinha de milho e termina de encher o prato com leite, misturando tudo e acrescentando ao polvilho já sovado.",
+        "Coloque o queijo ralado e sove mais um pouco. Se for necessário amoleça com água morna.",
+        "Enrolar as bolinhas com as mãos untadas em óleo e colocá-las em fôrma untada.",
+        "Assar em forno quente, previamente aquecido.",
+        "Após escaldar o polvilho, amasse tudo e sove muito bem.",
+        "Para formar as bolas passe um pouco de gordura nas mãos.",
+        "Coloque em fôrma unta e leve ao forno quente.",
+        "Ponha a água para ferver com a gordura e escalde o polvilho. Deixe esfriar e sove.",
+        "Depois de sovado, junte os ovos, a gordura, o sal e o leite, e, por último, o queijo ralado.",
+        "Amasse bem.",
+        "Unte as mãos e enrole os pãezinhos.",
+        "Coloque em fôrma untada.",
+        "Asse no forno em temperatura regular, previamente aquecido.",
+        "Escaldar o polvilho e sovar.",
+        "Colocar os ovos e amassar bem.",
+        "Depois, coloque o queijo ralado e misturar bem.",
+        "Unte a mão e faça as bolinhas de pão de queijo.",
+        "Coloque-as na fôrma untada e asse.",
+        "Categoria:Pães de queijo|",
+        "Categoria:Polvilho, receitas com|",
+        "Categoria:Ovo, receitas com|",
+        "Categoria:Queijo, receitas com|",
+        "Categoria:Fubá de canjica, receitas com|",
+        "Categoria:Farinha de milho, receitas com|",
+        "Categoria:Queijo parmesão, receitas com|"
+      ],
+      "tags": [
+        "Almoço & Jantar",
+        "Tradicional",
+        "Wikilivros"
+      ],
+      "caloriesPerServing": 1075,
+      "canonicalKey": "pao-de-queijo",
+      "originArea": "Brazilian",
+      "originCountry": "Brazil",
+      "diet": {
+        "hasMeat": true,
+        "hasLactose": true,
+        "hasGluten": false,
+        "hasEgg": true,
+        "vegetarian": false,
+        "vegan": false,
+        "lowCarb": false,
+        "highProtein": true,
+        "usesFrying": true
+      },
+      "sources": [
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FP%C3%A3o_de_queijo",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Pão de queijo\""
+        },
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FP%C3%A3o_de_queijo_com_iogurte",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Pão de queijo com iogurte\""
+        },
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FP%C3%A3o_de_queijo_de_batata",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Pão de queijo de batata\""
+        },
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FP%C3%A3o_de_queijo_de_liquidificador",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Pão de queijo de liquidificador\""
+        },
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FP%C3%A3o_de_queijo_do_padre",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Pão de queijo do padre\""
+        },
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FP%C3%A3o_de_queijo_doido",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Pão de queijo doido\""
+        },
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FP%C3%A3o_de_queijo_especial",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Pão de queijo especial\""
+        },
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FP%C3%A3o_de_queijo_f%C3%A1cil",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Pão de queijo fácil\""
+        },
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FP%C3%A3o_de_queijo_mineiro",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Pão de queijo mineiro\""
+        },
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FP%C3%A3o_de_queijo_para_congelar",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Pão de queijo para congelar\""
+        },
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FP%C3%A3o_de_queijo_tradi%C3%A7%C3%A3o",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Pão de queijo tradição\""
+        },
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FP%C3%A3o_de_queijo_%C3%A0_Bomjepe",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Pão de queijo à Bomjepe\""
+        }
+      ],
+      "aliases": [
+        "Pão de queijo",
+        "Pão de queijo à Bomjepe",
+        "Pão de queijo tradição",
+        "Pão de queijo para congelar",
+        "Pão de queijo mineiro",
+        "Pão de queijo fácil",
+        "Pão de queijo especial",
+        "Pão de queijo doido",
+        "Pão de queijo do padre",
+        "Pão de queijo de liquidificador",
+        "Pão de queijo de batata",
+        "Pão de queijo com iogurte"
+      ]
+    },
+    {
+      "id": "wikilivros_abacaxi-cristalizado",
+      "title": "Abacaxi cristalizado",
+      "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
+      "prepTimeMinutes": 90,
+      "difficulty": "Médio",
+      "servings": 4,
+      "servingsBucket": "3-4",
+      "category": "Almoço & Jantar",
+      "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+      "ingredients": [
+        {
+          "name": "abacaxi (pérola) maduro",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "açúcar",
+          "quantity": "1 kg",
+          "required": true
+        },
+        {
+          "name": "itros de água",
+          "quantity": "5 l",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de leite.",
+          "quantity": "2 colher",
+          "required": true
+        },
+        {
+          "name": "e 1/2 kg de açúcar",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "itro de água",
+          "quantity": "1/2 l",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de leite.",
+          "quantity": "2 colher",
+          "required": true
+        }
+      ],
+      "steps": [
+        "Lavar bem e secar o abacaxi.",
+        "Descascar e cortar em fatias de dois a três centímetros.",
+        "Colocar em 2 litros de água e deixar descansar por 30 minutos.",
+        "Numa panela, ferver um litro e meio de água.",
+        "Quando estiver borbulhando, mergulhar o abacaxi (é necessário o choque térmico).",
+        "Tampar com pano de prato e deixar por 10 minutos.",
+        "Tirar do fogo e deixar esfriar.",
+        "Tirar as fatias e, com uma faca, retirar o miolo e deixar escorrer. Reservar.",
+        "Colocar para ferver, em fogo médio, 500 ml de água, juntamente com 1 kg de açúcar e o leite.",
+        "Com uma escumadeira, retirar o excesso de espuma.",
+        "Quando estiver no ponto de bala mole (checar a consistência pingando com a colher num prato  com água fria), colocar os pedaços de abacaxi.",
+        "Quando levantar a fervura, retirar o doce do fogo e despejá-lo numa vasilha (que não pode ser de alumínio).",
+        "Deixar descansando até o dia seguinte.",
+        "Pôr novamente na panela e levar ao fogo.",
+        "Assim que levantar fervura, retirar os pedaços de abacaxi e colocá-los num pirex tampado, para não esfriar.",
+        "A calda é novamente levada ao ponto de bala mole, e o abacaxi volta à panela. Assim que levantar a fervura, retirar as fatias, colocá-las de volta no pirex, tampar e deixar descansar até o dia seguinte.",
+        "Repetir o procedimento por mais 2 dias (para desidratar a fruta).",
+        "Colocar para ferver, em fogo médio, a água, o açúcar e o leite.",
+        "Com uma escumadeira, tirar o excesso de espuma.",
+        "Escorrer o abacaxi e cortá-lo em cubos.",
+        "Colocá-los na panela da calda, mexendo com uma colher de pau até o ponto de bala mole, porém mais consistente.",
+        "Retirar do fogo e mexer até a calda ficar esbranquiçada.",
+        "Com um garfo, tirar pedaço por pedaço (rapidamente) e pôr para descansar sobre uma bandeja de alumínio (como as de pizza).",
+        "Deixar esfriar em temperatura ambiente."
+      ],
+      "tags": [
+        "Almoço & Jantar",
+        "Tradicional",
+        "Wikilivros"
+      ],
+      "caloriesPerServing": 445,
+      "canonicalKey": "abacaxi-cristalizado",
+      "originArea": "Brazilian",
+      "originCountry": "Brazil",
+      "diet": {
+        "hasMeat": false,
+        "hasLactose": true,
+        "hasGluten": false,
+        "hasEgg": false,
+        "vegetarian": true,
+        "vegan": false,
+        "lowCarb": false,
+        "highProtein": false,
+        "usesFrying": false
+      },
+      "sources": [
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FAbacaxi_cristalizado",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Abacaxi cristalizado\""
+        }
+      ],
+      "aliases": [
+        "Abacaxi cristalizado"
+      ]
+    },
+    {
+      "id": "wikilivros_abacaxi-de-festa",
+      "title": "Abacaxi de festa",
+      "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
+      "prepTimeMinutes": 46,
+      "difficulty": "Fácil",
+      "servings": 4,
+      "servingsBucket": "3-4",
+      "category": "Almoço & Jantar",
+      "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+      "ingredients": [
+        {
+          "name": "abacaxi",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "Champanhe, seco",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "Gelo picado.",
+          "quantity": "a gosto",
+          "required": true
+        }
+      ],
+      "steps": [
+        "Corte o abacaxi ao meio, retire a polpa.",
+        "Bata a polpa no liquidificador, coe e coloque-a nas duas metades do abacaxi.",
+        "Complete com champanhe e sirva com dois canudinhos.",
+        "Categoria:Bebidas com álcool|",
+        "Categoria:Champanhe, receitas com|"
+      ],
+      "tags": [
+        "Almoço & Jantar",
+        "Tradicional",
+        "Wikilivros"
+      ],
+      "caloriesPerServing": 305,
+      "canonicalKey": "abacaxi-de-festa",
+      "originArea": "Brazilian",
+      "originCountry": "Brazil",
+      "diet": {
+        "hasMeat": false,
+        "hasLactose": false,
+        "hasGluten": false,
+        "hasEgg": false,
+        "vegetarian": true,
+        "vegan": true,
+        "lowCarb": true,
+        "highProtein": false,
+        "usesFrying": false
+      },
+      "sources": [
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FAbacaxi_de_festa",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Abacaxi de festa\""
+        }
+      ],
+      "aliases": [
+        "Abacaxi de festa"
+      ]
+    },
+    {
+      "id": "wikilivros_abacaxi-grelhado",
+      "title": "Abacaxi grelhado",
+      "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
+      "prepTimeMinutes": 84,
+      "difficulty": "Médio",
+      "servings": 4,
+      "servingsBucket": "3-4",
+      "category": "Almoço & Jantar",
+      "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+      "ingredients": [
+        {
+          "name": "abacaxi, cortado em fatias de 2 centímetros",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de  adoçante",
+          "quantity": "3 colher",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de  rum",
+          "quantity": "3 colher",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de  suco de limão",
+          "quantity": "1 colher",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de  uva passa clara",
+          "quantity": "2 colher",
+          "required": true
+        },
+        {
+          "name": "Sorvete de abacaxi.",
+          "quantity": "a gosto",
+          "required": true
+        }
+      ],
+      "steps": [
+        "Retire o miolo de cada fatia de abacaxi, polvilhe-a com adoçante e regue-as com rum. Deixe descansar por dez minutos.",
+        "Coloque em um refratário com o suco que se formou e o suco de limão.",
+        "Leve ao forno quente por dez minutos, até o ponto de caramelo.",
+        "Arrume em um prato com as uvas passas e sirva quente.",
+        "Acompanhe com o sorvete de abacaxi.",
+        "Categoria:Rum, receitas com|",
+        "Categoria:Uva-passa clara, receitas com|",
+        "Categoria:Abacaxi, receitas com|",
+        "Categoria:Frutas|"
+      ],
+      "tags": [
+        "Almoço & Jantar",
+        "Tradicional",
+        "Wikilivros"
+      ],
+      "caloriesPerServing": 410,
+      "canonicalKey": "abacaxi-grelhado",
+      "originArea": "Brazilian",
+      "originCountry": "Brazil",
+      "diet": {
+        "hasMeat": false,
+        "hasLactose": false,
+        "hasGluten": false,
+        "hasEgg": true,
+        "vegetarian": true,
+        "vegan": false,
+        "lowCarb": true,
+        "highProtein": true,
+        "usesFrying": false
+      },
+      "sources": [
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FAbacaxi_grelhado",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Abacaxi grelhado\""
+        }
+      ],
+      "aliases": [
+        "Abacaxi grelhado"
+      ]
+    },
+    {
+      "id": "wikilivros_abobrinha-refogada",
+      "title": "Abobrinha refogada",
+      "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
+      "prepTimeMinutes": 84,
+      "difficulty": "Médio",
+      "servings": 4,
+      "servingsBucket": "3-4",
+      "category": "Almoço & Jantar",
+      "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+      "ingredients": [
+        {
+          "name": "abobrinhas picadas",
+          "quantity": "2",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de óleo",
+          "quantity": "2 colher",
+          "required": true
+        },
+        {
+          "name": "cebola picada",
+          "quantity": "1/2",
+          "required": true
+        },
+        {
+          "name": "Sal e pimenta-do-reino a gosto",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "envelope de caldo de legumes",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "ovos.",
+          "quantity": "4",
+          "required": true
+        }
+      ],
+      "steps": [
+        "Lave as abobrinhas com casca, pique em cubos e reserve.",
+        "Coloque numa panela o óleo, a cebola, a abobrinha, os temperos e o caldo de legumes.",
+        "Deixe refogar por aproximadamente uns 20 minutos ou até que esteja macia.",
+        "Em seguida, bata os ovos ligeiramente com sal a gosto e jogue na panela.",
+        "Deixe refogar mais um pouco até que seque e que os ovos estejam igual uma omelete.",
+        "Categoria:Verduras e Legumes|",
+        "Categoria:Abobrinha, receitas com|",
+        "Categoria:Ovo, receitas com|",
+        "Categoria:Caldo de legumes, receitas com|"
+      ],
+      "tags": [
+        "Almoço & Jantar",
+        "Tradicional",
+        "Wikilivros"
+      ],
+      "caloriesPerServing": 410,
+      "canonicalKey": "abobrinha-refogada",
+      "originArea": "Brazilian",
+      "originCountry": "Brazil",
+      "diet": {
+        "hasMeat": false,
+        "hasLactose": false,
+        "hasGluten": false,
+        "hasEgg": true,
+        "vegetarian": true,
+        "vegan": false,
+        "lowCarb": true,
+        "highProtein": true,
+        "usesFrying": false
+      },
+      "sources": [
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FAbobrinha_refogada",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Abobrinha refogada\""
+        }
+      ],
+      "aliases": [
+        "Abobrinha refogada"
+      ]
+    },
+    {
+      "id": "wikilivros_abobrinha-suculenta",
+      "title": "Abobrinha suculenta",
+      "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
+      "prepTimeMinutes": 72,
+      "difficulty": "Médio",
+      "servings": 4,
+      "servingsBucket": "3-4",
+      "category": "Almoço & Jantar",
+      "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+      "ingredients": [
+        {
+          "name": "abobrinhas italianas (cortadas em rodelas)",
+          "quantity": "1 kg",
+          "required": true
+        },
+        {
+          "name": "cebola, cortadinha",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "tomates médios, cortadinhos",
+          "quantity": "2",
+          "required": true
+        },
+        {
+          "name": "tabletes de caldo de galinha",
+          "quantity": "2",
+          "required": true
+        },
+        {
+          "name": "iogurte natural (sem sabor)",
+          "quantity": "1 copo",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de azeite de oliva",
+          "quantity": "2 colher",
+          "required": true
+        },
+        {
+          "name": "Sal à gosto",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "(americano) de água.",
+          "quantity": "1/2 copo",
+          "required": true
+        }
+      ],
+      "steps": [
+        "Numa panela aqueça o azeite e disponha a cebola. Doure-a e em seguida coloque os tomates.",
+        "Mexa um pouco e adicione os tabletes de caldo de galinha, junto de um pouco de água.",
+        "Dissolva-os e imediatamente ponha a abobrinha. Mexa e abafe por uns dois minutos.",
+        "Abra a panela e junte o iogurte. Mexa levemente, desligue o fogo e está pronto para servir.",
+        "Categoria:Verduras e Legumes|",
+        "Categoria:Abobrinha, receitas com|",
+        "Categoria:Tomate, receitas com|"
+      ],
+      "tags": [
+        "Almoço & Jantar",
+        "Tradicional",
+        "Wikilivros"
+      ],
+      "caloriesPerServing": 480,
+      "canonicalKey": "abobrinha-suculenta",
+      "originArea": "Brazilian",
+      "originCountry": "Brazil",
+      "diet": {
+        "hasMeat": true,
+        "hasLactose": true,
+        "hasGluten": false,
+        "hasEgg": false,
+        "vegetarian": false,
+        "vegan": false,
+        "lowCarb": true,
+        "highProtein": true,
+        "usesFrying": false
+      },
+      "sources": [
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FAbobrinha_suculenta",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Abobrinha suculenta\""
+        }
+      ],
+      "aliases": [
+        "Abobrinha suculenta"
+      ]
+    },
+    {
+      "id": "wikilivros_abobrinhas-recheadas",
+      "title": "Abobrinhas recheadas",
+      "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
+      "prepTimeMinutes": 90,
+      "difficulty": "Médio",
+      "servings": 4,
+      "servingsBucket": "3-4",
+      "category": "Almoço & Jantar",
+      "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+      "ingredients": [
+        {
+          "name": "abobrinhas",
+          "quantity": "4",
+          "required": true
+        },
+        {
+          "name": "ramas de tomates-cereja cortados ao meio",
+          "quantity": "200 g",
+          "required": true
+        },
+        {
+          "name": "e 1/2 xícaras (chá) de arroz cozido",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de castanha de caju, torrada e picada",
+          "quantity": "2 colher",
+          "required": true
+        },
+        {
+          "name": "óleo",
+          "quantity": "1 colher (chá)",
+          "required": true
+        },
+        {
+          "name": "casca ralada de limão",
+          "quantity": "1 colher (chá)",
+          "required": true
+        },
+        {
+          "name": "Suco de 1/2 limão",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "Sal e pimenta-do-reino a gosto.",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "abobrinhas pequenas",
+          "quantity": "6",
+          "required": true
+        },
+        {
+          "name": "ovos batidos",
+          "quantity": "2",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de requeijão",
+          "quantity": "3 colher",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de farinha de rosca",
+          "quantity": "2 colher",
+          "required": true
+        },
+        {
+          "name": "cebola picada",
+          "quantity": "1/2",
+          "required": true
+        },
+        {
+          "name": "caldo de carne",
+          "quantity": "1 xícara (chá)",
+          "required": true
+        },
+        {
+          "name": "tomates, sem pele e sem sementes e picados em pedaços",
+          "quantity": "3",
+          "required": true
+        },
+        {
+          "name": "margarina ou manteiga",
+          "quantity": "1 colher (sopa)",
+          "required": true
+        },
+        {
+          "name": "Sal a gosto",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de queijo ralado",
+          "quantity": "2 colher",
+          "required": true
+        },
+        {
+          "name": "Cheiro Verde.",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "abobrinhas, pequenas",
+          "quantity": "5",
+          "required": true
+        },
+        {
+          "name": "cubos de caldo de galinha",
+          "quantity": "2",
+          "required": true
+        },
+        {
+          "name": "s (chá) de água fervente",
+          "quantity": "2 xícara",
+          "required": true
+        },
+        {
+          "name": "pãozinho amanhecido, picadinho",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "cebolinha verde, picada",
+          "quantity": "1 colher (sopa)",
+          "required": true
+        },
+        {
+          "name": "tomate, picadinho",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de margarina",
+          "quantity": "2 colher",
+          "required": true
+        },
+        {
+          "name": "Queijo ralado a gosto.",
+          "quantity": "a gosto",
+          "required": true
+        }
+      ],
+      "steps": [
+        "Corte as abobrinhas ao meio no sentido do comprimento e retire a polpa com o auxílio de uma colher.",
+        "Passe as abobrinhas em água fervente por 1 minuto e escorra.",
+        "Em uma panela com o óleo, coloque a polpa das abobrinhas picadas. Aqueça em fogo médio até amaciar, mas não doure. Junte o suco de limão, a casca ralada, o arroz, as metades de tomate e a castanha de caju.",
+        "Tempere com sal e a pimenta-do-reino e recheie as abobrinhas.",
+        "Coloque num refratário e cubra com papel alumínio.",
+        "Asse por aproximadamente 30 minutos ou até ficarem macias.",
+        "Corte as abobrinhas ao meio no sentido do comprimento, retire as sementes.",
+        "Ferva-as rapidamente na água com um pouco de sal, deixando-as firmes.",
+        "Retire a polpa com cuidado; coloque estas polpas numa panela com o cheiro verde, os ovos, a farinha de rosca e o requeijão.",
+        "Cozinhe esta mistura no fogo baixo, acrescentando um pouco de leite se ela ficar muito sólida. Tempere com sal e recheie as cascas de abobrinhas.",
+        "Doure a cebola na manteiga, junte os tomates e o caldo de carne. Coloque esse molho numa fôrma, ponha uma camada de abobrinhas recheadas, salpique queijo parmesão ralado fino.",
+        "Leve ao forno por 15 minutos, antes de servir.",
+        "Raspe ligeiramente as cascas das abobrinhas. Corte-as ao meio, no sentido do comprimento. Cozinhe, por uns 15 minutos, juntamente com um cubo de caldo de galinha dissolvido na água.",
+        "Retire do fogo e com auxílio de uma colher, cave a polpa com cuidado.",
+        "Junte o pãozinho, a cebolinha, o tomate e a margarina e o outro cubo de caldo de galinha (amassados). Misture bem.",
+        "Recheie as abobrinhas e polvilhe com queijo.",
+        "Leve ao forno médio, em fôrma refratária, untada, até dourar. Sirva quente.",
+        "Categoria:Verduras e Legumes|",
+        "Categoria:Abobrinha, receitas com|"
+      ],
+      "tags": [
+        "Almoço & Jantar",
+        "Tradicional",
+        "Wikilivros"
+      ],
+      "caloriesPerServing": 1145,
+      "canonicalKey": "abobrinhas-recheadas",
+      "originArea": "Brazilian",
+      "originCountry": "Brazil",
+      "diet": {
+        "hasMeat": true,
+        "hasLactose": true,
+        "hasGluten": true,
+        "hasEgg": true,
+        "vegetarian": false,
+        "vegan": false,
+        "lowCarb": false,
+        "highProtein": true,
+        "usesFrying": false
+      },
+      "sources": [
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FAbobrinhas_recheadas",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Abobrinhas recheadas\""
+        }
+      ],
+      "aliases": [
+        "Abobrinhas recheadas"
+      ]
+    },
+    {
+      "id": "wikilivros_abobora-com-calda",
+      "title": "Abóbora com calda",
+      "description": "Receita tradicional brasileira do Wikilivros • Sobremesas",
+      "prepTimeMinutes": 90,
+      "difficulty": "Médio",
+      "servings": 4,
+      "servingsBucket": "3-4",
+      "category": "Sobremesas",
+      "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+      "ingredients": [
+        {
+          "name": "abóbora amarela de 1 kg (não pode ser moranga), aquela que tem pescoço",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "itro de água",
+          "quantity": "1/2 l",
+          "required": true
+        },
+        {
+          "name": "açúcar.",
+          "quantity": "1 kg",
+          "required": true
+        }
+      ],
+      "steps": [
+        "Cortar a abóbora, descascar, tirar as sementes e picar em pedaços de cerca de 4cm x 4cm.",
+        "Com uma faca pequena ou canivete, decorar as bordas, fazendo uma espécie de serrilhado.",
+        "Pôr na água com cal, durante meia hora, cobrindo com um pano e mexendo sempre.",
+        "Tirar a abóbora da cal, lavar muito bem cada pedaço com uma escovinha, em água corrente.",
+        "Com um garfo de cozinha, fazer dois furos nos pedaços de abóbora, um de cada lado, e cozinhar até que fiquem bem macios.",
+        "Tirar da panela, escorrer e reservar.",
+        "Com a água e o açúcar, fazer uma calda grossa, quase em ponto de fio.",
+        "Despejar a abóbora que deve estar na mesma temperatura da calda — ambas quentes ou frias — e ferver durante 20 minutos.",
+        "Tirar do fogo e deixar num tacho de cobre durante 24 horas, pelo menos.",
+        "Guardar em vidros esterilizados, juntamente com a calda.",
+        "Categoria:Outros Doces|",
+        "Categoria:Abóbora, receitas com|"
+      ],
+      "tags": [
+        "Sobremesas",
+        "Tradicional",
+        "Wikilivros"
+      ],
+      "caloriesPerServing": 305,
+      "canonicalKey": "abobora-com-calda",
+      "originArea": "Brazilian",
+      "originCountry": "Brazil",
+      "diet": {
+        "hasMeat": false,
+        "hasLactose": false,
+        "hasGluten": false,
+        "hasEgg": false,
+        "vegetarian": true,
+        "vegan": true,
+        "lowCarb": false,
+        "highProtein": false,
+        "usesFrying": false
+      },
+      "sources": [
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FAb%C3%B3bora_com_calda",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Abóbora com calda\""
+        }
+      ],
+      "aliases": [
+        "Abóbora com calda"
+      ]
+    },
+    {
+      "id": "wikilivros_alcatra-a-moda-brasileira",
+      "title": "Alcatra à moda brasileira",
+      "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
+      "prepTimeMinutes": 90,
+      "difficulty": "Médio",
+      "servings": 4,
+      "servingsBucket": "3-4",
+      "category": "Almoço & Jantar",
+      "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+      "ingredients": [
+        {
+          "name": "ramas de alcatra",
+          "quantity": "500 g",
+          "required": true
+        },
+        {
+          "name": "ramas de abóbora, cortada em cubos",
+          "quantity": "200 g",
+          "required": true
+        },
+        {
+          "name": "itro de caldo de carne",
+          "quantity": "1/2 l",
+          "required": true
+        },
+        {
+          "name": "cebola, em cubos",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "tomates em cubos",
+          "quantity": "2",
+          "required": true
+        },
+        {
+          "name": "Pimenta do reino a gosto e coentro",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "Salsa e coentro fresco a gosto",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "Arroz branco para acompanhar.",
+          "quantity": "a gosto",
+          "required": true
+        }
+      ],
+      "steps": [
+        "Corte a carne em cubos pequenos e tempere com sal a gosto.",
+        "Numa panela, aqueça o azeite. Junte a carne, a cebola e refogue.",
+        "Tempere com pimenta do reino a gosto. Adicione a salsa e o coentro fresco bem picados.",
+        "Acrescente os tomates e deixe refogar por alguns minutos, mexendo.",
+        "Adicione o caldo de carne e a abóbora.",
+        "Misture, tampe a panela e deixe cozinhar em fogo brando por cerca de 20 minutos (se necessário, adicione mais caldo).",
+        "Sirva acompanhado de arroz branco.",
+        "Categoria:Carnes|",
+        "Categoria:Alcatra, receitas com|",
+        "Categoria:Carne bovina, receitas com|",
+        "Categoria:Abóbora, receitas com|",
+        "Categoria:Tomate, receitas com|"
+      ],
+      "tags": [
+        "Almoço & Jantar",
+        "Tradicional",
+        "Wikilivros"
+      ],
+      "caloriesPerServing": 480,
+      "canonicalKey": "alcatra-a-moda-brasileira",
+      "originArea": "Brazilian",
+      "originCountry": "Brazil",
+      "diet": {
+        "hasMeat": true,
+        "hasLactose": false,
+        "hasGluten": false,
+        "hasEgg": false,
+        "vegetarian": false,
+        "vegan": false,
+        "lowCarb": false,
+        "highProtein": true,
+        "usesFrying": false
+      },
+      "sources": [
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FAlcatra_%C3%A0_moda_brasileira",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Alcatra à moda brasileira\""
+        }
+      ],
+      "aliases": [
+        "Alcatra à moda brasileira"
+      ]
+    },
+    {
+      "id": "wikilivros_alexander",
+      "title": "Alexander",
+      "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
+      "prepTimeMinutes": 90,
+      "difficulty": "Médio",
+      "servings": 4,
+      "servingsBucket": "3-4",
+      "category": "Almoço & Jantar",
+      "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+      "ingredients": [
+        {
+          "name": "ata de leite condensado",
+          "quantity": "1 l",
+          "required": true
+        },
+        {
+          "name": "ata de creme de leite",
+          "quantity": "1 l",
+          "required": true
+        },
+        {
+          "name": "ata de Gim (medido na lata de leite condensado)",
+          "quantity": "1 l",
+          "required": true
+        },
+        {
+          "name": "ata de licor de cacau (medido na lata de leite condensado).",
+          "quantity": "1 l",
+          "required": true
+        },
+        {
+          "name": "itros de guaraná",
+          "quantity": "1 l",
+          "required": true
+        },
+        {
+          "name": "(americano) de Rum",
+          "quantity": "1/2  copo",
+          "required": true
+        },
+        {
+          "name": "(americano) de Gim",
+          "quantity": "1/2  copo",
+          "required": true
+        },
+        {
+          "name": "(americano) de licor de cacau",
+          "quantity": "1/2  copo",
+          "required": true
+        },
+        {
+          "name": "ata de leite condensado",
+          "quantity": "1/2  l",
+          "required": true
+        },
+        {
+          "name": "ata de creme de leite",
+          "quantity": "1/2  l",
+          "required": true
+        },
+        {
+          "name": "gelo picado.",
+          "quantity": "1 xícara (chá)",
+          "required": true
+        },
+        {
+          "name": "gelo picado",
+          "quantity": "1 xícara  (chá)",
+          "required": true
+        },
+        {
+          "name": "dose de conhaque ou Gim",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "dose de creme (licor) de cacau",
+          "quantity": "1/2",
+          "required": true
+        },
+        {
+          "name": "dose de creme de leite.",
+          "quantity": "1/2",
+          "required": true
+        },
+        {
+          "name": "ata de leite condensado",
+          "quantity": "1 l",
+          "required": true
+        },
+        {
+          "name": "ata de creme de leite com soro",
+          "quantity": "1 l",
+          "required": true
+        },
+        {
+          "name": "cálices, pelo friso, de licor de cacau",
+          "quantity": "3",
+          "required": true
+        },
+        {
+          "name": "cálices de Gim.",
+          "quantity": "2",
+          "required": true
+        },
+        {
+          "name": "cálice de conhaque",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "cálice de creme (licor) de cacau",
+          "quantity": "1/2",
+          "required": true
+        },
+        {
+          "name": "cálice de creme de leite",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "noz-moscada ralada.",
+          "quantity": "1 pitada",
+          "required": true
+        }
+      ],
+      "steps": [
+        "Bata todos os ingredientes no liquidificador.",
+        "Servir gelado.",
+        "Bater todos os ingredientes no liquidificador.",
+        "Servir gelado.",
+        "Coloque o gelo picado na coqueteleira e despeje por cima os ingredientes restantes; agite bem.",
+        "Coe a mistura num copo adequado.",
+        "Bater no liquidificador e servir gelado.",
+        "Bata tudo em uma coqueteleira, com gelo picado.",
+        "Coe retirando o gelo.",
+        "Polvilhe cada copo para short drink com noz-moscada."
+      ],
+      "tags": [
+        "Almoço & Jantar",
+        "Tradicional",
+        "Wikilivros"
+      ],
+      "caloriesPerServing": 1005,
+      "canonicalKey": "alexander",
+      "originArea": "Brazilian",
+      "originCountry": "Brazil",
+      "diet": {
+        "hasMeat": false,
+        "hasLactose": true,
+        "hasGluten": false,
+        "hasEgg": false,
+        "vegetarian": true,
+        "vegan": false,
+        "lowCarb": false,
+        "highProtein": false,
+        "usesFrying": false
+      },
+      "sources": [
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FAlexander",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Alexander\""
+        }
+      ],
+      "aliases": [
+        "Alexander"
+      ]
+    },
+    {
+      "id": "wikilivros_almondega-de-soja",
+      "title": "Almôndega de soja",
+      "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
+      "prepTimeMinutes": 50,
+      "difficulty": "Médio",
+      "servings": 4,
+      "servingsBucket": "3-4",
+      "category": "Almoço & Jantar",
+      "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+      "ingredients": [
+        {
+          "name": "½ litro de água quente",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "tablete de caldo de legumes (ou verduras)",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "proteína de soja texturizada",
+          "quantity": "1 xícara (chá)",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de alcaparras",
+          "quantity": "2 colher",
+          "required": true
+        },
+        {
+          "name": "tomates secos",
+          "quantity": "2",
+          "required": true
+        },
+        {
+          "name": "ovo",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "Sal e pimenta do reino a gosto",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "Farinha de rosca (pão ralado), o quanto baste para o ponto de enrolar",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "Azeite de oliva",
+          "quantity": "a gosto",
+          "required": true
+        }
+      ],
+      "steps": [
+        "Hidrate a proteína de soja na água quente com o tablete de caldo de legumes dissolvido, por aproximadamente 15 minutos, ou até que esteja inchada. Escorra bem o excesso de água da proteína de soja e deixe esfriar.",
+        "Numa vasilha coloque a proteìna de soja, as alcaparras e o tomate seco tritados, o ovo, sal e pimenta do reino a gosto e misture bem acrescentando, aos poucos, a farinha de rosca, até dar o ponto de enrolar (atenção para não colocar muita, senão pode ficar dura).",
+        "Modele as almondegas e coloque-as em uma forma coberta com papel-manteiga, coloque um fiozinho de azeite em cima de cada uma e leve-as ao forno, preaquecido a 200 °C até dourar. Sirva ainda quente.",
+        "Categoria:Vegetariana"
+      ],
+      "tags": [
+        "Almoço & Jantar",
+        "Tradicional",
+        "Wikilivros"
+      ],
+      "caloriesPerServing": 515,
+      "canonicalKey": "almondega-de-soja",
+      "originArea": "Brazilian",
+      "originCountry": "Brazil",
+      "diet": {
+        "hasMeat": false,
+        "hasLactose": true,
+        "hasGluten": true,
+        "hasEgg": true,
+        "vegetarian": true,
+        "vegan": false,
+        "lowCarb": false,
+        "highProtein": true,
+        "usesFrying": false
+      },
+      "sources": [
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FAlm%C3%B4ndega_de_soja",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Almôndega de soja\""
+        }
+      ],
+      "aliases": [
+        "Almôndega de soja"
+      ]
+    },
+    {
+      "id": "wikilivros_almondegas-deliciosas",
+      "title": "Almôndegas deliciosas",
+      "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
+      "prepTimeMinutes": 90,
+      "difficulty": "Médio",
+      "servings": 4,
+      "servingsBucket": "3-4",
+      "category": "Almoço & Jantar",
+      "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+      "ingredients": [
+        {
+          "name": "carne moída",
+          "quantity": "1/2 kg",
+          "required": true
+        },
+        {
+          "name": "salsinha picada",
+          "quantity": "1/2 xícara (chá)",
+          "required": true
+        },
+        {
+          "name": "ovos",
+          "quantity": "2",
+          "required": true
+        },
+        {
+          "name": "sal",
+          "quantity": "1 colher (chá)",
+          "required": true
+        },
+        {
+          "name": "colher (chá) de pimenta do reino moída",
+          "quantity": "1/4",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de farinha de rosca",
+          "quantity": "3 colher",
+          "required": true
+        },
+        {
+          "name": "óleo para fritar.",
+          "quantity": "1 xícara (chá)",
+          "required": true
+        },
+        {
+          "name": "cebola picada",
+          "quantity": "1/2",
+          "required": true
+        },
+        {
+          "name": "salsinha",
+          "quantity": "1/2 xícara (chá)",
+          "required": true
+        },
+        {
+          "name": "es (sopa) cheias de extrato de tomate",
+          "quantity": "3 colher",
+          "required": true
+        },
+        {
+          "name": "e 1/2 xícaras (chá) de água quente",
+          "quantity": "2",
+          "required": true
+        },
+        {
+          "name": "sal.",
+          "quantity": "1 colher (chá)",
+          "required": true
+        },
+        {
+          "name": "ramas de carne bovina (de primeira), moída",
+          "quantity": "800 g",
+          "required": true
+        },
+        {
+          "name": "ramas de carne de porco (fraldinha) moída",
+          "quantity": "200 g",
+          "required": true
+        },
+        {
+          "name": "cebola",
+          "quantity": "1/2",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de mostarda amarela",
+          "quantity": "2 colher",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de ketchup",
+          "quantity": "2 colher",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de molho inglês",
+          "quantity": "3 colher",
+          "required": true
+        },
+        {
+          "name": "ovos",
+          "quantity": "2",
+          "required": true
+        },
+        {
+          "name": "Sal a gosto.",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "ramas de tomate (sem pele e sem semente) picadinho",
+          "quantity": "500 g",
+          "required": true
+        },
+        {
+          "name": "ramas de cenoura picadinha",
+          "quantity": "200 g",
+          "required": true
+        },
+        {
+          "name": "ramas de cebola picadinha",
+          "quantity": "100 g",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de óleo",
+          "quantity": "2 colher",
+          "required": true
+        },
+        {
+          "name": "itro de água",
+          "quantity": "1/2 l",
+          "required": true
+        },
+        {
+          "name": "colorau",
+          "quantity": "1 colher (sobremesa)",
+          "required": true
+        },
+        {
+          "name": "ramo de manjericão.",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "farinha de trigo",
+          "quantity": "1/2 xícara (chá)",
+          "required": true
+        },
+        {
+          "name": "farinha de pão",
+          "quantity": "1 xícara (chá)",
+          "required": true
+        },
+        {
+          "name": "farinha de milho (tipo beiju)",
+          "quantity": "1 xícara (chá)",
+          "required": true
+        },
+        {
+          "name": "farinha de mandioca (tipo beiju)",
+          "quantity": "1 xícara (chá)",
+          "required": true
+        },
+        {
+          "name": "ovos.",
+          "quantity": "2",
+          "required": true
+        },
+        {
+          "name": "ramas de presunto fatiado e rasgado",
+          "quantity": "200 g",
+          "required": true
+        },
+        {
+          "name": "ramas de mussarela ralada",
+          "quantity": "200 g",
+          "required": true
+        },
+        {
+          "name": "Ervilha",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "orégano.",
+          "quantity": "1 pitada",
+          "required": true
+        }
+      ],
+      "steps": [
+        "Junte todos os ingredientes numa tigela grande e amasse bem com as mãos por mais ou menos 5 minutos.",
+        "Com as mãos sempre úmidas, faça bolinhas do tamanho de um limão e frite-as numa frigideira até dourarem os dois lados.",
+        "Retire as bolinhas da frigideira e coloque diretamente no molho de tomate (preparado conforme abaixo). Tampe e deixe por uns 10 minutos.",
+        "Doure a cebola, junte o extrato de tomate, o sal e a água quente.",
+        "Deixe ferver por uns 5 minutos.",
+        "Por último, coloque a salsinha e deixe em fogo baixo.",
+        "Juntar as carnes e a cebola e passá-las duas vezes, no moedor de lâmina fina.",
+        "Adicionar os temperos, os ovos e mexer com a ponta dos dedos, até a mistura ficar uniforme.",
+        "Fazer a bola de almôndega, de no máximo umas 35 gramas cada uma delas, sem apertá-la  — o macête é deixá-la fofa.",
+        "Para fritar, pôr as almôndegas numa caçarola e cobrir com óleo frio.",
+        "Acender o fogo e deixar fritar durante uns 20 minutos.",
+        "Retirá-las quando estiverem com aspecto dourado. Coloque-as no escorredor e reservar.",
+        "Misturar as três farinhas (a de pão, a de milho e a de mandioca), desmanchando os beijus.",
+        "Passe as almôndegas na farinha de trigo, em seguida nos ovos batidos, e depois nas três farinhas que foram juntadas, e, passe-as novamente nos ovos e depois nas três farinhas outra vez.",
+        "Fritá-las em óleo quente, para dourarem.",
+        "Aquecer o óleo, refogar a cebola, até ficar transparente.",
+        "Acrescentar os demais ingredientes.",
+        "Cozinhar até a cenoura ficar macia.",
+        "Retire do fogo e quando esfriar, bater no liquidificador.",
+        "Pôr o molho no fundo de uma travessa e, em seguida, as almôndegas empanadas.",
+        "Regar com mais molho e acrescentar as ervilhas.",
+        "Cobrir todo o recipiente com o presunto (picando as fatias) e,por cima, coloque a mussarela ralada.",
+        "Salpicar o orégano.",
+        "Levar ao forno preaquecido até dourar.",
+        "Categoria:Carnes|",
+        "Categoria:Carne moída, receitas com|"
+      ],
+      "tags": [
+        "Almoço & Jantar",
+        "Tradicional",
+        "Wikilivros"
+      ],
+      "caloriesPerServing": 1460,
+      "canonicalKey": "almondegas-deliciosas",
+      "originArea": "Brazilian",
+      "originCountry": "Brazil",
+      "diet": {
+        "hasMeat": true,
+        "hasLactose": true,
+        "hasGluten": true,
+        "hasEgg": true,
+        "vegetarian": false,
+        "vegan": false,
+        "lowCarb": false,
+        "highProtein": true,
+        "usesFrying": true
+      },
+      "sources": [
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FAlm%C3%B4ndegas_deliciosas",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Almôndegas deliciosas\""
+        }
+      ],
+      "aliases": [
+        "Almôndegas deliciosas"
+      ]
+    },
+    {
+      "id": "wikilivros_almondegas-faceis",
+      "title": "Almôndegas fáceis",
+      "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
+      "prepTimeMinutes": 54,
+      "difficulty": "Fácil",
+      "servings": 4,
+      "servingsBucket": "3-4",
+      "category": "Almoço & Jantar",
+      "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+      "ingredients": [
+        {
+          "name": "carne moída",
+          "quantity": "1 kg",
+          "required": true
+        },
+        {
+          "name": "ovos",
+          "quantity": "2",
+          "required": true
+        },
+        {
+          "name": "cebola ralada",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "es (sopa) de queijo ralado",
+          "quantity": "2 colher",
+          "required": true
+        },
+        {
+          "name": "s (chá) de farinha de trigo",
+          "quantity": "2 xícara",
+          "required": true
+        },
+        {
+          "name": "Sal, cheiro verde e pimenta a gosto",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "queijo ralado para polvilhar.",
+          "quantity": "1 colher (sopa)",
+          "required": true
+        }
+      ],
+      "steps": [
+        "Misture numa tigela, modele as almôndegas e vai colocando num pirex untado.",
+        "Jogue por cima 1 lata de molho (extrato) de tomate, salpique queijo ralado.",
+        "Leve ao forno para assar.",
+        "Categoria:Carnes|",
+        "Categoria:Carne moída, receitas com|"
+      ],
+      "tags": [
+        "Almoço & Jantar",
+        "Tradicional",
+        "Wikilivros"
+      ],
+      "caloriesPerServing": 445,
+      "canonicalKey": "almondegas-faceis",
+      "originArea": "Brazilian",
+      "originCountry": "Brazil",
+      "diet": {
+        "hasMeat": true,
+        "hasLactose": true,
+        "hasGluten": true,
+        "hasEgg": true,
+        "vegetarian": false,
+        "vegan": false,
+        "lowCarb": false,
+        "highProtein": true,
+        "usesFrying": false
+      },
+      "sources": [
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FAlm%C3%B4ndegas_f%C3%A1ceis",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Almôndegas fáceis\""
+        }
+      ],
+      "aliases": [
+        "Almôndegas fáceis"
+      ]
+    },
+    {
+      "id": "wikilivros_alua",
+      "title": "Aluá",
+      "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
+      "prepTimeMinutes": 60,
+      "difficulty": "Médio",
+      "servings": 4,
+      "servingsBucket": "3-4",
+      "category": "Almoço & Jantar",
+      "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+      "ingredients": [
+        {
+          "name": "abacaxi médio",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "itros de água",
+          "quantity": "2 l",
+          "required": true
+        },
+        {
+          "name": "Açúcar mascavado (opcional)",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "Cravo-da-índia a gosto",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "chá de gengibre ralado (opcional).",
+          "quantity": "1 colher",
+          "required": true
+        },
+        {
+          "name": "milho vermelho seco",
+          "quantity": "1 kg",
+          "required": true
+        },
+        {
+          "name": "raízes de gengibre",
+          "quantity": "3",
+          "required": true
+        },
+        {
+          "name": "rapadura",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "itros de água",
+          "quantity": "4 l",
+          "required": true
+        },
+        {
+          "name": "Casca de 2 abacaxis bem maduros e lavados",
+          "quantity": "a gosto",
+          "required": true
+        },
+        {
+          "name": "itros de água filtrada",
+          "quantity": "2 l",
+          "required": true
+        },
+        {
+          "name": "açúcar mascavado",
+          "quantity": "1 xícara",
+          "required": true
+        },
+        {
+          "name": "cravos-da-índia",
+          "quantity": "6",
+          "required": true
+        },
+        {
+          "name": "gengibre ralado",
+          "quantity": "1 colher (chá)",
+          "required": true
+        }
+      ],
+      "steps": [
+        "Cortam-se fatias grossas da casca de um abacaxi (ananás).",
+        "Colocam-se as cascas em uma panela e cobre-se com água. Deixa-se fermentar durante pelo menos um dia (quanto mais tempo as cascas ficarem a fermentar, mais alcoólica ficará a bebida).",
+        "Coa-se a bebida e adicionam-se os restantes ingredientes.",
+        "Serve-se frio."
+      ],
+      "tags": [
+        "Almoço & Jantar",
+        "Tradicional",
+        "Wikilivros"
+      ],
+      "caloriesPerServing": 690,
+      "canonicalKey": "alua",
+      "originArea": "Brazilian",
+      "originCountry": "Brazil",
+      "diet": {
+        "hasMeat": false,
+        "hasLactose": false,
+        "hasGluten": false,
+        "hasEgg": false,
+        "vegetarian": true,
+        "vegan": true,
+        "lowCarb": false,
+        "highProtein": false,
+        "usesFrying": false
+      },
+      "sources": [
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FAlu%C3%A1",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Aluá\""
+        }
+      ],
+      "aliases": [
+        "Aluá"
+      ]
+    },
+    {
+      "id": "wikilivros_amarula",
+      "title": "Amarula",
+      "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
+      "prepTimeMinutes": 74,
+      "difficulty": "Médio",
+      "servings": 4,
+      "servingsBucket": "3-4",
+      "category": "Almoço & Jantar",
+      "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+      "ingredients": [
+        {
+          "name": "(americano) de rum bacardi carta de ouro",
+          "quantity": "2 copos",
+          "required": true
+        },
+        {
+          "name": "(americano) de leite",
+          "quantity": "1 copo",
+          "required": true
+        },
+        {
+          "name": "ata de leite condensado",
+          "quantity": "1 l",
+          "required": true
+        },
+        {
+          "name": "ata de creme de leite",
+          "quantity": "1 l",
+          "required": true
+        },
+        {
+          "name": "barra de chocolate amargo ou achocolatado.",
+          "quantity": "1",
+          "required": true
+        },
+        {
+          "name": "ata de leite condensado",
+          "quantity": "1 l",
+          "required": true
+        },
+        {
+          "name": "bombons marca Ouro Branco (ou Sonho de Valsa)",
+          "quantity": "2",
+          "required": true
+        },
+        {
+          "name": "(americano) de açúcar queimado (faça a calda grossa)",
+          "quantity": "1 copos",
+          "required": true
+        },
+        {
+          "name": "(americano) de conhaque (marca Presidente).",
+          "quantity": "2 copos",
+          "required": true
+        }
+      ],
+      "steps": [
+        "Derreter a barra de chocolate até ficar em calda.",
+        "Deixar esfriar e, em seguida, bater no liquidificador juntamente com todos os demais ingredientes.",
+        "Cozinhar o leite condensado por dez minutos e deixar esfriar.",
+        "Em seguida, bater no liquidificador o leite condensado, os bombons, o conhaque juntamente com 1 e 1/2 copos de água e a calda de açúcar (queimada).",
+        "Categoria:Bebidas com álcool|",
+        "Categoria:Rum, receitas com|",
+        "Categoria:Conhaque, receitas com|"
+      ],
+      "tags": [
+        "Almoço & Jantar",
+        "Tradicional",
+        "Wikilivros"
+      ],
+      "caloriesPerServing": 515,
+      "canonicalKey": "amarula",
+      "originArea": "Brazilian",
+      "originCountry": "Brazil",
+      "diet": {
+        "hasMeat": false,
+        "hasLactose": true,
+        "hasGluten": false,
+        "hasEgg": false,
+        "vegetarian": true,
+        "vegan": false,
+        "lowCarb": false,
+        "highProtein": false,
+        "usesFrying": false
+      },
+      "sources": [
+        {
+          "sourceId": "wikilivros",
+          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FAmarula",
+          "license": "CC BY-SA 4.0 / GFDL",
+          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Amarula\""
+        }
+      ],
+      "aliases": [
+        "Amarula"
+      ]
     }
   ]
 }

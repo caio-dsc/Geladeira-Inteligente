@@ -1,10 +1,5 @@
 import { db } from './firebaseAdmin';
-
-const normalizeText = (s: string) =>
-  (s || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-
-const canonicalKeyFromTitle = (title: string) =>
-  normalizeText(title).replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+import { canonicalKeyFromTitle } from './importWikilivrosBrasil';
 
 function uniqByJson<T>(arr: T[]) {
   const seen = new Set<string>();

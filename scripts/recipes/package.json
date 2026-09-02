@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "generate:catalog": "tsx generateCatalog.ts",
     "import:themealdb:brazil": "tsx importThemealdbBrazil.ts",
     "import:wikilivros:br": "tsx importWikilivrosBrasil.ts",
     "consolidate:canonical": "tsx consolidateRecipesCanonical.ts",

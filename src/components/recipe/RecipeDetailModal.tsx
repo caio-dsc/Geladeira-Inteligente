@@ -182,6 +182,34 @@ export const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
             ))}
           </ol>
         </div>
+
+        {/* Source and License Attribution */}
+        {recipe.sources && recipe.sources.length > 0 && (
+          <div className="pt-3 border-t border-emerald-500/15 flex flex-wrap items-center justify-between gap-2 text-[11px] text-emerald-400/70">
+            {recipe.sources.map((src, i) => (
+              <div key={i} className="flex items-center gap-1.5">
+                <span className="font-semibold text-emerald-300">Fonte:</span>
+                {src.url ? (
+                  <a
+                    href={src.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline hover:text-emerald-200 transition-colors"
+                  >
+                    {src.attribution || src.sourceId}
+                  </a>
+                ) : (
+                  <span>{src.attribution || src.sourceId}</span>
+                )}
+                {src.license && (
+                  <span className="bg-emerald-950/80 px-1.5 py-0.5 rounded border border-emerald-500/20 text-emerald-300/80 text-[10px]">
+                    {src.license}
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </Modal>
   );
