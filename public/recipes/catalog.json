@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-02T02:16:05.989Z",
+  "generatedAt": "2026-09-02T02:41:55.539Z",
   "total": 23,
   "recipes": [
     {
@@ -653,127 +653,68 @@
       "imageUrl": "https://www.themealdb.com/images/media/meals/svprys1511176755.jpg/medium",
       "ingredients": [
         {
-          "name": "1 kg de filé mignon, contra-filé ou alcatra --",
-          "quantity": "",
+          "name": "Olive Oil",
+          "quantity": "1 tbls",
           "required": true
         },
         {
-          "name": "4 colheres (sopa) de manteiga",
-          "quantity": "",
+          "name": "Onions",
+          "quantity": "1",
           "required": true
         },
         {
-          "name": "Sal e pimenta a gosto",
-          "quantity": "",
+          "name": "Garlic",
+          "quantity": "1 clove",
           "required": true
         },
         {
-          "name": "1 cebola picada",
-          "quantity": "",
+          "name": "Butter",
+          "quantity": "1 tbsp",
           "required": true
         },
         {
-          "name": "1/2 xícara (chá) de conhaque",
-          "quantity": "",
+          "name": "Mushrooms",
+          "quantity": "250g",
           "required": true
         },
         {
-          "name": "200 gramas de cogumelos frescos, picados",
-          "quantity": "",
+          "name": "Beef Fillet",
+          "quantity": "500g",
           "required": true
         },
         {
-          "name": "3 tomates, sem pele e sem sementes, ( ou 3 colheres (sopa) de purê de tomate)",
-          "quantity": "",
+          "name": "Plain Flour",
+          "quantity": "1tbsp",
           "required": true
         },
         {
-          "name": "1 colher (sopa) de mostarda",
-          "quantity": "",
+          "name": "Creme Fraiche",
+          "quantity": "150g",
           "required": true
         },
         {
-          "name": "2 colheres (sopa) de catchup",
-          "quantity": "",
+          "name": "English Mustard",
+          "quantity": "1 tbsp",
           "required": true
         },
         {
-          "name": "1 lata de creme de leite.",
-          "quantity": "",
+          "name": "Beef Stock",
+          "quantity": "100ml",
           "required": true
         },
         {
-          "name": "Pique a carne em tirinhas finas.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Derreta 3 colheres (sopa) de manteiga numa frigideira grande e vá fritando a carne, aos poucos, em fogo alto, sem deixar juntar suco.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Retire a carne, junte mais 1 colher (sopa) de manteiga e frite aí a cebola. Junte a carne novamente e despeje conhaque, deixe aquecer e incline levemente a frigideira para que o conhaque incendeie. Deve flambar até acabar a chama, junte os cogumelos, tampe a frigideira e deixe por alguns minutos.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Acrescente os tomates picados (ou o purê de tomate), torne a tampar a panela e deixe por mais 5 minutos.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Acrescente a mostarda e o catchup. Mexa bem, deixando no fogo baixo.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "No momento de servir junte o creme de leite, misture-o bem e retire do fogo antes de ferver.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Para evitar a perda do suco de carne ao fritar, use uma frigideira grande e fogo forte, colocando pequenas porções de cada vez.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Antes de flambar o strogonoff, guarde a garrafa de conhaque, segure a frigideira pelo cabo e mantenha-se afastada do fogão.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Sirva com arroz branco com batata palha ou batata cozida; e,",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Salada de Legumes (sobre folhas de alfaces) com maçã — strogonoff — vinho tinto, seco — sorvete de ameixa.",
-          "quantity": "",
+          "name": "Parsley",
+          "quantity": "Topping",
           "required": true
         }
       ],
       "steps": [
-        "1 kg de filé mignon, contra-filé ou alcatra --",
-        "4 colheres (sopa) de manteiga;",
-        "Sal e pimenta a gosto;",
-        "1 cebola picada;",
-        "1/2 xícara (chá) de conhaque;",
-        "200 gramas de cogumelos frescos, picados;",
-        "3 tomates, sem pele e sem sementes, ( ou 3 colheres (sopa) de purê de tomate);",
-        "1 colher (sopa) de mostarda;",
-        "2 colheres (sopa) de catchup;",
-        "1 lata de creme de leite.",
         "Pique a carne em tirinhas finas.",
         "Derreta 3 colheres (sopa) de manteiga numa frigideira grande e vá fritando a carne, aos poucos, em fogo alto, sem deixar juntar suco.",
         "Retire a carne, junte mais 1 colher (sopa) de manteiga e frite aí a cebola. Junte a carne novamente e despeje conhaque, deixe aquecer e incline levemente a frigideira para que o conhaque incendeie. Deve flambar até acabar a chama, junte os cogumelos, tampe a frigideira e deixe por alguns minutos.",
         "Acrescente os tomates picados (ou o purê de tomate), torne a tampar a panela e deixe por mais 5 minutos.",
         "Acrescente a mostarda e o catchup. Mexa bem, deixando no fogo baixo.",
-        "No momento de servir junte o creme de leite, misture-o bem e retire do fogo antes de ferver.",
-        "Para evitar a perda do suco de carne ao fritar, use uma frigideira grande e fogo forte, colocando pequenas porções de cada vez.",
-        "Antes de flambar o strogonoff, guarde a garrafa de conhaque, segure a frigideira pelo cabo e mantenha-se afastada do fogão.",
-        "Sirva com arroz branco com batata palha ou batata cozida; e,",
-        "Salada de Legumes (sobre folhas de alfaces) com maçã — strogonoff — vinho tinto, seco — sorvete de ameixa."
+        "No momento de servir junte o creme de leite, misture-o bem e retire do fogo antes de ferver."
       ],
       "tags": [
         "Beef",
@@ -793,7 +734,7 @@
       "diet": {
         "hasMeat": true,
         "hasLactose": true,
-        "hasGluten": false,
+        "hasGluten": true,
         "hasEgg": false,
         "vegetarian": false,
         "vegan": false,
@@ -902,64 +843,9 @@
           "name": "Pimenta do reino moída na hora.",
           "quantity": "",
           "required": true
-        },
-        {
-          "name": "Tempere o peixe com sal, pimenta e limão.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Em separado tempere também os camarões com sal, pimenta e limão.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Deixe ambos tomarem gosto por 30 minutos.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Numa panela de barro (se tiver), aqueça o azeite, adicione a cebola e doure-a até amaciar e ficar transparente. Junte os pimentões e refogue por 2 (dois) minutos. Junte o tomate, o leite de coco, o azeite de dendê, o louro, os cheiros verdes picados.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Tempere com as pimentas e mais um pouquinho de sal.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Assim que ferver junte o peixe e cozinhe por 5 minutos.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Adicione os camarões e ferva por 8 minutos.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Desligue e deixe em tempo de espera por 15 minutos e sirva.",
-          "quantity": "",
-          "required": true
         }
       ],
       "steps": [
-        "1 e 1/2 kg de filés grossos de garoupa --",
-        "700 g de camarões brancos, limpos e sem cascas;",
-        "Suco de 1 limão;",
-        "1 cebola picada;",
-        "4 colheres (sopa) de azeite de oliva;",
-        "2 colheres (sopa) de azeite de dendê;",
-        "400 ml de leite de coco (2 garrafinhas);",
-        "1 lata de tomates pelados, moídos e peneirados;",
-        "Sal a gosto;",
-        "Molho de pimenta a gosto;",
-        "1 folha de louro;",
-        "Coentro e cebolinha verde picada;",
-        "1 pimentão verde e 1 vermelho cortado em rodelas;",
-        "200 gramas de cogumelos fatiados (em conserva);",
-        "Pimenta do reino moída na hora.",
         "Tempere o peixe com sal, pimenta e limão.",
         "Em separado tempere também os camarões com sal, pimenta e limão.",
         "Deixe ambos tomarem gosto por 30 minutos.",
@@ -1600,58 +1486,12 @@
           "required": true
         },
         {
-          "name": "Tempere o peixe com o suco de limão, o alho amassado e o sal. Em uma frigideira com óleo, frite as postas uma a uma, de ambos os lados, até dourar. Escorra e reserve.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Para o caldo, aqueça em uma panela o óleo e refogue a cebola, o alho amassado, o sal e o colorau, mexendo sempre.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Acrescente a água quente e deixe ferver por 15 minutos, juntando a salsinha, a cebolinha, o coentro e a pimenta-malagueta.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Coloque a telha no fogo e, com uma concha, despeje o caldo quente.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Arrume as postas de peixe reservadas e deixe cozinhar por cerca de 8 minutos. Salpique mais salsinha, cebolinha, coentro e sal.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Ponha o peixe em uma extremidade da telha e, na outra, junte a farinha de mandioca ao caldo aos poucos, mexendo com uma colher de pau, até formar um pirão mole.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Adicione o leite de coco sobre o peixe, deixe por mais 2 minutos no fogo e decore com o pimentão, as azeitonas e a cebolinha picada. Sirva a seguir, na própria telha.",
+          "name": "Pimenta-malagueta picada e sal a gosto",
           "quantity": "",
           "required": true
         }
       ],
       "steps": [
-        "400g de peixe de couro em postas (pintado ou surubim)",
-        "2 dentes de alho amassados",
-        "3 colheres (sopa) de leite de coco",
-        "1 xícara (chá) de farinha de mandioca",
-        "Suco de 2 limões",
-        "Óleo para fritar",
-        "Salsinha, cebolinha verde e coentro picados a gosto",
-        "Pimenta-malagueta picada e sal a gosto",
-        "1 colher (sopa) de óleo",
-        "1 dente de alho amassado",
-        "1 cebola média ralada",
-        "2 colheres (sopa) de colorau",
-        "1 litro de água quente",
-        "Azeitonas verdes a gosto",
-        "Pimentão verde em rodelas a gosto",
-        "Salsinha, cebolinha verde e coentro, picados a gosto",
         "Tempere o peixe com o suco de limão, o alho amassado e o sal. Em uma frigideira com óleo, frite as postas uma a uma, de ambos os lados, até dourar. Escorra e reserve.",
         "Para o caldo, aqueça em uma panela o óleo e refogue a cebola, o alho amassado, o sal e o colorau, mexendo sempre.",
         "Acrescente a água quente e deixe ferver por 15 minutos, juntando a salsinha, a cebolinha, o coentro e a pimenta-malagueta.",
@@ -1665,7 +1505,7 @@
         "Tradicional",
         "Wikilivros"
       ],
-      "caloriesPerServing": 1005,
+      "caloriesPerServing": 795,
       "canonicalKey": "peixe-na-telha",
       "originArea": "Brazilian",
       "originCountry": "Brazil",
@@ -1696,7 +1536,7 @@
       "id": "wikilivros_vatapa",
       "title": "Vatapá",
       "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
-      "prepTimeMinutes": 90,
+      "prepTimeMinutes": 56,
       "difficulty": "Médio",
       "servings": 4,
       "servingsBucket": "3-4",
@@ -1762,41 +1602,9 @@
           "name": "Farinha de trigo, se necessário",
           "quantity": "",
           "required": true
-        },
-        {
-          "name": "Coloque o pão de molho na metade do leite de coco e reserve a outra metade.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Coloque no liquidificador os ingredientes, o amendoim, a castanha de caju, a gengibre, as cebolas, o camarão seco e o sal. Triture todos os ingredientes, acrescente o pão que estava de molho aos poucos.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Leve ao fogo e vá adicionando aos poucos o coco ralado, o restante do leite de coco e o azeite de dendê, acerte o sal. Não pare de mexer, terá que atingir o ponto de consistência de uma pasta firme.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Se ficar ralo acrescente um pouco de farinha de trigo.",
-          "quantity": "",
-          "required": true
         }
       ],
       "steps": [
-        "6 pães frescos ou amanhecidos;",
-        "200 gramas de amendoim torrado e sem casca;",
-        "200 gramas de castanha de caju torrada;",
-        "1 cebola;",
-        "2 dentes de alho ;",
-        "200 gramas de camarão defumado ou seco dessalgado;",
-        "Sal a gosto;",
-        "1 pedaço de gengibre;",
-        "1 coco seco ralado, separando o leite do coco em um pano e um pouco de água;",
-        "50 ml de azeite de dendê;",
-        "1 pimenta malagueta pequena (opcional);",
-        "Farinha de trigo, se necessário;",
         "Coloque o pão de molho na metade do leite de coco e reserve a outra metade.",
         "Coloque no liquidificador os ingredientes, o amendoim, a castanha de caju, a gengibre, as cebolas, o camarão seco e o sal. Triture todos os ingredientes, acrescente o pão que estava de molho aos poucos.",
         "Leve ao fogo e vá adicionando aos poucos o coco ralado, o restante do leite de coco e o azeite de dendê, acerte o sal. Não pare de mexer, terá que atingir o ponto de consistência de uma pasta firme.",
@@ -1807,7 +1615,7 @@
         "Tradicional",
         "Wikilivros"
       ],
-      "caloriesPerServing": 760,
+      "caloriesPerServing": 620,
       "canonicalKey": "vatapa",
       "originArea": "Brazilian",
       "originCountry": "Brazil",
@@ -1838,7 +1646,7 @@
       "id": "wikilivros_estrogonofe-de-frango",
       "title": "Strogonoff de frango",
       "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
-      "prepTimeMinutes": 90,
+      "prepTimeMinutes": 60,
       "difficulty": "Médio",
       "servings": 4,
       "servingsBucket": "3-4",
@@ -1894,44 +1702,9 @@
           "name": "1 colher de sopa de mostarda",
           "quantity": "",
           "required": true
-        },
-        {
-          "name": "Derreta 3 colheres de manteiga numa panela e frite os peitos de frango aos poucos para não formar muito suco.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Retire a carne, junte mais 1 colher (sopa) de manteiga e frite as cebolas. Junte os tomates e o milho verde), tampe e deixe ferver por mais 1 minuto no fogo brando.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Adicione a carne ao molho.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Junte a mostarda, o catchup e deixe por mais 5 minutos, e prove.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Desligue o fogo e junte o creme de leite.",
-          "quantity": "",
-          "required": true
         }
       ],
       "steps": [
-        "1 kg de peito de frango --",
-        "Sal e pimenta a gosto;",
-        "4 colheres (sopa) de manteiga ou margarina;",
-        "2 cebolas picadas;",
-        "3 tomates picados (sem peles e sem sementes);",
-        "3 colheres (sopa) de ketchup;",
-        "1 lata de milho verde;",
-        "Cheiro verde picado;",
-        "1 lata de creme de leite.",
-        "1 colher de sopa de mostarda",
         "Derreta 3 colheres de manteiga numa panela e frite os peitos de frango aos poucos para não formar muito suco.",
         "Retire a carne, junte mais 1 colher (sopa) de manteiga e frite as cebolas. Junte os tomates e o milho verde), tampe e deixe ferver por mais 1 minuto no fogo brando.",
         "Adicione a carne ao molho.",
@@ -1943,7 +1716,7 @@
         "Tradicional",
         "Wikilivros"
       ],
-      "caloriesPerServing": 725,
+      "caloriesPerServing": 550,
       "canonicalKey": "estrogonofe-de-frango",
       "originArea": "Brazilian",
       "originCountry": "Brazil",
@@ -1981,7 +1754,7 @@
       "id": "wikilivros_estrogonofe-de-legumes",
       "title": "Strogonoff de legumes",
       "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
-      "prepTimeMinutes": 90,
+      "prepTimeMinutes": 42,
       "difficulty": "Médio",
       "servings": 4,
       "servingsBucket": "3-4",
@@ -2029,46 +1802,22 @@
           "required": true
         },
         {
-          "name": "Refogue a cebola em 2 colheres (sopa) de maionese, adicione farinha de trigo e frite.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Acrescente o leite aos poucos, misturando sempre até obter um creme liso, coloque o ketchup e a mostarda.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Junte os legumes, o conhaque e o restante da maionese mexendo sempre até levantar fervura e retire do fogo.",
-          "quantity": "",
-          "required": true
-        },
-        {
           "name": "Rendimento: de 4 a 6 porções.",
           "quantity": "",
           "required": true
         }
       ],
       "steps": [
-        "1 cebola em cubos;",
-        "1/2 xícara (chá) de maionese;",
-        "4 colheres (sopa) de farinha de trigo;",
-        "2 1/2 xícara (chá) de leite;",
-        "3 colheres (sopa) de Ketchup;",
-        "1 colher (sopa) de mostarda;",
-        "3 xícaras (chá) de legumes em cubos e cozidos (batata, cenoura, brócolis e etc);",
-        "2 colheres (sopa) de conhaque.",
         "Refogue a cebola em 2 colheres (sopa) de maionese, adicione farinha de trigo e frite.",
         "Acrescente o leite aos poucos, misturando sempre até obter um creme liso, coloque o ketchup e a mostarda.",
-        "Junte os legumes, o conhaque e o restante da maionese mexendo sempre até levantar fervura e retire do fogo.",
-        "Rendimento: de 4 a 6 porções."
+        "Junte os legumes, o conhaque e o restante da maionese mexendo sempre até levantar fervura e retire do fogo."
       ],
       "tags": [
         "Almoço & Jantar",
         "Tradicional",
         "Wikilivros"
       ],
-      "caloriesPerServing": 620,
+      "caloriesPerServing": 515,
       "canonicalKey": "estrogonofe-de-legumes",
       "originArea": "Brazilian",
       "originCountry": "Brazil",
@@ -2099,7 +1848,7 @@
       "id": "wikilivros_coxinha",
       "title": "Coxinha de frango com batata",
       "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
-      "prepTimeMinutes": 90,
+      "prepTimeMinutes": 70,
       "difficulty": "Médio",
       "servings": 4,
       "servingsBucket": "3-4",
@@ -2107,218 +1856,94 @@
       "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
       "ingredients": [
         {
-          "name": "1 colher (sopa) (15 ml) de óleo --",
+          "name": "1 colher (sopa) rasa, de sal --",
           "quantity": "",
           "required": true
         },
         {
-          "name": "1 colher (sopa) (15 gramas) de cebola picada",
+          "name": "2 colheres (sopa) rasas, de margarina",
           "quantity": "",
           "required": true
         },
         {
-          "name": "1 kg de sobrecoxas de frango ou galinha",
+          "name": "2 tabletes de caldo de galinha",
           "quantity": "",
           "required": true
         },
         {
-          "name": "1 e 1/2 xícara (360 ml) de caldo de galinha",
+          "name": "4 copos (tipo americano) de água",
           "quantity": "",
           "required": true
         },
         {
-          "name": "1 maço de salsa",
+          "name": "800 gramas de farinha de trigo",
           "quantity": "",
           "required": true
         },
         {
-          "name": "3 colheres (sopa) (45 gramas) de manteiga",
+          "name": "Farinha de pão (ou de rosca)",
           "quantity": "",
           "required": true
         },
         {
-          "name": "1/3 xícara (50 gramas) de cebola picada",
+          "name": "Leite.",
           "quantity": "",
           "required": true
         },
         {
-          "name": "2 colheres (sopa) (30 gramas) de purê de tomate",
+          "name": "1 kg de batata, cozida e amassada --",
           "quantity": "",
           "required": true
         },
         {
-          "name": "1 e 1/2 xícaras (chá) de leite",
+          "name": "1 kg de filé ou peito de frango, cozido",
           "quantity": "",
           "required": true
         },
         {
-          "name": "2 xícaras (300 gramas) de farinha de trigo",
+          "name": "1 molho de cebolinha",
           "quantity": "",
           "required": true
         },
         {
-          "name": "1 colher (chá) de sal",
+          "name": "1 molho de salsinha",
           "quantity": "",
           "required": true
         },
         {
-          "name": "Pimenta do Reino a gosto",
+          "name": "2 colheres (sopa) de extrato de tomate",
           "quantity": "",
           "required": true
         },
         {
-          "name": "Farinha de rosca torrada para polvilhar e envolver",
+          "name": "1/2 cebola ralada",
           "quantity": "",
           "required": true
         },
         {
-          "name": "2 ovos levemente batidos para envolver",
+          "name": "Pimenta-malagueta (opcional)",
           "quantity": "",
           "required": true
         },
         {
-          "name": "Óleo para fritar.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Numa panela, coloque o óleo, leve ao fogo médio e deixe aquecer.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Junte 1 colher de cebola picada e frite, mexendo com uma colher de pau, até ficar macia.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Acrescente as sobrecoxas e frite, virando os pedaços com um garfo de cabo comprido, até ficarem dourados.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Junte o caldo de galinha e a salsa, deixe ferver, reduza o fogo, tampe a panela e cozinhe por cerca de 30 minutos ou até a carne ficar macia.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Tire as sobrecoxas da panela (reserve o líquido de cozimento) e elimine a salsa. Retire a pele e os ossos e, com um garfo, desfie a carne e pique bem fininho.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "À parte, numa panela, aqueça 1 colher (sopa) de manteiga, frite a cebola picada. Junte a carne desfiada e o purê de tomate e deixe por mais 5 minutos. Reserve.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Se preferir, acrescente 1/2 colher (chá) de caril (curry) ao recheio.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Coe o líquido do cozimento numa peneira, meça 1 e 1/2 xícaras (chá) (se tiver menos, complete com água), passe para uma panela, acrescente a manteiga restante, o leite e a farinha de trigo, misture e cozinhe em fogo médio, mexendo com a colher de pau, até formar uma bola que se desprenda do fundo da panela.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Prove e tempere com sal e pimenta do reino a gosto.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Retire do Fogo.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Coloque a massa sobre uma superfície de trabalho polvilhada com farinha de rosca e deixe esfriar um pouco.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Vá retirando porções da massa com uma colher de sopa e abrindo na palma da mão.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Coloque 1/2 colher (sopa) de recheio no centro da massa.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Enrole a massa sobre o recheio dando o formato de uma coxinha.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Passe a coxinha na farinha de rosca, no ovo batido e novamente na farinha de rosca, envolvendo-a bem. Proceda dessa maneira até preparar todas as coxinhas.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Numa panela, coloque óleo em quantidade suficiente para mergulhar as coxinhas, leve ao fogo médio e deixe ficar bem quente, mas não fumegante.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Frite as coxinhas aos poucos, virando de vez em quando, até ficarem douradas por igual.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Retire-as com uma escumadeira, coloque as coxinhas sobre toalhas de papel absorvente enquanto frita as restantes.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Passe as coxinhas para uma travessa e sirva.",
+          "name": "Sal a gosto.",
           "quantity": "",
           "required": true
         }
       ],
       "steps": [
-        "1 colher (sopa) (15 ml) de óleo --",
-        "1 colher (sopa) (15 gramas) de cebola picada;",
-        "1 kg de sobrecoxas de frango ou galinha;",
-        "1 e 1/2 xícara (360 ml) de caldo de galinha;",
-        "1 maço de salsa;",
-        "3 colheres (sopa) (45 gramas) de manteiga;",
-        "1/3 xícara (50 gramas) de cebola picada;",
-        "2 colheres (sopa) (30 gramas) de purê de tomate;",
-        "1 e 1/2 xícaras (chá) de leite;",
-        "2 xícaras (300 gramas) de farinha de trigo;",
-        "1 colher (chá) de sal;",
-        "Pimenta do Reino a gosto;",
-        "Farinha de rosca torrada para polvilhar e envolver;",
-        "2 ovos levemente batidos para envolver;",
-        "Óleo para fritar.",
-        "Numa panela, coloque o óleo, leve ao fogo médio e deixe aquecer.",
-        "Junte 1 colher de cebola picada e frite, mexendo com uma colher de pau, até ficar macia.",
-        "Acrescente as sobrecoxas e frite, virando os pedaços com um garfo de cabo comprido, até ficarem dourados.",
-        "Junte o caldo de galinha e a salsa, deixe ferver, reduza o fogo, tampe a panela e cozinhe por cerca de 30 minutos ou até a carne ficar macia.",
-        "Tire as sobrecoxas da panela (reserve o líquido de cozimento) e elimine a salsa. Retire a pele e os ossos e, com um garfo, desfie a carne e pique bem fininho.",
-        "À parte, numa panela, aqueça 1 colher (sopa) de manteiga, frite a cebola picada. Junte a carne desfiada e o purê de tomate e deixe por mais 5 minutos. Reserve.",
-        "Se preferir, acrescente 1/2 colher (chá) de caril (curry) ao recheio.",
-        "Coe o líquido do cozimento numa peneira, meça 1 e 1/2 xícaras (chá) (se tiver menos, complete com água), passe para uma panela, acrescente a manteiga restante, o leite e a farinha de trigo, misture e cozinhe em fogo médio, mexendo com a colher de pau, até formar uma bola que se desprenda do fundo da panela.",
-        "Prove e tempere com sal e pimenta do reino a gosto.",
-        "Retire do Fogo.",
-        "Coloque a massa sobre uma superfície de trabalho polvilhada com farinha de rosca e deixe esfriar um pouco.",
-        "Vá retirando porções da massa com uma colher de sopa e abrindo na palma da mão.",
-        "Coloque 1/2 colher (sopa) de recheio no centro da massa.",
-        "Enrole a massa sobre o recheio dando o formato de uma coxinha.",
-        "Passe a coxinha na farinha de rosca, no ovo batido e novamente na farinha de rosca, envolvendo-a bem. Proceda dessa maneira até preparar todas as coxinhas.",
-        "Numa panela, coloque óleo em quantidade suficiente para mergulhar as coxinhas, leve ao fogo médio e deixe ficar bem quente, mas não fumegante.",
-        "Frite as coxinhas aos poucos, virando de vez em quando, até ficarem douradas por igual.",
-        "Retire-as com uma escumadeira, coloque as coxinhas sobre toalhas de papel absorvente enquanto frita as restantes.",
-        "Passe as coxinhas para uma travessa e sirva."
+        "Num tacho, pôr para ferver a água, o caldo de galinha, o sal e a margarina.",
+        "Quando levantar fervura, despeje a farinha de trigo e mexa até obter o ponto – quando a mistura se soltar do fundo da panela.",
+        "Faça uma bolinha com a massa.",
+        "Com essa massa, de formato arredondado, na palma da mão, coloque uma colher (chá) de recheio no meio e feche as bordas, formando o biquinho.",
+        "Frite em óleo bem quente e retire com uma escumadeira."
       ],
       "tags": [
         "Almoço & Jantar",
         "Tradicional",
         "Wikilivros"
       ],
-      "caloriesPerServing": 970,
+      "caloriesPerServing": 725,
       "canonicalKey": "coxinha",
       "originArea": "Brazilian",
       "originCountry": "Brazil",
@@ -2326,7 +1951,7 @@
         "hasMeat": true,
         "hasLactose": true,
         "hasGluten": true,
-        "hasEgg": true,
+        "hasEgg": false,
         "vegetarian": false,
         "vegan": false,
         "lowCarb": false,
@@ -2371,83 +1996,47 @@
       "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
       "ingredients": [
         {
-          "name": "1 e 1/2 xícaras (chá) de mandioca bem cozida --",
+          "name": "2 colheres (sopa, rasas) de margarina",
           "quantity": "",
           "required": true
         },
         {
-          "name": "2 colheres (sopa) de margarina",
+          "name": "3 colheres (sopa) de café solúvel",
           "quantity": "",
           "required": true
         },
         {
-          "name": "10 colheres (sopa) de açúcar",
+          "name": "1 lata de leite em pó, instantâneo (400 gramas) --",
           "quantity": "",
           "required": true
         },
         {
-          "name": "1 xícara (chá) de leite em pó",
+          "name": "1 lata de chocolate em pó (400 gramas)",
           "quantity": "",
           "required": true
         },
         {
-          "name": "3 colheres (sopa) de chocolate em pó",
+          "name": "1 lata de leite condensado",
           "quantity": "",
           "required": true
         },
         {
-          "name": "200 gramas (mais ou menos) de chocolate granulado para passar os brigadeiros.",
+          "name": "1/2 copo (tipo americano) de leite morno",
           "quantity": "",
           "required": true
         },
         {
-          "name": "Passe a mandioca já cozida e escorrida pelo processador. Reserve.",
+          "name": "50 gramas de grãos de café torrados (para decoração).",
           "quantity": "",
           "required": true
         },
         {
-          "name": "Se não tiver processador, passe pelo espremedor e depois pela peneira. Reserve.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Numa panela, derreta a margarina, acrescente a mandioca, o açúcar, o leite em pó e o chocolate em pó.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Deixe cozinhar até desprender do fundo da panela por cerca de 10 minutos em fogo médio.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Unte um prato com margarina, coloque a massa e espere esfriar.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Para enrolar os brigadeiros, unte as mãos com margarina.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Use como medida da massa uma colher (chá) também untada com margarina.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Depois de enrolados, passe no chocolate granulado.",
+          "name": "Brigadeiro Doce - Para outras idéias além das receitas tradicionais em Portugal.",
           "quantity": "",
           "required": true
         }
       ],
       "steps": [
-        "1 e 1/2 xícaras (chá) de mandioca bem cozida --",
-        "2 colheres (sopa) de margarina;",
-        "10 colheres (sopa) de açúcar;",
-        "1 xícara (chá) de leite em pó;",
-        "3 colheres (sopa) de chocolate em pó;",
-        "200 gramas (mais ou menos) de chocolate granulado para passar os brigadeiros.",
         "Passe a mandioca já cozida e escorrida pelo processador. Reserve.",
         "Se não tiver processador, passe pelo espremedor e depois pela peneira. Reserve.",
         "Numa panela, derreta a margarina, acrescente a mandioca, o açúcar, o leite em pó e o chocolate em pó.",
@@ -2680,7 +2269,7 @@
       "id": "wikilivros_pao-de-queijo",
       "title": "Pão de queijo",
       "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
-      "prepTimeMinutes": 60,
+      "prepTimeMinutes": 46,
       "difficulty": "Fácil",
       "servings": 4,
       "servingsBucket": "3-4",
@@ -2748,7 +2337,7 @@
         "Tradicional",
         "Wikilivros"
       ],
-      "caloriesPerServing": 410,
+      "caloriesPerServing": 445,
       "canonicalKey": "pao-de-queijo",
       "originArea": "Brazilian",
       "originCountry": "Brazil",
@@ -2829,17 +2418,10 @@
           "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FP%C3%A3o_de_queijo_tradi%C3%A7%C3%A3o",
           "license": "CC BY-SA 4.0 / GFDL",
           "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Pão de queijo tradição\""
-        },
-        {
-          "sourceId": "wikilivros",
-          "url": "https://pt.wikibooks.org/wiki/Livro_de_receitas%2FP%C3%A3o_de_queijo_%C3%A0_Bomjepe",
-          "license": "CC BY-SA 4.0 / GFDL",
-          "attribution": "Wikilivros (pt.wikibooks.org) - Contribuidores de \"Pão de queijo à Bomjepe\""
         }
       ],
       "aliases": [
         "Pão de queijo",
-        "Pão de queijo à Bomjepe",
         "Pão de queijo tradição",
         "Pão de queijo para congelar",
         "Pão de queijo mineiro",

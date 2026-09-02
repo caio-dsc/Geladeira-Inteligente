@@ -499,6 +499,24 @@ const FOUNDATION_RECIPES: Recipe[] = [
   }
 ];
 
+const normalizeUrl = (u?: string) =>
+  (u || '')
+    .trim()
+    .replace(/ /g, '_'); // MediaWiki aceita underscores no título
+
+const sourceKey = (s: RecipeSource) =>
+  `${s.sourceId}::${(s.externalId || '').trim()}::${normalizeUrl(s.url)}`;
+
+const mergeSources = (a: RecipeSource[] = [], b: RecipeSource[] = []) => {
+  const map = new Map<string, RecipeSource>();
+  for (const s of [...a, ...b]) {
+    const key = sourceKey(s);
+    if (!key) continue;
+    if (!map.has(key)) map.set(key, s);
+  }
+  return Array.from(map.values());
+};
+
 export async function generateCatalog() {
   console.log('--- Iniciando Geração do Catálogo Unificado de Receitas ---');
 
@@ -544,15 +562,8 @@ export async function generateCatalog() {
     } else {
       const existing = canonicalMap.get(key)!;
 
-      // 4.1 Sources: concat + dedupe por URL ou sourceId+externalId
-      const sourcesMap = new Map<string, RecipeSource>();
-      for (const s of [...(existing.sources || []), ...(r.sources || [])]) {
-        const sKey = s.url || `${s.sourceId}_${s.externalId || ''}_${s.attribution || ''}`;
-        if (!sourcesMap.has(sKey)) {
-          sourcesMap.set(sKey, s);
-        }
-      }
-      const mergedSources = Array.from(sourcesMap.values());
+      // 4.1 Sources: dedupe por chave estável (sourceId + externalId + normalizeUrl)
+      const mergedSources = mergeSources(existing.sources, r.sources);
 
       // 4.2 Aliases: concat + dedupe
       const aliasesSet = new Set<string>();

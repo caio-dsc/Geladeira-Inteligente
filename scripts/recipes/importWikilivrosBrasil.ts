@@ -87,9 +87,12 @@ export async function getSectionHtml(title: string, sectionIndex: string) {
  */
 function cleanText(s: string) {
   return (s || '')
-    .replace(/\s+/g, ' ')
-    .replace(/\[[^\]]*\]/g, '') // remove [1], [2] etc.
+    .replace(/\[\d+\]/g, '') // remove [1], [2] etc.
+    .replace(/\[(?:nota|ref|citac[aã]o)[^\]]*\]/gi, '')
+    .replace(/\[[^\]]*\]/g, '')
+    .replace(/^[-•*–—]\s*/, '') // remove marcadores manuais de lista
     .replace(/&nbsp;/g, ' ')
+    .replace(/\s+/g, ' ')
     .trim();
 }
 
@@ -166,21 +169,52 @@ export async function parseRecipeFromSections(title: string, thumbnail?: string)
 
   const sections = await getSections(title);
 
-  const ingSection = sections.find((s) => /ingredientes/i.test(s.line));
-  const prepSection = sections.find((s) => /(preparo|preparação)/i.test(s.line));
+  // 1. Caso existam seções separadas de ingredientes e preparo
+  const separateIngSection = sections.find((s) => /ingrediente/i.test(s.line) && !/preparo|preparaç/i.test(s.line));
+  const separatePrepSection = sections.find((s) => /(preparo|preparação|modo de preparo|como fazer)/i.test(s.line) && !/ingrediente/i.test(s.line));
 
-  if (!ingSection || !prepSection) {
-    console.log(`  - ${cleanTitle}: sem seção Ingredientes/Preparo, pulando`);
+  // 2. Ou seção combinada (ex: "Ingredientes e Preparo")
+  const combinedSection = sections.find((s) => /ingrediente/i.test(s.line) && /(preparo|preparação)/i.test(s.line));
+
+  let ingLines: string[] = [];
+  let stepLines: string[] = [];
+
+  if (separateIngSection && separatePrepSection) {
+    const ingHtml = await getSectionHtml(title, separateIngSection.index);
+    const prepHtml = await getSectionHtml(title, separatePrepSection.index);
+
+    ingLines = extractListItems(ingHtml, 'li');
+    stepLines = extractListItems(prepHtml, 'li');
+    if (stepLines.length === 0) {
+      stepLines = extractListItems(prepHtml, 'p, dd');
+    }
+  } else if (combinedSection) {
+    const combHtml = await getSectionHtml(title, combinedSection.index);
+    const $ = cheerio.load(combHtml);
+    $('sup.reference, .mw-editsection, .navbox, .catlinks, style, script, noscript, .thumb, .gallery, .reference, .citation, .metadata').remove();
+
+    ingLines = $('ul > li')
+      .map((_, el) => cleanText($(el).text()))
+      .get()
+      .filter(Boolean);
+
+    // No preparo combinado, pegamos o primeiro <ol> (instruções da receita)
+    const firstOl = $('ol').first();
+    if (firstOl.length > 0) {
+      stepLines = firstOl
+        .find('li')
+        .map((_, el) => cleanText($(el).text()))
+        .get()
+        .filter(Boolean);
+    } else {
+      stepLines = $('ol > li, p')
+        .map((_, el) => cleanText($(el).text()))
+        .get()
+        .filter((t) => t.length > 15 && !ingLines.includes(t));
+    }
+  } else {
+    console.log(`  - ${cleanTitle}: sem seção Ingredientes/Preparo estruturada, pulando`);
     return null;
-  }
-
-  const ingHtml = await getSectionHtml(title, ingSection.index);
-  const prepHtml = await getSectionHtml(title, prepSection.index);
-
-  const ingLines = extractListItems(ingHtml, 'li');
-  let stepLines = extractListItems(prepHtml, 'li');
-  if (stepLines.length === 0) {
-    stepLines = extractListItems(prepHtml, 'p, dd');
   }
 
   const isGarbage = (s: string) =>
