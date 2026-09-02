@@ -1,7 +1,24 @@
+import * as cheerio from 'cheerio';
 import { Recipe, RecipeIngredient, ServingsBucket } from '../../src/types';
 import { computeDietFlags } from './dietHeuristics';
 
 const WIKI_API = 'https://pt.wikibooks.org/w/api.php';
+
+const WIKI_HEADERS = {
+  'User-Agent': 'GeladeiraInteligenteBot/1.0 (https://geladeira-inteligente.app; bot@geladeira-inteligente.app)',
+  Accept: 'application/json',
+};
+
+async function fetchJson(url: string): Promise<any> {
+  try {
+    const res = await fetch(url, { headers: WIKI_HEADERS });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (err) {
+    console.warn(`Erro ao fazer fetchJson em ${url}:`, err);
+    return null;
+  }
+}
 
 export const normalizeText = (s: string) =>
   (s || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^\w\s-]/g, '').replace(/\s+/g, ' ').trim();
@@ -34,137 +51,193 @@ export const canonicalKeyFromTitle = (rawTitle: string): string => {
   return norm.replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 };
 
-function cleanWikitext(text: string): string {
-  return text
-    .replace(/\{\{w\|([^|}]+)(?:\|[^}]+)?\}\}/gi, '$1')
-    .replace(/\{\{[^}]+\}\}/g, '')
-    .replace(/\[\[(?:[^|\]]*\|)?([^\]]+)\]\]/g, '$1')
-    .replace(/'''?/g, '')
-    .replace(/<!--[\s\S]*?-->/g, '')
+/**
+ * 2.1 Buscar seções da página via MediaWiki parse API
+ */
+export async function getSections(title: string) {
+  const url = new URL(WIKI_API);
+  url.searchParams.set('action', 'parse');
+  url.searchParams.set('format', 'json');
+  url.searchParams.set('formatversion', '2');
+  url.searchParams.set('page', title);
+  url.searchParams.set('prop', 'sections');
+
+  const data = await fetchJson(url.toString());
+  return (data?.parse?.sections || []) as Array<{ index: string; line: string }>;
+}
+
+/**
+ * 2.2 Buscar HTML só de uma seção via MediaWiki parse API
+ */
+export async function getSectionHtml(title: string, sectionIndex: string) {
+  const url = new URL(WIKI_API);
+  url.searchParams.set('action', 'parse');
+  url.searchParams.set('format', 'json');
+  url.searchParams.set('formatversion', '2');
+  url.searchParams.set('page', title);
+  url.searchParams.set('prop', 'text');
+  url.searchParams.set('section', sectionIndex);
+
+  const data = await fetchJson(url.toString());
+  return (data?.parse?.text || '') as string;
+}
+
+/**
+ * Helper para limpeza e deduplicação de textos HTML
+ */
+function cleanText(s: string) {
+  return (s || '')
+    .replace(/\s+/g, ' ')
+    .replace(/\[[^\]]*\]/g, '') // remove [1], [2] etc.
     .replace(/&nbsp;/g, ' ')
     .trim();
 }
 
-function parseWikitextRecipe(title: string, wikitext: string, thumbnail?: string): Recipe | null {
-  const cleanTitle = title.replace(/^Livro de receitas\//i, '').trim();
-  if (!cleanTitle || cleanTitle.toLowerCase().includes('imprimir') || cleanTitle.toLowerCase().includes('índice')) {
+function normalizeKey(s: string) {
+  return (s || '')
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
+
+function dedupeStrings(items: string[]) {
+  const out: string[] = [];
+  const seen = new Set<string>();
+  for (const it of items) {
+    const k = normalizeKey(it);
+    if (!k || seen.has(k)) continue;
+    seen.add(k);
+    out.push(it);
+  }
+  return out;
+}
+
+function extractListItems(html: string, selector: string) {
+  const $ = cheerio.load(html);
+  // remove elementos que geram sujeira
+  $('sup.reference, .mw-editsection, .navbox, .catlinks').remove();
+
+  const items = $(selector)
+    .map((_, el) => cleanText($(el).text()))
+    .get()
+    .filter(Boolean);
+
+  return dedupeStrings(items);
+}
+
+function parseIngredientLine(rawItem: string): RecipeIngredient | null {
+  const cleaned = cleanText(rawItem);
+  if (cleaned.length < 2 || cleaned.toLowerCase().startsWith('ingrediente')) {
     return null;
   }
 
-  const lines = wikitext.split('\n');
-  const ingredients: RecipeIngredient[] = [];
-  const steps: string[] = [];
+  const matchQty = cleaned.match(
+    /^([\d/.,]+\s*(?:g|kg|ml|l|xícara|xícaras|colher|colheres|pitada|fatias?|dentes?|unidades?|copos?|latas?|pacotes?|vidro|vidros)?(?:\s*(?:\(chá\)|\(sopa\)|\(sobremesa\)|\(café\)))?)\s*(?:de\s+)?(.*)$/i
+  );
 
-  let inIngredients = false;
-  let inSteps = false;
-
-  for (const line of lines) {
-    const trimmed = line.trim();
-    const cleanHeader = cleanWikitext(trimmed).toLowerCase().replace(/[:=*\s]/g, '');
-
-    // Headers / Section switches
-    if (
-      cleanHeader.startsWith('ingrediente') ||
-      cleanHeader.includes('ingredientesepreparo') ||
-      /^={1,4}\s*'*'*ingredientes/i.test(trimmed) ||
-      /^[:*#']{0,3}'''Ingredientes/i.test(trimmed)
-    ) {
-      inIngredients = true;
-      inSteps = false;
-      continue;
-    }
-    if (
-      cleanHeader.startsWith('preparo') ||
-      cleanHeader.startsWith('mododepreparo') ||
-      cleanHeader.startsWith('comofazer') ||
-      cleanHeader.startsWith('instrucoes') ||
-      /^={1,4}\s*'*'*(preparo|modo de preparo|instru)/i.test(trimmed) ||
-      /^[:*#']{0,3}'''(Preparo|Modo de preparo)/i.test(trimmed)
-    ) {
-      inIngredients = false;
-      inSteps = true;
-      continue;
-    }
-    if (
-      cleanHeader.startsWith('dica') ||
-      cleanHeader.startsWith('sugestao') ||
-      cleanHeader.startsWith('vejatambem') ||
-      cleanHeader.startsWith('referencia') ||
-      cleanHeader.startsWith('nota') ||
-      /^={1,4}\s*'*'*(dicas?|veja também|referências)/i.test(trimmed) ||
-      /^[:*#']{0,3}'''(Dicas?|Sugestão)/i.test(trimmed)
-    ) {
-      inIngredients = false;
-      inSteps = false;
-      continue;
-    }
-
-    // Capture ingredients (bullet items * or -)
-    if (inIngredients && (trimmed.startsWith('*') || trimmed.startsWith('-') || trimmed.startsWith('•'))) {
-      const rawItem = cleanWikitext(trimmed.replace(/^[*•-]\s*/, ''));
-      if (rawItem.length > 2 && !rawItem.toLowerCase().startsWith('ingrediente')) {
-        // Separa quantidade do nome se possível
-        const matchQty = rawItem.match(/^([\d/.,]+\s*(?:g|kg|ml|l|xícara|xícaras|colher|colheres|pitada|fatias?|dentes?|unidades?|copos?|latas?|pacotes?|vidro|vidros)?(?:\s*(?:\(chá\)|\(sopa\)|\(sobremesa\)|\(café\)))?)\s*(?:de\s+)?(.*)$/i);
-        if (matchQty && matchQty[2]) {
-          ingredients.push({
-            name: matchQty[2].trim().replace(/;$/, ''),
-            quantity: matchQty[1].trim() || '1 porção',
-            required: true,
-          });
-        } else {
-          ingredients.push({
-            name: rawItem.replace(/;$/, '').trim(),
-            quantity: 'a gosto',
-            required: true,
-          });
-        }
-      }
-    }
-
-    // Capture steps (ordered # or numbered lines or bulleted steps)
-    if (inSteps) {
-      if (trimmed.startsWith('#') || /^\d+[.)]\s+/.test(trimmed) || trimmed.startsWith('*')) {
-        const rawStep = cleanWikitext(trimmed.replace(/^[#*•-]\s*|^\d+[.)]\s*/, ''));
-        if (rawStep.length > 5 && !rawStep.toLowerCase().startsWith('preparo')) {
-          steps.push(rawStep);
-        }
-      } else if (trimmed.length > 20 && !trimmed.startsWith('=') && !trimmed.startsWith(':')) {
-        const rawStep = cleanWikitext(trimmed);
-        if (rawStep.length > 10) {
-          steps.push(rawStep);
-        }
-      }
-    }
+  if (matchQty && matchQty[2]) {
+    return {
+      name: matchQty[2].trim().replace(/;$/, ''),
+      quantity: matchQty[1].trim() || '1 porção',
+      required: true,
+    };
   }
 
-  if (ingredients.length === 0 || steps.length === 0) {
+  return {
+    name: cleaned.replace(/;$/, '').trim(),
+    quantity: 'a gosto',
+    required: true,
+  };
+}
+
+export async function parseRecipeFromSections(title: string, thumbnail?: string): Promise<Recipe | null> {
+  const cleanTitle = title.replace(/^Livro de receitas\//i, '').trim();
+  if (!cleanTitle || cleanTitle.toLowerCase().includes('imprimir') || cleanTitle.toLowerCase().includes('índice')) {
     return null;
   }
 
   const lowerTitle = cleanTitle.toLowerCase();
   // Filter out non-food articles
   const NON_FOOD_TERMS = ['amaciante', 'sabonete', 'detergente', 'desinfetante', 'vela', 'shampoo', 'inseticida', 'repelente', 'artesanato', 'limpeza', 'verniz', 'cola'];
-  if (NON_FOOD_TERMS.some(t => lowerTitle.includes(t))) {
+  if (NON_FOOD_TERMS.some((t) => lowerTitle.includes(t))) {
+    return null;
+  }
+
+  const sections = await getSections(title);
+
+  const ingSection = sections.find((s) => /ingredientes/i.test(s.line));
+  const prepSection = sections.find((s) => /(preparo|preparação)/i.test(s.line));
+
+  if (!ingSection || !prepSection) {
+    console.log(`  - ${cleanTitle}: sem seção Ingredientes/Preparo, pulando`);
+    return null;
+  }
+
+  const ingHtml = await getSectionHtml(title, ingSection.index);
+  const prepHtml = await getSectionHtml(title, prepSection.index);
+
+  const ingLines = extractListItems(ingHtml, 'li');
+  let stepLines = extractListItems(prepHtml, 'li');
+  if (stepLines.length === 0) {
+    stepLines = extractListItems(prepHtml, 'p, dd');
+  }
+
+  const isGarbage = (s: string) =>
+    /https?:\/\//i.test(s) || /categoria:/i.test(s) || /wikilivros/i.test(s);
+
+  const rawIngredientsClean = ingLines.filter((raw) => !isGarbage(raw));
+  const rawStepsClean = stepLines.filter((raw) => !isGarbage(raw));
+
+  const ingredients: RecipeIngredient[] = rawIngredientsClean
+    .filter((raw) => raw.length > 2 && !raw.toLowerCase().startsWith('ingrediente'))
+    .map((raw) => ({
+      name: raw.replace(/;$/, '').trim(),
+      quantity: '',
+      required: true,
+    }));
+
+  const steps = dedupeStrings(rawStepsClean.filter((s) => s.length > 5 && !s.toLowerCase().startsWith('preparo')));
+
+  const ingredientsClean = ingredients.filter((i) => !isGarbage(i.name));
+  const stepsClean = steps.filter((s) => !isGarbage(s));
+
+  if (ingredientsClean.length < 3 || stepsClean.length < 2) {
+    console.log(`  - ${cleanTitle}: descartada pelo quality gate (ing: ${ingredientsClean.length}, steps: ${stepsClean.length}), pulando`);
     return null;
   }
 
   // Deduce category
   let category = 'Almoço & Jantar';
-  if (lowerTitle.includes('bolo') || lowerTitle.includes('doce') || lowerTitle.includes('pudim') || lowerTitle.includes('torta doce') || lowerTitle.includes('calda') || lowerTitle.includes('geleia') || lowerTitle.includes('brigadeiro')) {
+  if (
+    lowerTitle.includes('bolo') ||
+    lowerTitle.includes('doce') ||
+    lowerTitle.includes('pudim') ||
+    lowerTitle.includes('torta doce') ||
+    lowerTitle.includes('calda') ||
+    lowerTitle.includes('geleia') ||
+    lowerTitle.includes('brigadeiro')
+  ) {
     category = 'Sobremesas';
   } else if (lowerTitle.includes('salada')) {
     category = 'Saladas';
   } else if (lowerTitle.includes('sopa') || lowerTitle.includes('creme') || lowerTitle.includes('caldo')) {
     category = 'Sopas & Cremes';
-  } else if (lowerTitle.includes('arroz') || lowerTitle.includes('farofa') || lowerTitle.includes('pure') || lowerTitle.includes('molho') || lowerTitle.includes('mandioca frita')) {
+  } else if (
+    lowerTitle.includes('arroz') ||
+    lowerTitle.includes('farofa') ||
+    lowerTitle.includes('pure') ||
+    lowerTitle.includes('molho') ||
+    lowerTitle.includes('mandioca frita')
+  ) {
     category = 'Acompanhamentos';
   } else if (lowerTitle.includes('macarrao') || lowerTitle.includes('lasanha') || lowerTitle.includes('nhoque') || lowerTitle.includes('massa')) {
     category = 'Massas';
   }
 
   const diet = computeDietFlags(
-    ingredients.map((i) => i.name),
-    steps
+    ingredientsClean.map((i) => i.name),
+    stepsClean
   );
 
   const servings = 4;
@@ -176,14 +249,14 @@ function parseWikitextRecipe(title: string, wikitext: string, thumbnail?: string
     id: `wikilivros_${canonicalKeyFromTitle(cleanTitle)}`,
     title: cleanTitle,
     description: `Receita tradicional brasileira do Wikilivros • ${category}`,
-    prepTimeMinutes: Math.min(90, Math.max(15, steps.length * 8 + ingredients.length * 2)),
-    difficulty: ingredients.length > 8 || steps.length > 6 ? 'Médio' : 'Fácil',
+    prepTimeMinutes: Math.min(90, Math.max(15, stepsClean.length * 8 + ingredientsClean.length * 2)),
+    difficulty: ingredientsClean.length > 8 || stepsClean.length > 6 ? 'Médio' : 'Fácil',
     servings,
     servingsBucket,
     category,
     imageUrl: defaultImg,
-    ingredients,
-    steps,
+    ingredients: ingredientsClean,
+    steps: stepsClean,
     tags: [category, 'Tradicional', 'Wikilivros'],
     caloriesPerServing: Math.round(200 + ingredients.length * 35),
     canonicalKey: canonicalKeyFromTitle(cleanTitle),
@@ -200,11 +273,6 @@ function parseWikitextRecipe(title: string, wikitext: string, thumbnail?: string
     ],
   };
 }
-
-const WIKI_HEADERS = {
-  'User-Agent': 'GeladeiraInteligenteBot/1.0 (https://geladeira-inteligente.app; bot@geladeira-inteligente.app)',
-  Accept: 'application/json',
-};
 
 export async function fetchWikilivrosBrazilianRecipes(): Promise<Recipe[]> {
   const recipes: Recipe[] = [];
@@ -270,37 +338,21 @@ export async function fetchWikilivrosBrazilianRecipes(): Promise<Recipe[]> {
 
   console.log(`Wikilivros: Total de páginas candidatas a processar: ${pageIdsSet.size}`);
 
-  const pageIds = Array.from(pageIdsSet).slice(0, 60);
+  const pageEntries = Array.from(pageTitlesMap.entries()).slice(0, 45);
 
-  // Processa em lotes de 10
-  for (let i = 0; i < pageIds.length; i += 10) {
-    const chunk = pageIds.slice(i, i + 10);
-    const idsStr = chunk.join('|');
-    const queryUrl = `${WIKI_API}?action=query&prop=revisions|pageimages&rvslots=main&rvprop=content&piprop=thumbnail&pithumbsize=800&pageids=${idsStr}&format=json`;
-
+  // Processa as páginas com getSections e getSectionHtml
+  for (const [_, title] of pageEntries) {
     try {
-      const r = await fetch(queryUrl, { headers: WIKI_HEADERS });
-      if (!r.ok) continue;
-      const data = await r.json();
-      const pages = data.query?.pages || {};
-
-      for (const pid of chunk) {
-        const page = pages[pid];
-        if (!page) continue;
-        const wikitext = page.revisions?.[0]?.slots?.main?.['*'];
-        if (!wikitext) continue;
-
-        const thumb = page.thumbnail?.source;
-        const parsed = parseWikitextRecipe(page.title, wikitext, thumb);
-        if (parsed && parsed.ingredients.length > 0 && parsed.steps.length > 0) {
-          recipes.push(parsed);
-        }
+      const parsed = await parseRecipeFromSections(title);
+      if (parsed && parsed.ingredients.length > 0 && parsed.steps.length > 0) {
+        recipes.push(parsed);
       }
     } catch (err) {
-      console.warn('Erro no lote do Wikilivros:', err);
+      console.warn(`Wikilivros: Erro ao parsear seções de ${title}:`, err);
     }
   }
 
-  console.log(`Wikilivros: ${recipes.length} receitas válidas importadas.`);
+  console.log(`Wikilivros: ${recipes.length} receitas válidas importadas via MediaWiki parse.`);
   return recipes;
 }
+

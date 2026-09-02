@@ -613,8 +613,22 @@ export async function generateCatalog() {
     }
   }
 
-  const finalRecipes = Array.from(canonicalMap.values());
-  console.log(`Total de receitas consolidadas pós-dedup: ${finalRecipes.length}`);
+  const isGarbage = (s: string) =>
+    /https?:\/\//i.test(s) || /categoria:/i.test(s) || /wikilivros/i.test(s);
+
+  const finalRecipes = Array.from(canonicalMap.values())
+    .map((r) => {
+      const validIngredients = (r.ingredients || []).filter((i) => !isGarbage(i.name));
+      const validSteps = (r.steps || []).filter((s) => !isGarbage(s));
+      return {
+        ...r,
+        ingredients: validIngredients,
+        steps: validSteps,
+      };
+    })
+    .filter((r) => r.ingredients.length >= 3 && r.steps.length >= 2);
+
+  console.log(`Total de receitas consolidadas pós-dedup e quality gate: ${finalRecipes.length}`);
 
   const outputData = {
     version: 1,
