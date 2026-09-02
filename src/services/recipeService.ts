@@ -18,21 +18,33 @@ class RecipeService implements IRecipeService {
   }
 
   private async initRecipes(): Promise<void> {
+    let baseRecipes: Recipe[] = MOCK_RECIPES;
     try {
       const resp = await fetch('/recipes/catalog.json', { cache: 'force-cache' });
       if (resp.ok) {
         const data = await resp.json();
         if (Array.isArray(data.recipes) && data.recipes.length > 0) {
-          this.recipes = data.recipes;
-          this.isLoadedFromFirestore = true;
-          return;
+          baseRecipes = data.recipes;
         }
       }
     } catch (e) {
       console.warn('Falha ao carregar catálogo estático:', e);
     }
 
-    this.recipes = MOCK_RECIPES;
+    let remoteRecipes: Recipe[] = [];
+    try {
+      remoteRecipes = await firestoreService.getRecipes();
+    } catch (e) {
+      console.warn('Aviso ao carregar receitas do Firestore:', e);
+    }
+
+    const merged = [...baseRecipes, ...(remoteRecipes || [])];
+
+    // dedupe por id (se quiser, dá para trocar por canonicalKey depois)
+    const map = new Map<string, Recipe>();
+    for (const r of merged) map.set(r.id, r);
+
+    this.recipes = Array.from(map.values());
     this.isLoadedFromFirestore = true;
   }
 
