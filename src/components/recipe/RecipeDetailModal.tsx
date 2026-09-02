@@ -34,6 +34,26 @@ export const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
       ? recipe.steps
       : (recipe as any).instructions) ?? [];
 
+  const placeholder =
+    "data:image/svg+xml;charset=utf-8," +
+    encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="800" height="500">
+        <defs>
+          <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+            <stop offset="0" stop-color="#052014"/>
+            <stop offset="1" stop-color="#0b2b1b"/>
+          </linearGradient>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#g)"/>
+        <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle"
+          fill="#7ef0b5" font-family="Arial" font-size="28" font-weight="700">
+          Sem foto
+        </text>
+      </svg>
+    `);
+
+  const imgSrc = recipe.imageUrl?.trim() ? recipe.imageUrl : placeholder;
+
   return (
     <Modal
       isOpen={isOpen}
@@ -68,10 +88,13 @@ export const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
         {/* Banner with image and key stats */}
         <div className="relative rounded-2xl overflow-hidden aspect-16/9 bg-[#07190f] shadow-lg border border-emerald-500/20">
           <img
-            src={recipe.imageUrl}
+            src={imgSrc}
             alt={recipe.title}
             referrerPolicy="no-referrer"
             className="w-full h-full object-cover"
+            onError={(e) => {
+              e.currentTarget.src = placeholder;
+            }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#06140c] via-[#06140c]/40 to-transparent" />
           

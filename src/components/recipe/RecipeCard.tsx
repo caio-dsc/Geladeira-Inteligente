@@ -12,6 +12,26 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onClick }) => {
   const isFullMatch = recipe.matchPercentage === 100;
   const isHighMatch = recipe.matchPercentage >= 70;
 
+  const placeholder =
+    "data:image/svg+xml;charset=utf-8," +
+    encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="800" height="500">
+        <defs>
+          <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+            <stop offset="0" stop-color="#052014"/>
+            <stop offset="1" stop-color="#0b2b1b"/>
+          </linearGradient>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#g)"/>
+        <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle"
+          fill="#7ef0b5" font-family="Arial" font-size="28" font-weight="700">
+          Sem foto
+        </text>
+      </svg>
+    `);
+
+  const imgSrc = recipe.imageUrl?.trim() ? recipe.imageUrl : placeholder;
+
   return (
     <Card
       variant="interactive"
@@ -23,11 +43,14 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onClick }) => {
         {/* Thumbnail with overlay badges */}
         <div className="relative aspect-16/10 w-full overflow-hidden bg-[#07190f]">
           <img
-            src={recipe.imageUrl}
+            src={imgSrc}
             alt={recipe.title}
             referrerPolicy="no-referrer"
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             loading="lazy"
+            onError={(e) => {
+              e.currentTarget.src = placeholder;
+            }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0b2116] via-transparent to-transparent opacity-90" />
 

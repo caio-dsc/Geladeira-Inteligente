@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { RecipeMatch, FoodItem } from '../../types';
 import { RecipeCard } from '../recipe/RecipeCard';
 import { Input } from '../common/Input';
@@ -23,6 +23,8 @@ export interface RecipesViewProps {
   recipesUpdatedAt?: number | null;
 }
 
+const normalizeCategory = (c?: string) => (c && c.trim() ? c.trim() : 'Outros');
+
 export const RecipesView: React.FC<RecipesViewProps> = ({
   recipes,
   inventory,
@@ -37,15 +39,41 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedDiet, setSelectedDiet] = useState<string>('all');
 
-  const categories = [
-    { id: 'all', label: 'Todas as Categorias' },
-    { id: 'Café & Lanches', label: 'Café & Lanches' },
-    { id: 'Almoço & Jantar', label: 'Almoço & Jantar' },
-    { id: 'Acompanhamentos', label: 'Acompanhamentos' },
-    { id: 'Saladas', label: 'Saladas' },
-    { id: 'Massas', label: 'Massas' },
-    { id: 'Sobremesas', label: 'Sobremesas' },
-  ];
+  const categoryCounts = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const r of recipes) {
+      const cat = normalizeCategory(r.category);
+      map.set(cat, (map.get(cat) || 0) + 1);
+    }
+    return map;
+  }, [recipes]);
+
+  const categories = useMemo(() => {
+    const preferredOrder: string[] = [
+      'Café & Lanches',
+      'Almoço & Jantar',
+      'Saladas',
+      'Sopas & Cremes',
+      'Sobremesas',
+      'Bebidas',
+      'Outros',
+    ];
+
+    const present: string[] = Array.from(categoryCounts.keys());
+
+    // ordena: primeiro as preferidas na ordem acima, depois o resto por A-Z
+    const ordered: string[] = [
+      ...preferredOrder.filter((c) => categoryCounts.has(c)),
+      ...present
+        .filter((c) => !preferredOrder.includes(c))
+        .sort((a, b) => a.localeCompare(b, 'pt-BR')),
+    ];
+
+    return [
+      { id: 'all', label: `Todas as Categorias (${recipes.length})` },
+      ...ordered.map((c) => ({ id: c, label: `${c} (${categoryCounts.get(c) || 0})` })),
+    ];
+  }, [categoryCounts, recipes.length]);
 
   const dietFilters = [
     { id: 'all', label: 'Todas Dietas' },
@@ -58,46 +86,70 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
     { id: 'rico_em_proteina', label: 'Proteico' },
   ];
 
-  const filteredRecipes = recipes
-    .filter((recipe) => {
-      const matchesSearch = 
-        recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        recipe.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (recipe.aliases && recipe.aliases.some((a) => a.toLowerCase().includes(searchTerm.toLowerCase()))) ||
-        recipe.ingredients.some((ing) => ing.name.toLowerCase().includes(searchTerm.toLowerCase()));
+  const filteredRecipes = useMemo(() => {
+    return recipes
+      .filter((recipe) => {
+        const matchesSearch = 
+          recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          recipe.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (recipe.aliases && recipe.aliases.some((a) => a.toLowerCase().includes(searchTerm.toLowerCase()))) ||
+          recipe.ingredients.some((ing) => ing.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
-      const matchesCategory = selectedCategory === 'all' || recipe.category === selectedCategory;
+        const matchesCategory =
+          selectedCategory === 'all' || normalizeCategory(recipe.category) === selectedCategory;
 
-      let matchesDiet = true;
-      if (selectedDiet !== 'all' && recipe.diet) {
-        const d = recipe.diet;
-        if (selectedDiet === 'sem_gluten') matchesDiet = d.hasGluten === false;
-        else if (selectedDiet === 'vegano') matchesDiet = d.vegan === true;
-        else if (selectedDiet === 'vegetariano') matchesDiet = d.vegetarian === true || d.vegan === true || d.hasMeat === false;
-        else if (selectedDiet === 'sem_lactose') matchesDiet = d.hasLactose === false;
-        else if (selectedDiet === 'sem_frituras') matchesDiet = d.usesFrying !== true;
-        else if (selectedDiet === 'low_carb') matchesDiet = d.lowCarb === true;
-        else if (selectedDiet === 'rico_em_proteina') matchesDiet = d.highProtein === true;
-      }
+        let matchesDiet = true;
+        if (selectedDiet !== 'all' && recipe.diet) {
+          const d = recipe.diet;
+          if (selectedDiet === 'sem_gluten') matchesDiet = d.hasGluten === false;
+          else if (selectedDiet === 'vegano') matchesDiet = d.vegan === true;
+          else if (selectedDiet === 'vegetariano') matchesDiet = d.vegetarian === true || d.vegan === true || d.hasMeat === false;
+          else if (selectedDiet === 'sem_lactose') matchesDiet = d.hasLactose === false;
+          else if (selectedDiet === 'sem_frituras') matchesDiet = d.usesFrying !== true;
+          else if (selectedDiet === 'low_carb') matchesDiet = d.lowCarb === true;
+          else if (selectedDiet === 'rico_em_proteina') matchesDiet = d.highProtein === true;
+        }
 
-      let matchesMatch = true;
-      if (filterMatch === 'ready') matchesMatch = recipe.isReadyToCook;
-      if (filterMatch === 'high') matchesMatch = recipe.matchPercentage >= 60;
+        let matchesMatch = true;
+        if (filterMatch === 'ready') matchesMatch = recipe.isReadyToCook;
+        if (filterMatch === 'high') matchesMatch = recipe.matchPercentage >= 60;
 
-      return matchesSearch && matchesCategory && matchesDiet && matchesMatch;
-    })
-    .sort((a, b) => {
-      // 1. isReadyToCook desc (Prontas primeiro)
-      if (a.isReadyToCook !== b.isReadyToCook) {
-        return a.isReadyToCook ? -1 : 1;
-      }
-      // 2. matchPercentage desc
-      if (b.matchPercentage !== a.matchPercentage) {
-        return b.matchPercentage - a.matchPercentage;
-      }
-      // 3. title asc (ordem alfabética)
-      return a.title.localeCompare(b.title, 'pt-BR');
-    });
+        return matchesSearch && matchesCategory && matchesDiet && matchesMatch;
+      })
+      .sort((a, b) => {
+        // 1. isReadyToCook desc (Prontas primeiro)
+        if (a.isReadyToCook !== b.isReadyToCook) {
+          return a.isReadyToCook ? -1 : 1;
+        }
+        // 2. matchPercentage desc
+        if (b.matchPercentage !== a.matchPercentage) {
+          return b.matchPercentage - a.matchPercentage;
+        }
+        // 3. title asc (ordem alfabética)
+        return a.title.localeCompare(b.title, 'pt-BR');
+      });
+  }, [recipes, searchTerm, selectedCategory, selectedDiet, filterMatch]);
+
+  const groupedByCategory = useMemo(() => {
+    const groups: Record<string, RecipeMatch[]> = {};
+    for (const r of filteredRecipes) {
+      const cat = normalizeCategory(r.category);
+      (groups[cat] ||= []).push(r);
+    }
+
+    // ordena dentro de cada categoria: prontas primeiro, depois match%, depois título
+    for (const cat of Object.keys(groups)) {
+      groups[cat].sort((a, b) => {
+        const readyDiff = Number(b.isReadyToCook) - Number(a.isReadyToCook);
+        if (readyDiff !== 0) return readyDiff;
+        const matchDiff = (b.matchPercentage || 0) - (a.matchPercentage || 0);
+        if (matchDiff !== 0) return matchDiff;
+        return a.title.localeCompare(b.title, 'pt-BR');
+      });
+    }
+
+    return groups;
+  }, [filteredRecipes]);
 
   const readyCount = recipes.filter((r) => r.isReadyToCook).length;
   const almostReadyCount = recipes.filter((r) => !r.isReadyToCook && r.matchPercentage >= 60).length;
@@ -241,20 +293,49 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
 
       {/* Grid of Recipes */}
       {filteredRecipes.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-          {filteredRecipes.map((recipe) => (
-            <RecipeCard key={recipe.id} recipe={recipe} onClick={onSelectRecipe} />
-          ))}
-        </div>
+        selectedCategory === 'all' ? (
+          <div className="space-y-8">
+            {(Object.entries(groupedByCategory) as [string, RecipeMatch[]][]).map(([cat, items]) => (
+              <div key={cat} className="space-y-3">
+                <div className="flex items-end justify-between">
+                  <div>
+                    <h3 className="text-sm sm:text-base font-black text-white">{cat}</h3>
+                    <p className="text-xs text-emerald-300/60">{items.length} receita(s)</p>
+                  </div>
+
+                  <button
+                    onClick={() => setSelectedCategory(cat)}
+                    className="text-xs font-black text-emerald-300 hover:text-white transition cursor-pointer"
+                  >
+                    Ver todas
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+                  {items.slice(0, 6).map((recipe) => (
+                    <RecipeCard key={recipe.id} recipe={recipe} onClick={onSelectRecipe} />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+            {filteredRecipes.map((recipe) => (
+              <RecipeCard key={recipe.id} recipe={recipe} onClick={onSelectRecipe} />
+            ))}
+          </div>
+        )
       ) : (
         <EmptyState
           icon={<Utensils className="w-8 h-8 text-emerald-400" />}
-          title="Nenhuma receita compatível com esses filtros"
-          description="Tente relaxar os filtros de busca ou adicione novos ingredientes à sua geladeira para desbloquear mais sugestões."
-          actionLabel="Ver Minha Geladeira"
+          title="Nenhuma receita encontrada"
+          message="Tente ajustar a busca, filtros ou adicione mais itens na geladeira."
+          actionLabel="Ver Geladeira"
           onAction={onNavigateToInventory}
         />
       )}
     </div>
   );
 };
+
