@@ -6,6 +6,7 @@ export interface IRecipeService {
   getRecipes(): Promise<Recipe[]>;
   getMatchingRecipes(inventory: FoodItem[], preferences?: UserPreferences): Promise<RecipeMatch[]>;
   getRecipeById(id: string, inventory?: FoodItem[]): Promise<RecipeMatch | null>;
+  refreshRecipesFromFirestore(): Promise<void>;
 }
 
 class RecipeService implements IRecipeService {
@@ -31,6 +32,11 @@ class RecipeService implements IRecipeService {
     }
   }
 
+  public async refreshRecipesFromFirestore(): Promise<void> {
+    this.isLoadedFromFirestore = false;
+    await this.initRecipes();
+  }
+
   public async getRecipes(): Promise<Recipe[]> {
     if (!this.isLoadedFromFirestore) {
       await this.initRecipes();
@@ -49,7 +55,7 @@ class RecipeService implements IRecipeService {
       const matchedIngredients: string[] = [];
       const missingIngredients: string[] = [];
 
-      recipe.ingredients.forEach((ing) => {
+      (recipe.ingredients ?? []).forEach((ing) => {
         const normalizedIng = this.normalizeString(ing.name);
         const isMatched = inventoryNames.some((invName) => 
           invName.includes(normalizedIng) || normalizedIng.includes(invName)
@@ -62,7 +68,7 @@ class RecipeService implements IRecipeService {
         }
       });
 
-      const totalIngredients = recipe.ingredients.length;
+      const totalIngredients = (recipe.ingredients ?? []).length;
       const matchPercentage = totalIngredients > 0 
         ? Math.round((matchedIngredients.length / totalIngredients) * 100) 
         : 0;

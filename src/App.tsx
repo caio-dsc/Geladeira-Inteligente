@@ -43,6 +43,10 @@ export default function App() {
   // Toast notifications
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  // Recipe manual refresh state
+  const [isRefreshingRecipes, setIsRefreshingRecipes] = useState(false);
+  const [recipesUpdatedAt, setRecipesUpdatedAt] = useState<number | null>(null);
+
   const showToast = (message: string) => {
     setToastMessage(message);
     setTimeout(() => {
@@ -59,6 +63,26 @@ export default function App() {
       console.error('Erro ao calcular receitas:', e);
     }
   }, []);
+
+  const handleRefreshRecipes = useCallback(async () => {
+    try {
+      setIsRefreshingRecipes(true);
+
+      // 1) recarrega catálogo do Firestore (se você importou receitas novas)
+      await recipeService.refreshRecipesFromFirestore();
+
+      // 2) recalcula matches com inventário atual
+      await updateRecipeMatches(inventory, user?.preferences);
+
+      setRecipesUpdatedAt(Date.now());
+      showToast('Receitas atualizadas!');
+    } catch (e) {
+      console.error('Erro ao atualizar receitas manualmente:', e);
+      showToast('Falha ao atualizar receitas. Veja o console.');
+    } finally {
+      setIsRefreshingRecipes(false);
+    }
+  }, [inventory, user?.preferences, updateRecipeMatches]);
 
   // Update recipes whenever inventory or user preferences change
   useEffect(() => {
@@ -254,6 +278,9 @@ export default function App() {
             inventory={inventory}
             onSelectRecipe={setSelectedRecipe}
             onNavigateToInventory={() => setActiveTab('inventory')}
+            onRefreshRecipes={handleRefreshRecipes}
+            isRefreshingRecipes={isRefreshingRecipes}
+            recipesUpdatedAt={recipesUpdatedAt}
           />
         )}
 

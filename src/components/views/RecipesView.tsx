@@ -8,7 +8,9 @@ import {
   Search, 
   Sparkles, 
   CheckCircle2, 
-  Utensils 
+  Utensils,
+  RefreshCcw,
+  Loader2
 } from 'lucide-react';
 
 export interface RecipesViewProps {
@@ -16,6 +18,9 @@ export interface RecipesViewProps {
   inventory: FoodItem[];
   onSelectRecipe: (recipe: RecipeMatch) => void;
   onNavigateToInventory: () => void;
+  onRefreshRecipes: () => void;
+  isRefreshingRecipes?: boolean;
+  recipesUpdatedAt?: number | null;
 }
 
 export const RecipesView: React.FC<RecipesViewProps> = ({
@@ -23,6 +28,9 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
   inventory,
   onSelectRecipe,
   onNavigateToInventory,
+  onRefreshRecipes,
+  isRefreshingRecipes,
+  recipesUpdatedAt,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterMatch, setFilterMatch] = useState<'all' | 'ready' | 'high'>('all');
@@ -70,10 +78,40 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
           </p>
         </div>
 
-        {/* Ready badge */}
-        <div className="flex items-center gap-2 bg-[#092617] p-2.5 px-4 rounded-2xl border border-emerald-500/30 text-xs text-emerald-200 font-bold self-start sm:self-auto shadow-[0_0_15px_rgba(16,185,129,0.2)]">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-          <span>{readyCount} {readyCount === 1 ? 'receita pronta' : 'receitas prontas'} para cozinhar</span>
+        {/* Badges & Actions */}
+        <div className="flex flex-col items-start sm:items-end gap-1.5 self-start sm:self-auto">
+          <div className="flex items-center gap-2">
+            {/* Ready badge */}
+            <div className="flex items-center gap-2 bg-[#092617] p-2.5 px-4 rounded-2xl border border-emerald-500/30 text-xs text-emerald-200 font-bold shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              <span>{readyCount} {readyCount === 1 ? 'receita pronta' : 'receitas prontas'} para cozinhar</span>
+            </div>
+
+            {/* Botão atualizar */}
+            <button
+              onClick={onRefreshRecipes}
+              disabled={!!isRefreshingRecipes}
+              className={`flex items-center gap-2 px-3 py-2.5 rounded-2xl border text-xs font-black transition
+                ${isRefreshingRecipes
+                  ? 'bg-white/5 border-white/10 text-white/40 cursor-not-allowed'
+                  : 'bg-emerald-500/15 border-emerald-500/30 text-emerald-200 hover:bg-emerald-500/25'}
+              `}
+              title="Recalcular receitas com base na geladeira"
+            >
+              {isRefreshingRecipes ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <RefreshCcw className="w-4 h-4" />
+              )}
+              Atualizar
+            </button>
+          </div>
+
+          {recipesUpdatedAt && (
+            <div className="text-[11px] text-emerald-300/60 font-medium">
+              Última atualização: {new Date(recipesUpdatedAt).toLocaleString('pt-BR')}
+            </div>
+          )}
         </div>
       </div>
 
