@@ -1,0 +1,444 @@
+{
+  "version": 1,
+  "generatedAt": "2026-09-02T00:00:00.000Z",
+  "recipes": [
+    {
+      "id": "omelete_simples",
+      "canonicalKey": "omelete",
+      "title": "Omelete Rápido com Queijo",
+      "description": "Omelete leve, fofo e dourado, recheado com queijo derretido.",
+      "prepTimeMinutes": 10,
+      "difficulty": "Fácil",
+      "servings": 1,
+      "servingsBucket": "1",
+      "category": "Café & Lanches",
+      "imageUrl": "https://images.unsplash.com/photo-1510693206972-df098062cb71?w=600&auto=format&fit=crop&q=80",
+      "caloriesPerServing": 240,
+      "tags": ["Rápido", "Proteico", "Sem Glúten"],
+      "ingredients": [
+        { "name": "Ovo", "quantity": "2 un", "required": true, "category": "proteins" },
+        { "name": "Manteiga", "quantity": "1 colher de chá", "required": true, "category": "dairy" },
+        { "name": "Queijo Muçarela", "quantity": "50g", "required": false, "category": "dairy" },
+        { "name": "Sal", "quantity": "a gosto", "required": false, "category": "condiments" }
+      ],
+      "steps": [
+        "Quebre os ovos em uma tigela, tempere com uma pitada de sal e bata com um garfo até espumar levemente.",
+        "Aqueça uma frigideira antiaderente em fogo médio e derreta a manteiga.",
+        "Despeje os ovos batidos e deixe firmar as bordas por cerca de 1 a 2 minutos.",
+        "Adicione o queijo em uma das metades, dobre a outra por cima e sirva imediatamente."
+      ],
+      "diet": {
+        "hasGluten": false,
+        "hasLactose": true,
+        "hasMeat": false,
+        "hasEgg": true,
+        "vegetarian": true,
+        "vegan": false,
+        "usesFrying": false
+      }
+    },
+    {
+      "id": "arroz_branco",
+      "canonicalKey": "arroz_branco",
+      "title": "Arroz Branco Soltinho",
+      "description": "Arroz tradicional brasileiro, soltinho e bem temperado com alho e cebola.",
+      "prepTimeMinutes": 20,
+      "difficulty": "Fácil",
+      "servings": 4,
+      "servingsBucket": "3-4",
+      "category": "Acompanhamentos",
+      "imageUrl": "https://images.unsplash.com/photo-1516684732162-798a0062be99?w=600&auto=format&fit=crop&q=80",
+      "caloriesPerServing": 180,
+      "tags": ["Clássico", "Vegano", "Sem Glúten"],
+      "ingredients": [
+        { "name": "Arroz", "quantity": "1 xícara", "required": true, "category": "pantry" },
+        { "name": "Alho", "quantity": "2 dentes picados", "required": true, "category": "vegetables" },
+        { "name": "Cebola", "quantity": "1/2 unidade picada", "required": false, "category": "vegetables" },
+        { "name": "Óleo", "quantity": "1 colher de sopa", "required": true, "category": "pantry" },
+        { "name": "Sal", "quantity": "1 colher de chá", "required": false, "category": "condiments" }
+      ],
+      "steps": [
+        "Em uma panela, aqueça o óleo e refogue a cebola e o alho até dourarem levemente.",
+        "Adicione o arroz e mexa bem por 1 minuto para fritar os grãos.",
+        "Acrescente 2 xícaras de água fervente e o sal.",
+        "Cozinhe em fogo médio com a tampa entreaberta até a água secar e os grãos ficarem macios (aprox. 15 minutos)."
+      ],
+      "diet": {
+        "hasGluten": false,
+        "hasLactose": false,
+        "hasMeat": false,
+        "hasEgg": false,
+        "vegetarian": true,
+        "vegan": true,
+        "usesFrying": false
+      }
+    },
+    {
+      "id": "feijao_carioca",
+      "canonicalKey": "feijao_carioca",
+      "title": "Feijão Carioca Caseiro",
+      "description": "Feijão com caldo encorpado, temperado com alho, louro e azeite.",
+      "prepTimeMinutes": 45,
+      "difficulty": "Médio",
+      "servings": 4,
+      "servingsBucket": "3-4",
+      "category": "Acompanhamentos",
+      "imageUrl": "https://images.unsplash.com/photo-1547496502-affa22d38842?w=600&auto=format&fit=crop&q=80",
+      "caloriesPerServing": 160,
+      "tags": ["Rico em Fibras", "Vegano", "Tradicional"],
+      "ingredients": [
+        { "name": "Feijão Carioca", "quantity": "1 xícara", "required": true, "category": "pantry" },
+        { "name": "Alho", "quantity": "3 dentes picados", "required": true, "category": "vegetables" },
+        { "name": "Cebola", "quantity": "1/2 unidade", "required": false, "category": "vegetables" },
+        { "name": "Azeite", "quantity": "1 colher de sopa", "required": true, "category": "pantry" },
+        { "name": "Sal", "quantity": "a gosto", "required": false, "category": "condiments" }
+      ],
+      "steps": [
+        "Deixe o feijão de molho em água por pelo menos 4 horas antes do preparo.",
+        "Cozinhe na panela de pressão com água limpa e folha de louro por 20 minutos após pegar pressão.",
+        "Em outra frigideira, doure o alho e a cebola no azeite.",
+        "Adicione uma concha do feijão cozido na frigideira, amasse com a concha para engrossar o caldo e devolva tudo à panela.",
+        "Ferva em fogo baixo por 5 minutos para apurar o tempero."
+      ],
+      "diet": {
+        "hasGluten": false,
+        "hasLactose": false,
+        "hasMeat": false,
+        "hasEgg": false,
+        "vegetarian": true,
+        "vegan": true,
+        "usesFrying": false
+      }
+    },
+    {
+      "id": "frango_grelhado",
+      "canonicalKey": "frango_grelhado",
+      "title": "Filé de Frango Grelhado com Ervas",
+      "description": "Peito de frango suculento marinado com alho, limão e azeite.",
+      "prepTimeMinutes": 15,
+      "difficulty": "Fácil",
+      "servings": 2,
+      "servingsBucket": "2",
+      "category": "Pratos Principais",
+      "imageUrl": "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=600&auto=format&fit=crop&q=80",
+      "caloriesPerServing": 220,
+      "tags": ["High Protein", "Low Carb", "Sem Glúten"],
+      "ingredients": [
+        { "name": "Peito de Frango", "quantity": "400g em filés", "required": true, "category": "proteins" },
+        { "name": "Alho", "quantity": "2 dentes amassados", "required": true, "category": "vegetables" },
+        { "name": "Limão", "quantity": "1/2 unidade", "required": false, "category": "fruits" },
+        { "name": "Azeite", "quantity": "1 colher de sopa", "required": true, "category": "pantry" },
+        { "name": "Sal", "quantity": "a gosto", "required": false, "category": "condiments" }
+      ],
+      "steps": [
+        "Tempere os filés de frango com o alho, suco de limão, sal e um fio de azeite.",
+        "Aqueça uma frigideira ou grelha em fogo alto.",
+        "Grelhe os filés por 3 a 4 minutos de cada lado até ficarem dourados por fora e cozidos por dentro.",
+        "Deixe descansar por 2 minutos antes de fatiar para reter a suculência."
+      ],
+      "diet": {
+        "hasGluten": false,
+        "hasLactose": false,
+        "hasMeat": true,
+        "hasEgg": false,
+        "vegetarian": false,
+        "vegan": false,
+        "highProtein": true,
+        "lowCarb": true,
+        "usesFrying": false
+      }
+    },
+    {
+      "id": "salada_fresca",
+      "canonicalKey": "salada_fresca",
+      "title": "Salada Colorida com Tomate e Cenoura",
+      "description": "Salada refrescante e crocante com alface, tomate fresco e cenoura ralada.",
+      "prepTimeMinutes": 8,
+      "difficulty": "Fácil",
+      "servings": 2,
+      "servingsBucket": "2",
+      "category": "Saladas",
+      "imageUrl": "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=600&auto=format&fit=crop&q=80",
+      "caloriesPerServing": 75,
+      "tags": ["Leve", "Vegano", "Rápido"],
+      "ingredients": [
+        { "name": "Alface Americana", "quantity": "1/2 maço", "required": true, "category": "vegetables" },
+        { "name": "Tomates Maduros", "quantity": "2 unidades", "required": true, "category": "vegetables" },
+        { "name": "Cenouras", "quantity": "1 unidade ralada", "required": true, "category": "vegetables" },
+        { "name": "Azeite", "quantity": "1 colher de sopa", "required": false, "category": "pantry" },
+        { "name": "Limão", "quantity": "1/2 unidade", "required": false, "category": "fruits" }
+      ],
+      "steps": [
+        "Lave bem as folhas de alface e seque.",
+        "Corte os tomates em gomos e rale a cenoura finamente.",
+        "Monte em uma saladeira com as folhas na base e os legumes por cima.",
+        "Tempere na hora de servir com azeite, limão e uma pitada de sal."
+      ],
+      "diet": {
+        "hasGluten": false,
+        "hasLactose": false,
+        "hasMeat": false,
+        "hasEgg": false,
+        "vegetarian": true,
+        "vegan": true,
+        "usesFrying": false
+      }
+    },
+    {
+      "id": "macarrao_alho_oleo",
+      "canonicalKey": "macarrao_alho_oleo",
+      "title": "Macarrão Alho e Óleo com Tomates",
+      "description": "Prato clássico e saboroso preparado em menos de 15 minutos.",
+      "prepTimeMinutes": 15,
+      "difficulty": "Fácil",
+      "servings": 2,
+      "servingsBucket": "2",
+      "category": "Massas",
+      "imageUrl": "https://images.unsplash.com/photo-1621996346565-e3d5d62817d2?w=600&auto=format&fit=crop&q=80",
+      "caloriesPerServing": 340,
+      "tags": ["Massa", "Rápido", "Vegetariano"],
+      "ingredients": [
+        { "name": "Macarrão", "quantity": "200g", "required": true, "category": "pantry" },
+        { "name": "Alho", "quantity": "4 dentes laminados", "required": true, "category": "vegetables" },
+        { "name": "Azeite", "quantity": "3 colheres de sopa", "required": true, "category": "pantry" },
+        { "name": "Tomates Maduros", "quantity": "1 unidade em cubos", "required": false, "category": "vegetables" },
+        { "name": "Sal", "quantity": "a gosto", "required": false, "category": "condiments" }
+      ],
+      "steps": [
+        "Cozinhe o macarrão em bastante água fervente com sal até ficar al dente.",
+        "Em uma frigideira grande, aqueça o azeite e doure as lâminas de alho lentamente em fogo brando.",
+        "Adicione os tomates picados e refogue rapidamente.",
+        "Junte o macarrão escorrido diretamente na frigideira, misture bem e sirva."
+      ],
+      "diet": {
+        "hasGluten": true,
+        "hasLactose": false,
+        "hasMeat": false,
+        "hasEgg": false,
+        "vegetarian": true,
+        "vegan": true,
+        "usesFrying": false
+      }
+    },
+    {
+      "id": "pao_de_queijo",
+      "canonicalKey": "pao_de_queijo",
+      "title": "Pão de Queijo Mineiro",
+      "description": "Pão de queijo caseiro com casquinha crocante e interior elástico e saboroso.",
+      "prepTimeMinutes": 35,
+      "difficulty": "Médio",
+      "servings": 6,
+      "servingsBucket": "5+",
+      "category": "Café & Lanches",
+      "imageUrl": "https://images.unsplash.com/photo-1598142981504-20b784a92357?w=600&auto=format&fit=crop&q=80",
+      "caloriesPerServing": 180,
+      "tags": ["Sem Glúten", "Brasileiro", "Tradicional"],
+      "ingredients": [
+        { "name": "Polvilho Doce", "quantity": "250g", "required": true, "category": "pantry" },
+        { "name": "Queijo Muçarela", "quantity": "150g ralado", "required": true, "category": "dairy" },
+        { "name": "Leite Integral", "quantity": "100ml", "required": true, "category": "dairy" },
+        { "name": "Ovo", "quantity": "1 unidade", "required": true, "category": "proteins" },
+        { "name": "Óleo", "quantity": "50ml", "required": true, "category": "pantry" },
+        { "name": "Sal", "quantity": "1 colher de chá", "required": false, "category": "condiments" }
+      ],
+      "steps": [
+        "Ferva o leite com o óleo e o sal.",
+        "Escalde o polvilho em uma tigela grande misturando bem até amornar.",
+        "Acrescente o ovo e amasse com as mãos.",
+        "Incorpore o queijo ralado até formar uma massa homogênea.",
+        "Faça bolinhas e asse em forno pré-aquecido a 200°C por 25 a 30 minutos até dourarem."
+      ],
+      "diet": {
+        "hasGluten": false,
+        "hasLactose": true,
+        "hasMeat": false,
+        "hasEgg": true,
+        "vegetarian": true,
+        "vegan": false,
+        "usesFrying": false
+      }
+    },
+    {
+      "id": "bolo_cenoura_chocolate",
+      "canonicalKey": "bolo_cenoura",
+      "title": "Bolo de Cenoura com Calda de Chocolate",
+      "description": "Bolo fofinho de cenoura com cobertura cremosa e brilhante de chocolate.",
+      "prepTimeMinutes": 45,
+      "difficulty": "Médio",
+      "servings": 8,
+      "servingsBucket": "5+",
+      "category": "Sobremesas",
+      "imageUrl": "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=600&auto=format&fit=crop&q=80",
+      "caloriesPerServing": 290,
+      "tags": ["Doce", "Brasileiro", "Café da Tarde"],
+      "ingredients": [
+        { "name": "Cenouras", "quantity": "3 unidades médias", "required": true, "category": "vegetables" },
+        { "name": "Ovo", "quantity": "3 unidades", "required": true, "category": "proteins" },
+        { "name": "Óleo", "quantity": "1/2 xícara", "required": true, "category": "pantry" },
+        { "name": "Açúcar", "quantity": "1 e 1/2 xícara", "required": true, "category": "pantry" },
+        { "name": "Farinha de Trigo", "quantity": "2 xícaras", "required": true, "category": "pantry" },
+        { "name": "Fermento em Pó", "quantity": "1 colher de sopa", "required": true, "category": "pantry" },
+        { "name": "Chocolate em Pó", "quantity": "4 colheres de sopa", "required": false, "category": "pantry" },
+        { "name": "Manteiga", "quantity": "1 colher de sopa", "required": false, "category": "dairy" },
+        { "name": "Leite Integral", "quantity": "1/2 xícara", "required": false, "category": "dairy" }
+      ],
+      "steps": [
+        "No liquidificador, bata as cenouras picadas, os ovos e o óleo até ficar bem homogêneo.",
+        "Em uma tigela, misture o açúcar e a farinha. Despeje a mistura do liquidificador e incorpore.",
+        "Adicione o fermento por último, misturando delicadamente.",
+        "Despeje em fôrma untada e asse a 180°C por cerca de 40 minutos.",
+        "Para a calda: ferva em fogo baixo o chocolate, a manteiga, o açúcar e o leite até engrossar, e cubra o bolo ainda morno."
+      ],
+      "diet": {
+        "hasGluten": true,
+        "hasLactose": true,
+        "hasMeat": false,
+        "hasEgg": true,
+        "vegetarian": true,
+        "vegan": false,
+        "usesFrying": false
+      }
+    },
+    {
+      "id": "brigadeiro_tradicional",
+      "canonicalKey": "brigadeiro",
+      "title": "Brigadeiro Gourmet Tradicional",
+      "description": "O doce mais amado do Brasil, feito com leite condensado, cacau e manteiga.",
+      "prepTimeMinutes": 20,
+      "difficulty": "Fácil",
+      "servings": 6,
+      "servingsBucket": "5+",
+      "category": "Sobremesas",
+      "imageUrl": "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=600&auto=format&fit=crop&q=80",
+      "caloriesPerServing": 150,
+      "tags": ["Doce", "Festa", "Clássico"],
+      "ingredients": [
+        { "name": "Leite Condensado", "quantity": "1 lata (395g)", "required": true, "category": "pantry" },
+        { "name": "Chocolate em Pó", "quantity": "3 colheres de sopa", "required": true, "category": "pantry" },
+        { "name": "Manteiga", "quantity": "1 colher de sopa", "required": true, "category": "dairy" },
+        { "name": "Granulado de Chocolate", "quantity": "50g", "required": false, "category": "pantry" }
+      ],
+      "steps": [
+        "Em uma panela de fundo grosso, coloque o leite condensado, o chocolate em pó e a manteiga.",
+        "Cozinhe em fogo baixo, mexendo sem parar com espátula de silicone.",
+        "Quando a massa engrossar e desgrudar completamente do fundo da panela, desligue o fogo.",
+        "Transfira para um prato untado, deixe esfriar, enrole as bolinhas e passe no granulado."
+      ],
+      "diet": {
+        "hasGluten": false,
+        "hasLactose": true,
+        "hasMeat": false,
+        "hasEgg": false,
+        "vegetarian": true,
+        "vegan": false,
+        "usesFrying": false
+      }
+    },
+    {
+      "id": "panqueca_simples",
+      "canonicalKey": "panqueca",
+      "title": "Panqueca Leve com Frutas e Mel",
+      "description": "Massa suave e macia para recheios doces ou salgados.",
+      "prepTimeMinutes": 15,
+      "difficulty": "Fácil",
+      "servings": 2,
+      "servingsBucket": "2",
+      "category": "Café & Lanches",
+      "imageUrl": "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&auto=format&fit=crop&q=80",
+      "caloriesPerServing": 210,
+      "tags": ["Café da Manhã", "Vegetariano", "Rápido"],
+      "ingredients": [
+        { "name": "Ovo", "quantity": "1 unidade", "required": true, "category": "proteins" },
+        { "name": "Leite Integral", "quantity": "1 xícara", "required": true, "category": "dairy" },
+        { "name": "Farinha de Trigo", "quantity": "1 xícara", "required": true, "category": "pantry" },
+        { "name": "Manteiga", "quantity": "1 colher de sopa", "required": false, "category": "dairy" },
+        { "name": "Sal", "quantity": "1 pitada", "required": false, "category": "condiments" }
+      ],
+      "steps": [
+        "Bata o ovo, o leite, a farinha e o sal no liquidificador ou com um batedor até ficar homogêneo.",
+        "Aqueça uma frigideira antiaderente levemente untada com manteiga.",
+        "Despeje uma concha pequena de massa e gire a frigideira para espalhar fino.",
+        "Doure por 1 minuto, vire com espátula e doure o outro lado.",
+        "Sirva com frutas frescas, queijo ou recheio de sua preferência."
+      ],
+      "diet": {
+        "hasGluten": true,
+        "hasLactose": true,
+        "hasMeat": false,
+        "hasEgg": true,
+        "vegetarian": true,
+        "vegan": false,
+        "usesFrying": false
+      }
+    },
+    {
+      "id": "tapioca_recheada",
+      "canonicalKey": "tapioca",
+      "title": "Tapioca Quentinha com Queijo e Manteiga",
+      "description": "Tapioca típica do Nordeste, rápida, crocante por fora e macia por dentro.",
+      "prepTimeMinutes": 8,
+      "difficulty": "Fácil",
+      "servings": 1,
+      "servingsBucket": "1",
+      "category": "Café & Lanches",
+      "imageUrl": "https://images.unsplash.com/photo-1598142981504-20b784a92357?w=600&auto=format&fit=crop&q=80",
+      "caloriesPerServing": 190,
+      "tags": ["Sem Glúten", "Rápido", "Típico"],
+      "ingredients": [
+        { "name": "Goma de Tapioca", "quantity": "4 colheres de sopa", "required": true, "category": "pantry" },
+        { "name": "Queijo Muçarela", "quantity": "2 fatias", "required": true, "category": "dairy" },
+        { "name": "Manteiga", "quantity": "1 colher de chá", "required": false, "category": "dairy" }
+      ],
+      "steps": [
+        "Peneire a goma de tapioca diretamente em uma frigideira fria ou levemente aquecida.",
+        "Espalhe formando um disco uniforme com o auxílio de uma colher.",
+        "Ligue o fogo médio e deixe unir por cerca de 1 a 2 minutos até soltar da borda.",
+        "Coloque as fatias de queijo em uma metade, passe um toque de manteiga, dobre e deixe o queijo derreter."
+      ],
+      "diet": {
+        "hasGluten": false,
+        "hasLactose": true,
+        "hasMeat": false,
+        "hasEgg": false,
+        "vegetarian": true,
+        "vegan": false,
+        "usesFrying": false
+      }
+    },
+    {
+      "id": "creme_abacate",
+      "canonicalKey": "creme_abacate",
+      "title": "Creme de Abacate com Limão",
+      "description": "Sobremesa ou lanche refrescante, aveludado e cheio de gorduras boas.",
+      "prepTimeMinutes": 5,
+      "difficulty": "Fácil",
+      "servings": 2,
+      "servingsBucket": "2",
+      "category": "Sobremesas",
+      "imageUrl": "https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=600&auto=format&fit=crop&q=80",
+      "caloriesPerServing": 160,
+      "tags": ["Sem Glúten", "Rápido", "Vegano"],
+      "ingredients": [
+        { "name": "Abacate", "quantity": "1 unidade madura", "required": true, "category": "fruits" },
+        { "name": "Limão", "quantity": "1 unidade espremida", "required": true, "category": "fruits" },
+        { "name": "Açúcar", "quantity": "2 colheres de sopa", "required": false, "category": "pantry" },
+        { "name": "Leite Integral", "quantity": "50ml", "required": false, "category": "dairy" }
+      ],
+      "steps": [
+        "Retire a polpa do abacate maduro com uma colher.",
+        "Coloque no liquidificador ou mixer junto com o suco de limão e o açúcar (ou mel).",
+        "Bata até obter um creme sedoso e brilhante.",
+        "Leve à geladeira por 15 minutos antes de servir bem gelado."
+      ],
+      "diet": {
+        "hasGluten": false,
+        "hasLactose": false,
+        "hasMeat": false,
+        "hasEgg": false,
+        "vegetarian": true,
+        "vegan": true,
+        "usesFrying": false
+      }
+    }
+  ]
+}

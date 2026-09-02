@@ -35,31 +35,71 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [filterMatch, setFilterMatch] = useState<'all' | 'ready' | 'high'>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedDiet, setSelectedDiet] = useState<string>('all');
 
   const categories = [
     { id: 'all', label: 'Todas as Categorias' },
     { id: 'Café & Lanches', label: 'Café & Lanches' },
     { id: 'Almoço & Jantar', label: 'Almoço & Jantar' },
+    { id: 'Acompanhamentos', label: 'Acompanhamentos' },
     { id: 'Saladas', label: 'Saladas' },
-    { id: 'Sopas & Cremes', label: 'Sopas & Cremes' },
+    { id: 'Massas', label: 'Massas' },
+    { id: 'Sobremesas', label: 'Sobremesas' },
   ];
 
-  const filteredRecipes = recipes.filter((recipe) => {
-    const matchesSearch = 
-      recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      recipe.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      recipe.ingredients.some((ing) => ing.name.toLowerCase().includes(searchTerm.toLowerCase()));
+  const dietFilters = [
+    { id: 'all', label: 'Todas Dietas' },
+    { id: 'sem_gluten', label: 'Sem Glúten' },
+    { id: 'vegano', label: 'Vegano' },
+    { id: 'vegetariano', label: 'Vegetariano' },
+    { id: 'sem_lactose', label: 'Sem Lactose' },
+    { id: 'sem_frituras', label: 'Sem Frituras' },
+    { id: 'low_carb', label: 'Low Carb' },
+    { id: 'rico_em_proteina', label: 'Proteico' },
+  ];
 
-    const matchesCategory = selectedCategory === 'all' || recipe.category === selectedCategory;
+  const filteredRecipes = recipes
+    .filter((recipe) => {
+      const matchesSearch = 
+        recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        recipe.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        recipe.ingredients.some((ing) => ing.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
-    let matchesMatch = true;
-    if (filterMatch === 'ready') matchesMatch = recipe.isReadyToCook;
-    if (filterMatch === 'high') matchesMatch = recipe.matchPercentage >= 60;
+      const matchesCategory = selectedCategory === 'all' || recipe.category === selectedCategory;
 
-    return matchesSearch && matchesCategory && matchesMatch;
-  });
+      let matchesDiet = true;
+      if (selectedDiet !== 'all' && recipe.diet) {
+        const d = recipe.diet;
+        if (selectedDiet === 'sem_gluten') matchesDiet = d.hasGluten === false;
+        else if (selectedDiet === 'vegano') matchesDiet = d.vegan === true;
+        else if (selectedDiet === 'vegetariano') matchesDiet = d.vegetarian === true || d.vegan === true || d.hasMeat === false;
+        else if (selectedDiet === 'sem_lactose') matchesDiet = d.hasLactose === false;
+        else if (selectedDiet === 'sem_frituras') matchesDiet = d.usesFrying !== true;
+        else if (selectedDiet === 'low_carb') matchesDiet = d.lowCarb === true;
+        else if (selectedDiet === 'rico_em_proteina') matchesDiet = d.highProtein === true;
+      }
+
+      let matchesMatch = true;
+      if (filterMatch === 'ready') matchesMatch = recipe.isReadyToCook;
+      if (filterMatch === 'high') matchesMatch = recipe.matchPercentage >= 60;
+
+      return matchesSearch && matchesCategory && matchesDiet && matchesMatch;
+    })
+    .sort((a, b) => {
+      // 1. isReadyToCook desc (Prontas primeiro)
+      if (a.isReadyToCook !== b.isReadyToCook) {
+        return a.isReadyToCook ? -1 : 1;
+      }
+      // 2. matchPercentage desc
+      if (b.matchPercentage !== a.matchPercentage) {
+        return b.matchPercentage - a.matchPercentage;
+      }
+      // 3. title asc (ordem alfabética)
+      return a.title.localeCompare(b.title, 'pt-BR');
+    });
 
   const readyCount = recipes.filter((r) => r.isReadyToCook).length;
+  const almostReadyCount = recipes.filter((r) => !r.isReadyToCook && r.matchPercentage >= 60).length;
 
   return (
     <div className="space-y-6 pb-24 md:pb-10 text-emerald-100 text-left">
@@ -147,7 +187,7 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
                   : 'text-emerald-300/70 hover:text-white'
               }`}
             >
-              Prontas (100%)
+              Prontas ({readyCount})
             </button>
             <button
               onClick={() => setFilterMatch('high')}
@@ -157,7 +197,7 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
                   : 'text-emerald-300/70 hover:text-white'
               }`}
             >
-              Quase Prontas (≥60%)
+              Quase Prontas ({almostReadyCount})
             </button>
           </div>
         </div>
@@ -175,6 +215,24 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
               }`}
             >
               {cat.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Diet Pills */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none pt-1 border-t border-emerald-500/10">
+          <span className="text-[11px] font-bold text-emerald-400/80 uppercase tracking-wider whitespace-nowrap mr-1">Dieta:</span>
+          {dietFilters.map((diet) => (
+            <button
+              key={diet.id}
+              onClick={() => setSelectedDiet(diet.id)}
+              className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                selectedDiet === diet.id
+                  ? 'bg-emerald-400 text-stone-950 font-bold shadow-[0_0_10px_rgba(52,211,153,0.3)]'
+                  : 'bg-emerald-950/40 text-emerald-300/70 hover:text-emerald-100 hover:bg-emerald-900/40 border border-emerald-500/10'
+              }`}
+            >
+              {diet.label}
             </button>
           ))}
         </div>

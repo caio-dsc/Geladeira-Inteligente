@@ -82,15 +82,17 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onClick }) => {
 
           {/* Ingredients availability status */}
           <div className="mt-2.5 flex items-center justify-between text-xs">
-            {recipe.missingIngredients.length === 0 ? (
+            {recipe.isReadyToCook ? (
               <span className="text-emerald-400 font-bold flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                Tudo disponível na geladeira!
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                <span>Pronta para cozinhar!</span>
               </span>
             ) : (
-              <span className="text-amber-300/90 font-medium flex items-center gap-1.5">
+              <span className="text-amber-300/90 font-medium flex items-center gap-1.5 min-w-0" title={`Faltam: ${recipe.missingIngredients.join(', ')}`}>
                 <AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                Falta {recipe.missingIngredients.length} {recipe.missingIngredients.length === 1 ? 'item' : 'itens'}
+                <span className="truncate">
+                  Falta: <strong className="text-amber-200 font-bold">{recipe.missingIngredients.slice(0, 2).join(', ')}{recipe.missingIngredients.length > 2 ? ` (+${recipe.missingIngredients.length - 2})` : ''}</strong>
+                </span>
               </span>
             )}
           </div>
