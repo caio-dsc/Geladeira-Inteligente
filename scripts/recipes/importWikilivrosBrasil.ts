@@ -1,6 +1,7 @@
 import * as cheerio from 'cheerio';
 import { Recipe, RecipeIngredient, ServingsBucket } from '../../src/types';
 import { computeDietFlags } from './dietHeuristics';
+import { inferCategoryFromTitle } from '../catalog/utils';
 
 const WIKI_API = 'https://pt.wikibooks.org/w/api.php';
 
@@ -242,32 +243,8 @@ export async function parseRecipeFromSections(title: string, thumbnail?: string)
   }
 
   // Deduce category
-  let category = 'Almoço & Jantar';
-  if (
-    lowerTitle.includes('bolo') ||
-    lowerTitle.includes('doce') ||
-    lowerTitle.includes('pudim') ||
-    lowerTitle.includes('torta doce') ||
-    lowerTitle.includes('calda') ||
-    lowerTitle.includes('geleia') ||
-    lowerTitle.includes('brigadeiro')
-  ) {
-    category = 'Sobremesas';
-  } else if (lowerTitle.includes('salada')) {
-    category = 'Saladas';
-  } else if (lowerTitle.includes('sopa') || lowerTitle.includes('creme') || lowerTitle.includes('caldo')) {
-    category = 'Sopas & Cremes';
-  } else if (
-    lowerTitle.includes('arroz') ||
-    lowerTitle.includes('farofa') ||
-    lowerTitle.includes('pure') ||
-    lowerTitle.includes('molho') ||
-    lowerTitle.includes('mandioca frita')
-  ) {
-    category = 'Acompanhamentos';
-  } else if (lowerTitle.includes('macarrao') || lowerTitle.includes('lasanha') || lowerTitle.includes('nhoque') || lowerTitle.includes('massa')) {
-    category = 'Massas';
-  }
+  const titleClean = cleanTitle;
+  const category = inferCategoryFromTitle(titleClean);
 
   const diet = computeDietFlags(
     ingredientsClean.map((i) => i.name),
@@ -282,7 +259,7 @@ export async function parseRecipeFromSections(title: string, thumbnail?: string)
   return {
     id: `wikilivros_${canonicalKeyFromTitle(cleanTitle)}`,
     title: cleanTitle,
-    description: `Receita tradicional brasileira do Wikilivros • ${category}`,
+    description: `Receita brasileira do Wikilivros • ${category}`,
     prepTimeMinutes: Math.min(90, Math.max(15, stepsClean.length * 8 + ingredientsClean.length * 2)),
     difficulty: ingredientsClean.length > 8 || stepsClean.length > 6 ? 'Médio' : 'Fácil',
     servings,

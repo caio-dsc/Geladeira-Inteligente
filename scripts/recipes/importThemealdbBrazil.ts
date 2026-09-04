@@ -1,4 +1,6 @@
 import { db } from './firebaseAdmin';
+import { translateIngredient } from '../catalog/ingredientDictionary';
+import { inferCategoryFromTitle, mapToAppCategory } from '../catalog/utils';
 
 const API_BASE = 'https://www.themealdb.com/api/json/v1/1';
 
@@ -30,12 +32,17 @@ const difficultyFromHeuristics = (ingredientCount: number, stepCount: number) =>
 };
 
 function extractIngredients(meal: MealDetail) {
-  const ingredients: { name: string; quantity: string; required: boolean }[] = [];
+  const ingredients: { name: string; nameOriginal?: string; quantity: string; required: boolean }[] = [];
   for (let i = 1; i <= 20; i++) {
     const ing = (meal[`strIngredient${i}`] || '').trim();
     const meas = (meal[`strMeasure${i}`] || '').trim();
     if (!ing) continue;
-    ingredients.push({ name: ing, quantity: meas || 'a gosto', required: true });
+    ingredients.push({
+      name: translateIngredient(ing),
+      nameOriginal: ing,
+      quantity: meas || 'a gosto',
+      required: true,
+    });
   }
   return ingredients;
 }
@@ -129,14 +136,21 @@ export async function main() {
     );
 
     const servings = 2; // TheMealDB V1 geralmente não traz servings; definimos padrão
+    const title = meal.strMeal;
+    const catFromApi = mapToAppCategory(meal.strCategory);
+    const category =
+      catFromApi === 'Outros' || /miscellaneous|side/i.test(meal.strCategory || '')
+        ? inferCategoryFromTitle(title)
+        : catFromApi;
+
     const recipe = {
       title: meal.strMeal,
-      description: `${meal.strCategory || 'Receita'} • ${meal.strArea || 'Brazilian'}`,
+      description: `${meal.strCategory || 'Receita'} • ${category}`,
       prepTimeMinutes: 30,
       difficulty: difficultyFromHeuristics(ingredients.length, steps.length),
       servings,
       servingsBucket: servingsBucketFromServings(servings),
-      category: 'Almoço & Jantar',
+      category,
       imageUrl: (meal.strMealThumb || s.strMealThumb) ? `${meal.strMealThumb || s.strMealThumb}/medium` : '',
       ingredients,
       steps,

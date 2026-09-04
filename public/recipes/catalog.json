@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-02T02:41:55.539Z",
+  "generatedAt": "2026-09-04T02:04:48.586Z",
   "total": 23,
   "recipes": [
     {
@@ -644,7 +644,7 @@
     {
       "id": "themealdb_52834",
       "title": "Strogonoff",
-      "description": "Beef • Russian",
+      "description": "Beef • Almoço & Jantar",
       "prepTimeMinutes": 35,
       "difficulty": "Fácil",
       "servings": 2,
@@ -653,57 +653,68 @@
       "imageUrl": "https://www.themealdb.com/images/media/meals/svprys1511176755.jpg/medium",
       "ingredients": [
         {
-          "name": "Olive Oil",
+          "name": "Azeite",
+          "nameOriginal": "Olive Oil",
           "quantity": "1 tbls",
           "required": true
         },
         {
-          "name": "Onions",
+          "name": "Cebola",
+          "nameOriginal": "Onions",
           "quantity": "1",
           "required": true
         },
         {
-          "name": "Garlic",
+          "name": "Alho",
+          "nameOriginal": "Garlic",
           "quantity": "1 clove",
           "required": true
         },
         {
-          "name": "Butter",
+          "name": "Manteiga",
+          "nameOriginal": "Butter",
           "quantity": "1 tbsp",
           "required": true
         },
         {
-          "name": "Mushrooms",
+          "name": "Cogumelo",
+          "nameOriginal": "Mushrooms",
           "quantity": "250g",
           "required": true
         },
         {
-          "name": "Beef Fillet",
+          "name": "Carne bovina",
+          "nameOriginal": "Beef Fillet",
           "quantity": "500g",
           "required": true
         },
         {
-          "name": "Plain Flour",
+          "name": "Farinha de trigo",
+          "nameOriginal": "Plain Flour",
           "quantity": "1tbsp",
           "required": true
         },
         {
           "name": "Creme Fraiche",
+          "nameOriginal": "Creme Fraiche",
           "quantity": "150g",
           "required": true
         },
         {
-          "name": "English Mustard",
+          "name": "Mostarda",
+          "nameOriginal": "English Mustard",
           "quantity": "1 tbsp",
           "required": true
         },
         {
-          "name": "Beef Stock",
+          "name": "Caldo de carne",
+          "nameOriginal": "Beef Stock",
           "quantity": "100ml",
           "required": true
         },
         {
-          "name": "Parsley",
+          "name": "Salsinha",
+          "nameOriginal": "Parsley",
           "quantity": "Topping",
           "required": true
         }
@@ -761,7 +772,7 @@
     {
       "id": "themealdb_53481",
       "title": "Moqueca de peixe e camarão",
-      "description": "Seafood • Culinária Brasileira",
+      "description": "Seafood • Almoço & Jantar",
       "prepTimeMinutes": 35,
       "difficulty": "Fácil",
       "servings": 2,
@@ -921,7 +932,7 @@
     {
       "id": "themealdb_53482",
       "title": "Black bean & meat stew - feijoada",
-      "description": "Beef • Culinária Brasileira",
+      "description": "Beef • Almoço & Jantar",
       "prepTimeMinutes": 35,
       "difficulty": "Médio",
       "servings": 2,
@@ -930,52 +941,62 @@
       "imageUrl": "https://www.themealdb.com/images/media/meals/xrxz7h1782592711.jpg/medium",
       "ingredients": [
         {
-          "name": "Black Beans",
+          "name": "Feijão preto",
+          "nameOriginal": "Black Beans",
           "quantity": "250g",
           "required": true
         },
         {
           "name": "Bacon",
+          "nameOriginal": "Bacon",
           "quantity": "100g",
           "required": true
         },
         {
-          "name": "Pork Back Ribs",
+          "name": "Carne de porco",
+          "nameOriginal": "Pork Back Ribs",
           "quantity": "500g",
           "required": true
         },
         {
-          "name": "Chorizo",
+          "name": "Linguiça calabresa",
+          "nameOriginal": "Chorizo",
           "quantity": "3",
           "required": true
         },
         {
-          "name": "Pork Shoulder",
+          "name": "Carne de porco",
+          "nameOriginal": "Pork Shoulder",
           "quantity": "500g",
           "required": true
         },
         {
-          "name": "Onion",
+          "name": "Cebola",
+          "nameOriginal": "Onion",
           "quantity": "3 chopped",
           "required": true
         },
         {
-          "name": "Garlic",
+          "name": "Alho",
+          "nameOriginal": "Garlic",
           "quantity": "4 Cloves Chopped",
           "required": true
         },
         {
-          "name": "Chilli Flakes",
+          "name": "Pimenta",
+          "nameOriginal": "Chilli Flakes",
           "quantity": "Pinch",
           "required": true
         },
         {
-          "name": "Oil",
+          "name": "Óleo",
+          "nameOriginal": "Oil",
           "quantity": "Drizzle",
           "required": true
         },
         {
-          "name": "Bay Leaf",
+          "name": "Folha de louro",
+          "nameOriginal": "Bay Leaf",
           "quantity": "2",
           "required": true
         }
@@ -1025,12 +1046,12 @@
     {
       "id": "wikilivros_acaraje",
       "title": "Acarajé",
-      "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
+      "description": "Receita brasileira do Wikilivros • Café & Lanches",
       "prepTimeMinutes": 90,
       "difficulty": "Médio",
       "servings": 4,
       "servingsBucket": "3-4",
-      "category": "Almoço & Jantar",
+      "category": "Café & Lanches",
       "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
       "ingredients": [
         {
@@ -1089,7 +1110,7 @@
         "Coloque o camarão seco dentro do acarajé e feche. Sirva a seguir."
       ],
       "tags": [
-        "Almoço & Jantar",
+        "Café & Lanches",
         "Tradicional",
         "Wikilivros"
       ],
@@ -1123,7 +1144,7 @@
     {
       "id": "wikilivros_barreado",
       "title": "Barreado",
-      "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
+      "description": "Receita brasileira do Wikilivros • Almoço & Jantar",
       "prepTimeMinutes": 60,
       "difficulty": "Médio",
       "servings": 4,
@@ -1224,7 +1245,7 @@
     {
       "id": "wikilivros_bolo-de-pinhao",
       "title": "Bolo de Pinhão",
-      "description": "Receita tradicional brasileira do Wikilivros • Sobremesas",
+      "description": "Receita brasileira do Wikilivros • Sobremesas",
       "prepTimeMinutes": 50,
       "difficulty": "Médio",
       "servings": 4,
@@ -1319,12 +1340,12 @@
     {
       "id": "wikilivros_cuscuz-de-mandipuva",
       "title": "Cuscuz de Mandipuva",
-      "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
+      "description": "Receita brasileira do Wikilivros • Café & Lanches",
       "prepTimeMinutes": 66,
       "difficulty": "Médio",
       "servings": 4,
       "servingsBucket": "3-4",
-      "category": "Almoço & Jantar",
+      "category": "Café & Lanches",
       "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
       "ingredients": [
         {
@@ -1363,7 +1384,7 @@
         "Deixe cozinhar de 25 a 30 minutos e estará pronto."
       ],
       "tags": [
-        "Almoço & Jantar",
+        "Café & Lanches",
         "Tradicional",
         "Wikilivros"
       ],
@@ -1397,7 +1418,7 @@
     {
       "id": "wikilivros_peixe-na-telha",
       "title": "Peixe na telha",
-      "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
+      "description": "Receita brasileira do Wikilivros • Almoço & Jantar",
       "prepTimeMinutes": 90,
       "difficulty": "Médio",
       "servings": 4,
@@ -1535,7 +1556,7 @@
     {
       "id": "wikilivros_vatapa",
       "title": "Vatapá",
-      "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
+      "description": "Receita brasileira do Wikilivros • Almoço & Jantar",
       "prepTimeMinutes": 56,
       "difficulty": "Médio",
       "servings": 4,
@@ -1645,7 +1666,7 @@
     {
       "id": "wikilivros_estrogonofe-de-frango",
       "title": "Strogonoff de frango",
-      "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
+      "description": "Receita brasileira do Wikilivros • Almoço & Jantar",
       "prepTimeMinutes": 60,
       "difficulty": "Médio",
       "servings": 4,
@@ -1753,7 +1774,7 @@
     {
       "id": "wikilivros_estrogonofe-de-legumes",
       "title": "Strogonoff de legumes",
-      "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
+      "description": "Receita brasileira do Wikilivros • Almoço & Jantar",
       "prepTimeMinutes": 42,
       "difficulty": "Médio",
       "servings": 4,
@@ -1847,12 +1868,12 @@
     {
       "id": "wikilivros_coxinha",
       "title": "Coxinha de frango com batata",
-      "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
+      "description": "Receita brasileira do Wikilivros • Café & Lanches",
       "prepTimeMinutes": 70,
       "difficulty": "Médio",
       "servings": 4,
       "servingsBucket": "3-4",
-      "category": "Almoço & Jantar",
+      "category": "Café & Lanches",
       "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
       "ingredients": [
         {
@@ -1939,9 +1960,10 @@
         "Frite em óleo bem quente e retire com uma escumadeira."
       ],
       "tags": [
-        "Almoço & Jantar",
+        "Café & Lanches",
         "Tradicional",
-        "Wikilivros"
+        "Wikilivros",
+        "Almoço & Jantar"
       ],
       "caloriesPerServing": 725,
       "canonicalKey": "coxinha",
@@ -1987,7 +2009,7 @@
     {
       "id": "wikilivros_brigadeiro",
       "title": "Brigadeiro",
-      "description": "Receita tradicional brasileira do Wikilivros • Sobremesas",
+      "description": "Receita brasileira do Wikilivros • Sobremesas",
       "prepTimeMinutes": 48,
       "difficulty": "Fácil",
       "servings": 4,
@@ -2049,7 +2071,8 @@
       "tags": [
         "Sobremesas",
         "Tradicional",
-        "Wikilivros"
+        "Wikilivros",
+        "Bebidas"
       ],
       "caloriesPerServing": 340,
       "canonicalKey": "brigadeiro",
@@ -2102,7 +2125,7 @@
     {
       "id": "wikilivros_feijoada",
       "title": "Feijoada brasileira completa",
-      "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
+      "description": "Receita brasileira do Wikilivros • Almoço & Jantar",
       "prepTimeMinutes": 90,
       "difficulty": "Médio",
       "servings": 4,
@@ -2268,12 +2291,12 @@
     {
       "id": "wikilivros_pao-de-queijo",
       "title": "Pão de queijo",
-      "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
+      "description": "Receita brasileira do Wikilivros • Café & Lanches",
       "prepTimeMinutes": 46,
       "difficulty": "Fácil",
       "servings": 4,
       "servingsBucket": "3-4",
-      "category": "Almoço & Jantar",
+      "category": "Café & Lanches",
       "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
       "ingredients": [
         {
@@ -2333,7 +2356,7 @@
         "Leve ao forno pré-aquecido. Quando crescer e corar, abaixe o forno e deixe secar um pouco ainda dentro do forno."
       ],
       "tags": [
-        "Almoço & Jantar",
+        "Café & Lanches",
         "Tradicional",
         "Wikilivros"
       ],
@@ -2437,12 +2460,12 @@
     {
       "id": "wikilivros_abacaxi-cristalizado",
       "title": "Abacaxi cristalizado",
-      "description": "Receita tradicional brasileira do Wikilivros • Almoço & Jantar",
+      "description": "Receita brasileira do Wikilivros • Outros",
       "prepTimeMinutes": 72,
       "difficulty": "Médio",
       "servings": 4,
       "servingsBucket": "3-4",
-      "category": "Almoço & Jantar",
+      "category": "Outros",
       "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
       "ingredients": [
         {
@@ -2477,7 +2500,7 @@
         "Tirar as fatias e, com uma faca, retirar o miolo e deixar escorrer. Reservar."
       ],
       "tags": [
-        "Almoço & Jantar",
+        "Outros",
         "Tradicional",
         "Wikilivros"
       ],

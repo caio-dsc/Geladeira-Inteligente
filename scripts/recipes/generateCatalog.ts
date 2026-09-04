@@ -3,6 +3,8 @@ import path from 'path';
 import { Recipe, RecipeIngredient, RecipeSource, ServingsBucket } from '../../src/types';
 import { computeDietFlags } from './dietHeuristics';
 import { fetchWikilivrosBrazilianRecipes, canonicalKeyFromTitle, normalizeText } from './importWikilivrosBrasil';
+import { translateIngredient } from '../catalog/ingredientDictionary';
+import { inferCategoryFromTitle, mapToAppCategory } from '../catalog/utils';
 
 const MEALDB_BASE = 'https://www.themealdb.com/api/json/v1/1';
 
@@ -30,8 +32,10 @@ function extractTheMealDBIngredients(meal: any): RecipeIngredient[] {
     const ing = (meal[`strIngredient${i}`] || '').trim();
     const meas = (meal[`strMeasure${i}`] || '').trim();
     if (!ing) continue;
+    const translatedName = translateIngredient(ing);
     ingredients.push({
-      name: ing,
+      name: translatedName,
+      nameOriginal: ing,
       quantity: meas || 'a gosto',
       required: true,
     });
@@ -47,7 +51,7 @@ function extractTheMealDBSteps(meal: any): string[] {
   return txt.split('.').map((s: string) => s.trim()).filter((s: string) => s.length > 5);
 }
 
-async function fetchTheMealDBBrazilian(): Promise<Recipe[]> {
+async function importTheMealDBBrazilian(): Promise<Recipe[]> {
   const recipes: Recipe[] = [];
   console.log('TheMealDB: Buscando receitas brasileiras e pratos populares...');
 
@@ -105,16 +109,22 @@ async function fetchTheMealDBBrazilian(): Promise<Recipe[]> {
 
       const servings = 2;
       const key = canonicalKeyFromTitle(meal.strMeal);
+      const title = meal.strMeal;
+      const catFromApi = mapToAppCategory(meal.strCategory);
+      const category =
+        catFromApi === 'Outros' || /miscellaneous|side/i.test(meal.strCategory || '')
+          ? inferCategoryFromTitle(title)
+          : catFromApi;
 
       const recipe: Recipe = {
         id: `themealdb_${meal.idMeal}`,
         title: meal.strMeal,
-        description: `${meal.strCategory || 'Prato Tradicional'} • ${meal.strArea || 'Culinária Brasileira'}`,
+        description: `${meal.strCategory || 'Prato Tradicional'} • ${category}`,
         prepTimeMinutes: 35,
         difficulty: difficultyFromHeuristics(ingredients.length, steps.length),
         servings,
         servingsBucket: servingsBucketFromServings(servings),
-        category: 'Almoço & Jantar',
+        category,
         imageUrl: imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80',
         ingredients,
         steps,
@@ -142,8 +152,23 @@ async function fetchTheMealDBBrazilian(): Promise<Recipe[]> {
     }
   }
 
+  const untranslated = new Set<string>();
+  for (const r of recipes) {
+    for (const ing of r.ingredients) {
+      if (ing.name === ing.nameOriginal && /^[a-z\s-]+$/i.test(ing.nameOriginal)) {
+        untranslated.add(ing.nameOriginal);
+      }
+    }
+  }
+  if (untranslated.size) {
+    console.log('\n[TheMealDB] Ingredientes SEM tradução (adicione ao dicionário):');
+    console.log([...untranslated].sort().join(', '), '\n');
+  }
+
   return recipes;
 }
+
+const fetchTheMealDBBrazilian = importTheMealDBBrazilian;
 
 // Catálogo base de referência brasileiro de alta qualidade
 const FOUNDATION_RECIPES: Recipe[] = [

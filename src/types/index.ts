@@ -31,6 +31,7 @@ export interface FoodItem {
 
 export interface RecipeIngredient {
   name: string;
+  nameOriginal?: string;
   quantity: string;
   required: boolean;
   category?: CategoryType;
