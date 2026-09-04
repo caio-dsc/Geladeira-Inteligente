@@ -167,3 +167,36 @@ export function computeDietFlags(
   };
 }
 
+export type CanonicalDietaryRestriction =
+  | 'Sem Frituras'
+  | 'Vegetariano'
+  | 'Sem Glúten'
+  | 'Sem Lactose'
+  | 'Low Carb'
+  | 'Vegano'
+  | 'Rico em Proteína';
+
+export const CANONICAL_DIETARY_RESTRICTIONS: readonly CanonicalDietaryRestriction[] = [
+  'Sem Frituras',
+  'Vegetariano',
+  'Sem Glúten',
+  'Sem Lactose',
+  'Low Carb',
+  'Vegano',
+  'Rico em Proteína',
+] as const;
+
+export function getDietaryRestrictionsFromFlags(diet?: DietFlags | null): CanonicalDietaryRestriction[] {
+  if (!diet) return [];
+  const list: CanonicalDietaryRestriction[] = [];
+  if (diet.usesFrying === false) list.push('Sem Frituras');
+  if (diet.vegetarian || (!diet.hasMeat && diet.vegetarian !== false)) list.push('Vegetariano');
+  if (diet.hasGluten === false) list.push('Sem Glúten');
+  if (diet.hasLactose === false) list.push('Sem Lactose');
+  if (diet.lowCarb === true) list.push('Low Carb');
+  if (diet.vegan === true) list.push('Vegano');
+  if (diet.highProtein === true) list.push('Rico em Proteína');
+  return list;
+}
+
+

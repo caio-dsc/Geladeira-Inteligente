@@ -88,8 +88,27 @@ export interface RecipeMatch extends Recipe {
   isReadyToCook: boolean;
 }
 
+export type CanonicalDietaryRestriction =
+  | 'Sem Frituras'
+  | 'Vegetariano'
+  | 'Sem Glúten'
+  | 'Sem Lactose'
+  | 'Low Carb'
+  | 'Vegano'
+  | 'Rico em Proteína';
+
+export const CANONICAL_DIETARY_RESTRICTIONS: readonly CanonicalDietaryRestriction[] = [
+  'Sem Frituras',
+  'Vegetariano',
+  'Sem Glúten',
+  'Sem Lactose',
+  'Low Carb',
+  'Vegano',
+  'Rico em Proteína',
+] as const;
+
 export interface UserPreferences {
-  dietaryRestrictions: string[];
+  dietaryRestrictions: (CanonicalDietaryRestriction | string)[];
   cookingLevel: 'Iniciante' | 'Intermediário' | 'Chef';
   allergies: string[];
   defaultServings: number;

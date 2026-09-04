@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-04T02:04:48.586Z",
+  "generatedAt": "2026-09-04T10:56:10.644Z",
   "total": 23,
   "recipes": [
     {
@@ -74,7 +74,11 @@
         "Prato Típico",
         "Carnes",
         "Tradicional",
-        "Fim de Semana"
+        "Fim de Semana",
+        "Sem Glúten",
+        "Sem Lactose",
+        "Sem Frituras",
+        "Rico em Proteína"
       ],
       "caloriesPerServing": 520,
       "canonicalKey": "feijoada-completa-tradicional",
@@ -159,10 +163,14 @@
         "Asse em forno pré-aquecido a 200°C por 25 a 30 minutos até dourarem."
       ],
       "tags": [
-        "Sem Glúten",
         "Mineiro",
         "Café da Manhã",
-        "Lanche"
+        "Lanche",
+        "Vegetariano",
+        "Sem Glúten",
+        "Sem Frituras",
+        "Low Carb",
+        "Rico em Proteína"
       ],
       "caloriesPerServing": 240,
       "canonicalKey": "pao-de-queijo-mineiro",
@@ -176,8 +184,8 @@
         "hasEgg": true,
         "vegetarian": true,
         "vegan": false,
-        "lowCarb": false,
-        "highProtein": false,
+        "lowCarb": true,
+        "highProtein": true,
         "usesFrying": false
       },
       "sources": [
@@ -264,10 +272,11 @@
         "Finalize salpicando coentro fresco picado e sirva bem quente com arroz branco."
       ],
       "tags": [
-        "Sem Glúten",
-        "Sem Lactose",
         "Frutos do Mar",
-        "Baiana"
+        "Baiana",
+        "Sem Glúten",
+        "Sem Frituras",
+        "Rico em Proteína"
       ],
       "caloriesPerServing": 350,
       "canonicalKey": "moqueca-baiana-de-peixe",
@@ -276,12 +285,12 @@
       "originCountry": "Brazil",
       "diet": {
         "hasMeat": true,
-        "hasLactose": false,
+        "hasLactose": true,
         "hasGluten": false,
         "hasEgg": false,
         "vegetarian": false,
         "vegan": false,
-        "lowCarb": true,
+        "lowCarb": false,
         "highProtein": true,
         "usesFrying": false
       },
@@ -352,10 +361,12 @@
       ],
       "tags": [
         "Rápido",
-        "Low Carb",
-        "Sem Glúten",
         "Proteico",
-        "Vegetariano"
+        "Vegetariano",
+        "Sem Glúten",
+        "Sem Frituras",
+        "Low Carb",
+        "Rico em Proteína"
       ],
       "caloriesPerServing": 220,
       "canonicalKey": "omelete-rapido-com-legumes",
@@ -430,8 +441,10 @@
       "tags": [
         "Sobremesa",
         "Doce Típico",
+        "Vegetariano",
         "Sem Glúten",
-        "Vegetariano"
+        "Sem Frituras",
+        "Low Carb"
       ],
       "caloriesPerServing": 180,
       "canonicalKey": "brigadeiro-gourmet-brasileiro",
@@ -445,7 +458,7 @@
         "hasEgg": false,
         "vegetarian": true,
         "vegan": false,
-        "lowCarb": false,
+        "lowCarb": true,
         "highProtein": false,
         "usesFrying": false
       },
@@ -523,9 +536,11 @@
       ],
       "tags": [
         "Nordestino",
-        "Sem Glúten",
         "Prato Único",
-        "Carnes"
+        "Carnes",
+        "Sem Glúten",
+        "Sem Frituras",
+        "Rico em Proteína"
       ],
       "caloriesPerServing": 480,
       "canonicalKey": "baiao-de-dois-cearense",
@@ -608,11 +623,12 @@
         "Regue a salada com o molho imediatamente antes de servir para manter a crocância."
       ],
       "tags": [
+        "Leve",
         "Vegano",
         "Sem Glúten",
         "Sem Lactose",
-        "Low Carb",
-        "Leve"
+        "Sem Frituras",
+        "Low Carb"
       ],
       "caloriesPerServing": 130,
       "canonicalKey": "salada-tropical-completa",
@@ -729,10 +745,10 @@
       ],
       "tags": [
         "Beef",
-        "TheMealDB",
         "Almoço & Jantar",
         "Tradicional",
-        "Wikilivros"
+        "Wikilivros",
+        "Rico em Proteína"
       ],
       "caloriesPerServing": 380,
       "canonicalKey": "estrogonofe",
@@ -868,10 +884,12 @@
       ],
       "tags": [
         "Seafood",
-        "TheMealDB",
         "Almoço & Jantar",
         "Tradicional",
-        "Wikilivros"
+        "Wikilivros",
+        "Vegetariano",
+        "Sem Glúten",
+        "Sem Frituras"
       ],
       "caloriesPerServing": 380,
       "canonicalKey": "moqueca-baiana",
@@ -885,14 +903,14 @@
       "originArea": "Brazilian",
       "originCountry": "Brazil",
       "diet": {
-        "hasMeat": true,
+        "hasMeat": false,
         "hasLactose": true,
         "hasGluten": false,
         "hasEgg": false,
-        "vegetarian": false,
+        "vegetarian": true,
         "vegan": false,
-        "lowCarb": true,
-        "highProtein": true,
+        "lowCarb": false,
+        "highProtein": false,
         "usesFrying": false
       },
       "sources": [
@@ -1013,7 +1031,10 @@
       ],
       "tags": [
         "Beef",
-        "TheMealDB"
+        "Sem Glúten",
+        "Sem Lactose",
+        "Sem Frituras",
+        "Rico em Proteína"
       ],
       "caloriesPerServing": 380,
       "canonicalKey": "black-bean-meat-stew-feijoada",
@@ -1031,7 +1052,7 @@
         "vegan": false,
         "lowCarb": false,
         "highProtein": true,
-        "usesFrying": true
+        "usesFrying": false
       },
       "sources": [
         {
@@ -1112,7 +1133,10 @@
       "tags": [
         "Café & Lanches",
         "Tradicional",
-        "Wikilivros"
+        "Wikilivros",
+        "Sem Glúten",
+        "Sem Lactose",
+        "Rico em Proteína"
       ],
       "caloriesPerServing": 480,
       "canonicalKey": "acaraje",
@@ -1213,7 +1237,12 @@
       "tags": [
         "Almoço & Jantar",
         "Tradicional",
-        "Wikilivros"
+        "Wikilivros",
+        "Sem Glúten",
+        "Sem Lactose",
+        "Sem Frituras",
+        "Low Carb",
+        "Rico em Proteína"
       ],
       "caloriesPerServing": 550,
       "canonicalKey": "barreado",
@@ -1308,7 +1337,9 @@
       "tags": [
         "Sobremesas",
         "Tradicional",
-        "Wikilivros"
+        "Wikilivros",
+        "Vegetariano",
+        "Sem Frituras"
       ],
       "caloriesPerServing": 515,
       "canonicalKey": "bolo-de-pinhao",
@@ -1322,7 +1353,7 @@
         "vegetarian": true,
         "vegan": false,
         "lowCarb": false,
-        "highProtein": true,
+        "highProtein": false,
         "usesFrying": false
       },
       "sources": [
@@ -1386,7 +1417,11 @@
       "tags": [
         "Café & Lanches",
         "Tradicional",
-        "Wikilivros"
+        "Wikilivros",
+        "Vegano",
+        "Sem Glúten",
+        "Sem Lactose",
+        "Sem Frituras"
       ],
       "caloriesPerServing": 375,
       "canonicalKey": "cuscuz-de-mandipuva",
@@ -1524,7 +1559,8 @@
       "tags": [
         "Almoço & Jantar",
         "Tradicional",
-        "Wikilivros"
+        "Wikilivros",
+        "Rico em Proteína"
       ],
       "caloriesPerServing": 795,
       "canonicalKey": "peixe-na-telha",
@@ -1533,7 +1569,7 @@
       "diet": {
         "hasMeat": true,
         "hasLactose": true,
-        "hasGluten": false,
+        "hasGluten": true,
         "hasEgg": false,
         "vegetarian": false,
         "vegan": false,
@@ -1634,7 +1670,9 @@
       "tags": [
         "Almoço & Jantar",
         "Tradicional",
-        "Wikilivros"
+        "Wikilivros",
+        "Sem Frituras",
+        "Rico em Proteína"
       ],
       "caloriesPerServing": 620,
       "canonicalKey": "vatapa",
@@ -1735,7 +1773,9 @@
       "tags": [
         "Almoço & Jantar",
         "Tradicional",
-        "Wikilivros"
+        "Wikilivros",
+        "Sem Glúten",
+        "Rico em Proteína"
       ],
       "caloriesPerServing": 550,
       "canonicalKey": "estrogonofe-de-frango",
@@ -1836,21 +1876,22 @@
       "tags": [
         "Almoço & Jantar",
         "Tradicional",
-        "Wikilivros"
+        "Wikilivros",
+        "Rico em Proteína"
       ],
       "caloriesPerServing": 515,
       "canonicalKey": "estrogonofe-de-legumes",
       "originArea": "Brazilian",
       "originCountry": "Brazil",
       "diet": {
-        "hasMeat": false,
+        "hasMeat": true,
         "hasLactose": true,
         "hasGluten": true,
-        "hasEgg": true,
-        "vegetarian": true,
+        "hasEgg": false,
+        "vegetarian": false,
         "vegan": false,
         "lowCarb": false,
-        "highProtein": false,
+        "highProtein": true,
         "usesFrying": true
       },
       "sources": [
@@ -1963,7 +2004,8 @@
         "Café & Lanches",
         "Tradicional",
         "Wikilivros",
-        "Almoço & Jantar"
+        "Almoço & Jantar",
+        "Rico em Proteína"
       ],
       "caloriesPerServing": 725,
       "canonicalKey": "coxinha",
@@ -2072,7 +2114,11 @@
         "Sobremesas",
         "Tradicional",
         "Wikilivros",
-        "Bebidas"
+        "Bebidas",
+        "Vegetariano",
+        "Sem Glúten",
+        "Sem Frituras",
+        "Low Carb"
       ],
       "caloriesPerServing": 340,
       "canonicalKey": "brigadeiro",
@@ -2085,7 +2131,7 @@
         "hasEgg": false,
         "vegetarian": true,
         "vegan": false,
-        "lowCarb": false,
+        "lowCarb": true,
         "highProtein": false,
         "usesFrying": false
       },
@@ -2252,7 +2298,11 @@
       "tags": [
         "Almoço & Jantar",
         "Tradicional",
-        "Wikilivros"
+        "Wikilivros",
+        "Sem Glúten",
+        "Sem Lactose",
+        "Sem Frituras",
+        "Rico em Proteína"
       ],
       "caloriesPerServing": 935,
       "canonicalKey": "feijoada",
@@ -2267,7 +2317,7 @@
         "vegan": false,
         "lowCarb": false,
         "highProtein": true,
-        "usesFrying": true
+        "usesFrying": false
       },
       "sources": [
         {
@@ -2358,7 +2408,12 @@
       "tags": [
         "Café & Lanches",
         "Tradicional",
-        "Wikilivros"
+        "Wikilivros",
+        "Vegetariano",
+        "Sem Glúten",
+        "Sem Frituras",
+        "Low Carb",
+        "Rico em Proteína"
       ],
       "caloriesPerServing": 445,
       "canonicalKey": "pao-de-queijo",
@@ -2371,7 +2426,7 @@
         "hasEgg": true,
         "vegetarian": true,
         "vegan": false,
-        "lowCarb": false,
+        "lowCarb": true,
         "highProtein": true,
         "usesFrying": false
       },
@@ -2502,7 +2557,10 @@
       "tags": [
         "Outros",
         "Tradicional",
-        "Wikilivros"
+        "Wikilivros",
+        "Vegetariano",
+        "Sem Glúten",
+        "Sem Frituras"
       ],
       "caloriesPerServing": 340,
       "canonicalKey": "abacaxi-cristalizado",

@@ -119,51 +119,10 @@ class RecipeService implements IRecipeService {
     let matches = matchedList;
 
     // Filtro por preferências dietéticas do usuário
-    if (preferences?.dietaryRestrictions && preferences.dietaryRestrictions.length > 0) {
-      const prefs = preferences.dietaryRestrictions;
-
-      matches = matches.filter((recipe) => {
-        const d = recipe.diet;
-        if (!d) return true; // sem info de diet, mantém
-
-        for (const pref of prefs) {
-          const p = pref.toLowerCase().trim().replace(/[-_]/g, ' ').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-
-          // Sem Glúten
-          if (p === 'sem gluten' || p === 'gluten free') {
-            if (d.hasGluten === true) return false;
-          }
-          // Sem Lactose
-          else if (p === 'sem lactose' || p === 'lactose free') {
-            if (d.hasLactose === true) return false;
-          }
-          // Vegano
-          else if (p === 'vegano' || p === 'vegan') {
-            if (d.vegan !== true) return false;
-          }
-          // Vegetariano
-          else if (p === 'vegetariano' || p === 'vegetarian') {
-            if (d.hasMeat === true || (d.vegetarian === false && d.vegan !== true)) return false;
-          }
-          // Sem Frituras
-          else if (p === 'sem fritura' || p === 'sem frituras' || p === 'no frying') {
-            if (d.usesFrying === true) return false;
-          }
-          // Sem Carne
-          else if (p === 'sem carne' || p === 'no meat') {
-            if (d.hasMeat === true) return false;
-          }
-          // Low Carb
-          else if (p === 'low carb' || p === 'lowcarb') {
-            if (d.lowCarb === false) return false;
-          }
-          // Rico em Proteína
-          else if (p === 'rico em proteina' || p === 'high protein' || p === 'proteico') {
-            if (d.highProtein === false) return false;
-          }
-        }
-        return true;
-      });
+    if (preferences?.dietaryRestrictions?.length) {
+      matches = matches.filter((m) =>
+        this.matchesDietFilters((m as any).recipe ?? m, preferences.dietaryRestrictions!)
+      );
     }
 
     // Filtro por nível culinário
@@ -250,6 +209,42 @@ class RecipeService implements IRecipeService {
       matchPercentage,
       isReadyToCook: total > 0 && missingRequired.length === 0,
     };
+  }
+
+  private matchesDietFilters(recipe: Recipe, restrictions: string[]): boolean {
+    if (!restrictions?.length) return true;
+    const d = recipe.diet;
+    // se não tem diet, não esconde (evita sumir catálogo antigo)
+    if (!d) return true;
+
+    for (const pref of restrictions) {
+      switch (pref) {
+        case 'Vegetariano':
+          if (d.hasMeat === true || d.vegetarian === false) return false;
+          break;
+        case 'Vegano':
+          if (d.vegan !== true) return false;
+          break;
+        case 'Sem Glúten':
+          if (d.hasGluten === true) return false;
+          break;
+        case 'Sem Lactose':
+          if (d.hasLactose === true) return false;
+          break;
+        case 'Sem Frituras':
+          if (d.usesFrying === true) return false;
+          break;
+        case 'Low Carb':
+          if (d.lowCarb === false) return false;
+          break;
+        case 'Rico em Proteína':
+          if (d.highProtein !== true) return false;
+          break;
+        default:
+          break;
+      }
+    }
+    return true;
   }
 
   private normalizeString(str: string): string {

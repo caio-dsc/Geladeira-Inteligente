@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { Recipe, RecipeIngredient, RecipeSource, ServingsBucket } from '../../src/types';
-import { computeDietFlags } from './dietHeuristics';
+import { computeDietFlags } from '../catalog/dietHeuristics';
 import { fetchWikilivrosBrazilianRecipes, canonicalKeyFromTitle, normalizeText } from './importWikilivrosBrasil';
 import { translateIngredient } from '../catalog/ingredientDictionary';
 import { inferCategoryFromTitle, mapToAppCategory } from '../catalog/utils';
@@ -128,7 +128,16 @@ async function importTheMealDBBrazilian(): Promise<Recipe[]> {
         imageUrl: imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80',
         ingredients,
         steps,
-        tags: [meal.strCategory || 'Brasileira', 'TheMealDB'].filter(Boolean),
+        tags: [
+          meal.strCategory || 'Brasileira',
+          ...(diet.vegan ? ['Vegano'] : []),
+          ...(diet.vegetarian && !diet.vegan ? ['Vegetariano'] : []),
+          ...(diet.hasGluten === false ? ['Sem Glúten'] : []),
+          ...(diet.hasLactose === false ? ['Sem Lactose'] : []),
+          ...(diet.usesFrying === false ? ['Sem Frituras'] : []),
+          ...(diet.lowCarb ? ['Low Carb'] : []),
+          ...(diet.highProtein ? ['Rico em Proteína'] : []),
+        ],
         caloriesPerServing: 380,
         canonicalKey: key,
         aliases: [meal.strMeal],
@@ -656,10 +665,40 @@ export async function generateCatalog() {
     .map((r) => {
       const validIngredients = (r.ingredients || []).filter((i) => !isGarbage(i.name));
       const validSteps = (r.steps || []).filter((s) => !isGarbage(s));
+      const diet = computeDietFlags(
+        validIngredients.map((i) => i.name),
+        validSteps
+      );
+
+      const DIETARY_TAG_NAMES = new Set([
+        'Vegano',
+        'Vegetariano',
+        'Sem Glúten',
+        'Sem Lactose',
+        'Sem Frituras',
+        'Low Carb',
+        'Rico em Proteína',
+      ]);
+
+      const dietTags = [
+        ...(diet.vegan ? ['Vegano'] : []),
+        ...(diet.vegetarian && !diet.vegan ? ['Vegetariano'] : []),
+        ...(diet.hasGluten === false ? ['Sem Glúten'] : []),
+        ...(diet.hasLactose === false ? ['Sem Lactose'] : []),
+        ...(diet.usesFrying === false ? ['Sem Frituras'] : []),
+        ...(diet.lowCarb ? ['Low Carb'] : []),
+        ...(diet.highProtein ? ['Rico em Proteína'] : []),
+      ];
+
+      const cleanNonDietTags = (r.tags || []).filter((t) => !DIETARY_TAG_NAMES.has(t));
+      const tags = Array.from(new Set([...cleanNonDietTags, ...dietTags]));
+
       return {
         ...r,
         ingredients: validIngredients,
         steps: validSteps,
+        diet,
+        tags,
       };
     })
     .filter((r) => r.ingredients.length >= 3 && r.steps.length >= 2);
@@ -673,7 +712,19 @@ export async function generateCatalog() {
     recipes: finalRecipes,
   };
 
-  const outputPath = path.resolve(process.cwd(), 'public/recipes/catalog.json');
+  function findProjectRoot(): string {
+    let curr = process.cwd();
+    while (curr !== path.dirname(curr)) {
+      if (fs.existsSync(path.join(curr, 'package.json')) && fs.existsSync(path.join(curr, 'public'))) {
+        return curr;
+      }
+      curr = path.dirname(curr);
+    }
+    return process.cwd();
+  }
+
+  const projectRoot = findProjectRoot();
+  const outputPath = path.resolve(projectRoot, 'public/recipes/catalog.json');
   fs.mkdirSync(path.dirname(outputPath), { recursive: true });
   fs.writeFileSync(outputPath, JSON.stringify(outputData, null, 2), 'utf-8');
 

@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { User, NavigationTab } from '../../types';
+import { User, NavigationTab, CANONICAL_DIETARY_RESTRICTIONS } from '../../types';
 import { authService } from '../../services/authService';
 import { Card } from '../common/Card';
 import { Button } from '../common/Button';
@@ -92,15 +92,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
-  const availableRestrictions = [
-    'Sem Frituras',
-    'Vegetariano',
-    'Sem Glúten',
-    'Sem Lactose',
-    'Low Carb',
-    'Vegano',
-    'Rico em Proteína',
-  ];
+  const availableRestrictions = CANONICAL_DIETARY_RESTRICTIONS;
 
   const handleAvatarSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

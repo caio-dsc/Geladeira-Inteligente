@@ -53,4 +53,24 @@ export function mapToAppCategory(strCategory?: string): string {
   return 'Outros';
 }
 
+export type CanonicalDietaryRestriction =
+  | 'Sem Frituras'
+  | 'Vegetariano'
+  | 'Sem Glúten'
+  | 'Sem Lactose'
+  | 'Low Carb'
+  | 'Vegano'
+  | 'Rico em Proteína';
+
+export const CANONICAL_DIETARY_RESTRICTIONS: readonly CanonicalDietaryRestriction[] = [
+  'Sem Frituras',
+  'Vegetariano',
+  'Sem Glúten',
+  'Sem Lactose',
+  'Low Carb',
+  'Vegano',
+  'Rico em Proteína',
+] as const;
+
+
 

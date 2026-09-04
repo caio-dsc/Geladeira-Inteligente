@@ -1,6 +1,6 @@
 import * as cheerio from 'cheerio';
 import { Recipe, RecipeIngredient, ServingsBucket } from '../../src/types';
-import { computeDietFlags } from './dietHeuristics';
+import { computeDietFlags } from '../catalog/dietHeuristics';
 import { inferCategoryFromTitle } from '../catalog/utils';
 
 const WIKI_API = 'https://pt.wikibooks.org/w/api.php';
@@ -268,7 +268,18 @@ export async function parseRecipeFromSections(title: string, thumbnail?: string)
     imageUrl: defaultImg,
     ingredients: ingredientsClean,
     steps: stepsClean,
-    tags: [category, 'Tradicional', 'Wikilivros'],
+    tags: [
+      category,
+      'Tradicional',
+      'Wikilivros',
+      ...(diet.vegan ? ['Vegano'] : []),
+      ...(diet.vegetarian && !diet.vegan ? ['Vegetariano'] : []),
+      ...(diet.hasGluten === false ? ['Sem Glúten'] : []),
+      ...(diet.hasLactose === false ? ['Sem Lactose'] : []),
+      ...(diet.usesFrying === false ? ['Sem Frituras'] : []),
+      ...(diet.lowCarb ? ['Low Carb'] : []),
+      ...(diet.highProtein ? ['Rico em Proteína'] : []),
+    ],
     caloriesPerServing: Math.round(200 + ingredients.length * 35),
     canonicalKey: canonicalKeyFromTitle(cleanTitle),
     originArea: 'Brazilian',

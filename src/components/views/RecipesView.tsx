@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { RecipeMatch, FoodItem } from '../../types';
 import { RecipeCard } from '../recipe/RecipeCard';
 import { Input } from '../common/Input';
@@ -21,9 +21,21 @@ export interface RecipesViewProps {
   onRefreshRecipes: () => void;
   isRefreshingRecipes?: boolean;
   recipesUpdatedAt?: number | null;
+  userDietaryRestrictions?: string[];
+  onDietaryRestrictionsChange?: (next: string[]) => void;
 }
 
 const normalizeCategory = (c?: string) => (c && c.trim() ? c.trim() : 'Outros');
+
+export const DIET_FILTERS = [
+  'Sem Frituras',
+  'Vegetariano',
+  'Vegano',
+  'Sem Glúten',
+  'Sem Lactose',
+  'Low Carb',
+  'Rico em Proteína',
+] as const;
 
 export const RecipesView: React.FC<RecipesViewProps> = ({
   recipes,
@@ -33,11 +45,26 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
   onRefreshRecipes,
   isRefreshingRecipes,
   recipesUpdatedAt,
+  userDietaryRestrictions,
+  onDietaryRestrictionsChange,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterMatch, setFilterMatch] = useState<'all' | 'ready' | 'high'>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [selectedDiet, setSelectedDiet] = useState<string>('all');
+  const [dietFilters, setDietFilters] = useState<string[]>(userDietaryRestrictions ?? []);
+
+  // se o perfil mudar (ex.: voltou do Profile), sincroniza
+  useEffect(() => {
+    setDietFilters(userDietaryRestrictions ?? []);
+  }, [userDietaryRestrictions]);
+
+  const toggleDiet = (label: string) => {
+    setDietFilters((prev) => {
+      const next = prev.includes(label) ? prev.filter((x) => x !== label) : [...prev, label];
+      onDietaryRestrictionsChange?.(next);
+      return next;
+    });
+  };
 
   const categoryCounts = useMemo(() => {
     const map = new Map<string, number>();
@@ -75,17 +102,6 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
     ];
   }, [categoryCounts, recipes.length]);
 
-  const dietFilters = [
-    { id: 'all', label: 'Todas Dietas' },
-    { id: 'sem_gluten', label: 'Sem Glúten' },
-    { id: 'vegano', label: 'Vegano' },
-    { id: 'vegetariano', label: 'Vegetariano' },
-    { id: 'sem_lactose', label: 'Sem Lactose' },
-    { id: 'sem_frituras', label: 'Sem Frituras' },
-    { id: 'low_carb', label: 'Low Carb' },
-    { id: 'rico_em_proteina', label: 'Proteico' },
-  ];
-
   const filteredRecipes = useMemo(() => {
     return recipes
       .filter((recipe) => {
@@ -99,15 +115,36 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
           selectedCategory === 'all' || normalizeCategory(recipe.category) === selectedCategory;
 
         let matchesDiet = true;
-        if (selectedDiet !== 'all' && recipe.diet) {
+        if (dietFilters.length > 0 && recipe.diet) {
           const d = recipe.diet;
-          if (selectedDiet === 'sem_gluten') matchesDiet = d.hasGluten === false;
-          else if (selectedDiet === 'vegano') matchesDiet = d.vegan === true;
-          else if (selectedDiet === 'vegetariano') matchesDiet = d.vegetarian === true || d.vegan === true || d.hasMeat === false;
-          else if (selectedDiet === 'sem_lactose') matchesDiet = d.hasLactose === false;
-          else if (selectedDiet === 'sem_frituras') matchesDiet = d.usesFrying !== true;
-          else if (selectedDiet === 'low_carb') matchesDiet = d.lowCarb === true;
-          else if (selectedDiet === 'rico_em_proteina') matchesDiet = d.highProtein === true;
+          for (const pref of dietFilters) {
+            switch (pref) {
+              case 'Vegetariano':
+                if (d.hasMeat === true || d.vegetarian === false) matchesDiet = false;
+                break;
+              case 'Vegano':
+                if (d.vegan !== true) matchesDiet = false;
+                break;
+              case 'Sem Glúten':
+                if (d.hasGluten === true) matchesDiet = false;
+                break;
+              case 'Sem Lactose':
+                if (d.hasLactose === true) matchesDiet = false;
+                break;
+              case 'Sem Frituras':
+                if (d.usesFrying === true) matchesDiet = false;
+                break;
+              case 'Low Carb':
+                if (d.lowCarb === false) matchesDiet = false;
+                break;
+              case 'Rico em Proteína':
+                if (d.highProtein !== true) matchesDiet = false;
+                break;
+              default:
+                break;
+            }
+            if (!matchesDiet) break;
+          }
         }
 
         let matchesMatch = true;
@@ -128,7 +165,7 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
         // 3. title asc (ordem alfabética)
         return a.title.localeCompare(b.title, 'pt-BR');
       });
-  }, [recipes, searchTerm, selectedCategory, selectedDiet, filterMatch]);
+  }, [recipes, searchTerm, selectedCategory, dietFilters, filterMatch]);
 
   const groupedByCategory = useMemo(() => {
     const groups: Record<string, RecipeMatch[]> = {};
@@ -272,22 +309,59 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
           ))}
         </div>
 
-        {/* Diet Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none pt-1 border-t border-emerald-500/10">
-          <span className="text-[11px] font-bold text-emerald-400/80 uppercase tracking-wider whitespace-nowrap mr-1">Dieta:</span>
-          {dietFilters.map((diet) => (
-            <button
-              key={diet.id}
-              onClick={() => setSelectedDiet(diet.id)}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold whitespace-nowrap transition-all cursor-pointer ${
-                selectedDiet === diet.id
-                  ? 'bg-emerald-400 text-stone-950 font-bold shadow-[0_0_10px_rgba(52,211,153,0.3)]'
-                  : 'bg-emerald-950/40 text-emerald-300/70 hover:text-emerald-100 hover:bg-emerald-900/40 border border-emerald-500/10'
-              }`}
-            >
-              {diet.label}
-            </button>
-          ))}
+        {/* Diet Chips */}
+        <div className="pt-2 border-t border-emerald-500/10">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[11px] font-bold text-emerald-400/80 uppercase tracking-wider">
+              Filtros de Dieta:
+            </span>
+            {userDietaryRestrictions && userDietaryRestrictions.length > 0 && (
+              <button
+                type="button"
+                onClick={() => {
+                  setDietFilters(userDietaryRestrictions);
+                  onDietaryRestrictionsChange?.(userDietaryRestrictions);
+                }}
+                className="text-[11px] font-bold text-emerald-400/90 hover:text-emerald-200 underline underline-offset-2 transition cursor-pointer"
+                title="Restaurar restrições salvas no perfil"
+              >
+                Usar do perfil
+              </button>
+            )}
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {DIET_FILTERS.map((label) => {
+              const active = dietFilters.includes(label);
+              return (
+                <button
+                  key={label}
+                  type="button"
+                  onClick={() => toggleDiet(label)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-bold border transition cursor-pointer ${
+                    active
+                      ? 'bg-emerald-500/25 border-emerald-400/50 text-emerald-200 shadow-[0_0_12px_rgba(16,185,129,0.25)]'
+                      : 'bg-white/5 border-white/10 text-white/60 hover:border-emerald-500/30 hover:text-emerald-200'
+                  }`}
+                >
+                  {label}
+                </button>
+              );
+            })}
+
+            {dietFilters.length > 0 && (
+              <button
+                type="button"
+                onClick={() => {
+                  setDietFilters([]);
+                  onDietaryRestrictionsChange?.([]);
+                }}
+                className="px-3 py-1.5 rounded-full text-xs font-bold text-rose-300/80 hover:text-rose-200 transition cursor-pointer"
+              >
+                Limpar dietas
+              </button>
+            )}
+          </div>
         </div>
       </div>
 

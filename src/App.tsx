@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { 
   NavigationTab, 
   User, 
@@ -46,6 +46,14 @@ export default function App() {
   // Recipe manual refresh state
   const [isRefreshingRecipes, setIsRefreshingRecipes] = useState(false);
   const [recipesUpdatedAt, setRecipesUpdatedAt] = useState<number | null>(null);
+  const [recipeDietFilters, setRecipeDietFilters] = useState<string[]>([]);
+
+  const prefsForRecipes = useMemo(() => ({
+    ...user?.preferences,
+    dietaryRestrictions: recipeDietFilters.length
+      ? recipeDietFilters
+      : (user?.preferences?.dietaryRestrictions ?? []),
+  }), [user?.preferences, recipeDietFilters]);
 
   const showToast = (message: string) => {
     setToastMessage(message);
@@ -72,7 +80,7 @@ export default function App() {
       await recipeService.refreshRecipesFromFirestore();
 
       // 2) recalcula matches com inventário atual
-      await updateRecipeMatches(inventory, user?.preferences);
+      await updateRecipeMatches(inventory, prefsForRecipes);
 
       setRecipesUpdatedAt(Date.now());
       showToast('Receitas atualizadas!');
@@ -82,12 +90,12 @@ export default function App() {
     } finally {
       setIsRefreshingRecipes(false);
     }
-  }, [inventory, user?.preferences, updateRecipeMatches]);
+  }, [inventory, prefsForRecipes, updateRecipeMatches]);
 
   // Update recipes whenever inventory or user preferences change
   useEffect(() => {
-    updateRecipeMatches(inventory, user?.preferences);
-  }, [inventory, user?.preferences, updateRecipeMatches]);
+    updateRecipeMatches(inventory, prefsForRecipes);
+  }, [inventory, prefsForRecipes, updateRecipeMatches]);
 
   // Initialize data subscriptions
   useEffect(() => {
@@ -281,6 +289,10 @@ export default function App() {
             onRefreshRecipes={handleRefreshRecipes}
             isRefreshingRecipes={isRefreshingRecipes}
             recipesUpdatedAt={recipesUpdatedAt}
+            userDietaryRestrictions={user?.preferences?.dietaryRestrictions ?? []}
+            onDietaryRestrictionsChange={(next) => {
+              setRecipeDietFilters(next);
+            }}
           />
         )}
 
