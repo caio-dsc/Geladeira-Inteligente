@@ -2,6 +2,7 @@ import React from 'react';
 import { RecipeMatch } from '../../types';
 import { Clock, ChefHat, CheckCircle2, AlertTriangle, ArrowRight } from 'lucide-react';
 import { Card } from '../common/Card';
+import { getRecipeDietBadges } from '../../services/recipeService';
 
 export interface RecipeCardProps {
   recipe: RecipeMatch;
@@ -11,6 +12,7 @@ export interface RecipeCardProps {
 export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onClick }) => {
   const isFullMatch = recipe.matchPercentage === 100;
   const isHighMatch = recipe.matchPercentage >= 70;
+  const dietBadges = getRecipeDietBadges(recipe.diet);
 
   const placeholder =
     "data:image/svg+xml;charset=utf-8," +
@@ -90,6 +92,20 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onClick }) => {
           <p className="text-xs text-emerald-300/70 mt-1 line-clamp-2 leading-relaxed">
             {recipe.description}
           </p>
+
+          {/* Compact Diet Badges */}
+          {dietBadges.length > 0 && (
+            <div className="flex flex-wrap gap-1 mt-2.5">
+              {dietBadges.map((badge) => (
+                <span
+                  key={badge}
+                  className="inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-950/80 border border-emerald-500/25 text-emerald-300"
+                >
+                  {badge}
+                </span>
+              ))}
+            </div>
+          )}
 
           {/* Quick info row */}
           <div className="flex items-center gap-3 mt-3 pt-3 border-t border-emerald-500/15 text-xs text-emerald-300/70">

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-04T10:56:10.644Z",
+  "generatedAt": "2026-09-05T00:19:22.919Z",
   "total": 23,
   "recipes": [
     {
@@ -169,7 +169,6 @@
         "Vegetariano",
         "Sem Glúten",
         "Sem Frituras",
-        "Low Carb",
         "Rico em Proteína"
       ],
       "caloriesPerServing": 240,
@@ -184,7 +183,7 @@
         "hasEgg": true,
         "vegetarian": true,
         "vegan": false,
-        "lowCarb": true,
+        "lowCarb": false,
         "highProtein": true,
         "usesFrying": false
       },
@@ -275,7 +274,9 @@
         "Frutos do Mar",
         "Baiana",
         "Sem Glúten",
+        "Sem Lactose",
         "Sem Frituras",
+        "Low Carb",
         "Rico em Proteína"
       ],
       "caloriesPerServing": 350,
@@ -285,12 +286,12 @@
       "originCountry": "Brazil",
       "diet": {
         "hasMeat": true,
-        "hasLactose": true,
+        "hasLactose": false,
         "hasGluten": false,
         "hasEgg": false,
         "vegetarian": false,
         "vegan": false,
-        "lowCarb": false,
+        "lowCarb": true,
         "highProtein": true,
         "usesFrying": false
       },
@@ -443,8 +444,7 @@
         "Doce Típico",
         "Vegetariano",
         "Sem Glúten",
-        "Sem Frituras",
-        "Low Carb"
+        "Sem Frituras"
       ],
       "caloriesPerServing": 180,
       "canonicalKey": "brigadeiro-gourmet-brasileiro",
@@ -458,7 +458,7 @@
         "hasEgg": false,
         "vegetarian": true,
         "vegan": false,
-        "lowCarb": true,
+        "lowCarb": false,
         "highProtein": false,
         "usesFrying": false
       },
@@ -748,6 +748,7 @@
         "Almoço & Jantar",
         "Tradicional",
         "Wikilivros",
+        "Sem Frituras",
         "Rico em Proteína"
       ],
       "caloriesPerServing": 380,
@@ -767,7 +768,7 @@
         "vegan": false,
         "lowCarb": false,
         "highProtein": true,
-        "usesFrying": true
+        "usesFrying": false
       },
       "sources": [
         {
@@ -887,9 +888,11 @@
         "Almoço & Jantar",
         "Tradicional",
         "Wikilivros",
-        "Vegetariano",
         "Sem Glúten",
-        "Sem Frituras"
+        "Sem Lactose",
+        "Sem Frituras",
+        "Low Carb",
+        "Rico em Proteína"
       ],
       "caloriesPerServing": 380,
       "canonicalKey": "moqueca-baiana",
@@ -903,14 +906,14 @@
       "originArea": "Brazilian",
       "originCountry": "Brazil",
       "diet": {
-        "hasMeat": false,
-        "hasLactose": true,
+        "hasMeat": true,
+        "hasLactose": false,
         "hasGluten": false,
         "hasEgg": false,
-        "vegetarian": true,
+        "vegetarian": false,
         "vegan": false,
-        "lowCarb": false,
-        "highProtein": false,
+        "lowCarb": true,
+        "highProtein": true,
         "usesFrying": false
       },
       "sources": [
@@ -1560,6 +1563,9 @@
         "Almoço & Jantar",
         "Tradicional",
         "Wikilivros",
+        "Sem Glúten",
+        "Sem Lactose",
+        "Sem Frituras",
         "Rico em Proteína"
       ],
       "caloriesPerServing": 795,
@@ -1568,14 +1574,14 @@
       "originCountry": "Brazil",
       "diet": {
         "hasMeat": true,
-        "hasLactose": true,
-        "hasGluten": true,
+        "hasLactose": false,
+        "hasGluten": false,
         "hasEgg": false,
         "vegetarian": false,
         "vegan": false,
         "lowCarb": false,
         "highProtein": true,
-        "usesFrying": true
+        "usesFrying": false
       },
       "sources": [
         {
@@ -1671,6 +1677,7 @@
         "Almoço & Jantar",
         "Tradicional",
         "Wikilivros",
+        "Sem Lactose",
         "Sem Frituras",
         "Rico em Proteína"
       ],
@@ -1680,7 +1687,7 @@
       "originCountry": "Brazil",
       "diet": {
         "hasMeat": true,
-        "hasLactose": true,
+        "hasLactose": false,
         "hasGluten": true,
         "hasEgg": false,
         "vegetarian": false,
@@ -1775,6 +1782,7 @@
         "Tradicional",
         "Wikilivros",
         "Sem Glúten",
+        "Sem Frituras",
         "Rico em Proteína"
       ],
       "caloriesPerServing": 550,
@@ -1790,7 +1798,7 @@
         "vegan": false,
         "lowCarb": false,
         "highProtein": true,
-        "usesFrying": true
+        "usesFrying": false
       },
       "sources": [
         {
@@ -1877,22 +1885,23 @@
         "Almoço & Jantar",
         "Tradicional",
         "Wikilivros",
-        "Rico em Proteína"
+        "Vegetariano",
+        "Sem Frituras"
       ],
       "caloriesPerServing": 515,
       "canonicalKey": "estrogonofe-de-legumes",
       "originArea": "Brazilian",
       "originCountry": "Brazil",
       "diet": {
-        "hasMeat": true,
+        "hasMeat": false,
         "hasLactose": true,
         "hasGluten": true,
-        "hasEgg": false,
-        "vegetarian": false,
+        "hasEgg": true,
+        "vegetarian": true,
         "vegan": false,
         "lowCarb": false,
-        "highProtein": true,
-        "usesFrying": true
+        "highProtein": false,
+        "usesFrying": false
       },
       "sources": [
         {
@@ -2117,8 +2126,7 @@
         "Bebidas",
         "Vegetariano",
         "Sem Glúten",
-        "Sem Frituras",
-        "Low Carb"
+        "Sem Frituras"
       ],
       "caloriesPerServing": 340,
       "canonicalKey": "brigadeiro",
@@ -2131,7 +2139,7 @@
         "hasEgg": false,
         "vegetarian": true,
         "vegan": false,
-        "lowCarb": true,
+        "lowCarb": false,
         "highProtein": false,
         "usesFrying": false
       },
@@ -2412,7 +2420,6 @@
         "Vegetariano",
         "Sem Glúten",
         "Sem Frituras",
-        "Low Carb",
         "Rico em Proteína"
       ],
       "caloriesPerServing": 445,
@@ -2426,7 +2433,7 @@
         "hasEgg": true,
         "vegetarian": true,
         "vegan": false,
-        "lowCarb": true,
+        "lowCarb": false,
         "highProtein": true,
         "usesFrying": false
       },

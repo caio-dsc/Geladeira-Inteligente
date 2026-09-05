@@ -1,6 +1,9 @@
 import { Recipe, RecipeMatch, FoodItem, UserPreferences } from '../types';
 import { MOCK_RECIPES } from '../data/mockData';
 import { firestoreService } from './firestoreService';
+import { matchesDietFilters, getRecipeDietBadges } from '../utils/dietFilters';
+
+export { matchesDietFilters, getRecipeDietBadges };
 
 export interface IRecipeService {
   getRecipes(): Promise<Recipe[]>;
@@ -121,7 +124,7 @@ class RecipeService implements IRecipeService {
     // Filtro por preferências dietéticas do usuário
     if (preferences?.dietaryRestrictions?.length) {
       matches = matches.filter((m) =>
-        this.matchesDietFilters((m as any).recipe ?? m, preferences.dietaryRestrictions!)
+        matchesDietFilters((m as any).recipe?.diet ?? m.diet, preferences.dietaryRestrictions!)
       );
     }
 
@@ -211,42 +214,6 @@ class RecipeService implements IRecipeService {
     };
   }
 
-  private matchesDietFilters(recipe: Recipe, restrictions: string[]): boolean {
-    if (!restrictions?.length) return true;
-    const d = recipe.diet;
-    // se não tem diet, não esconde (evita sumir catálogo antigo)
-    if (!d) return true;
-
-    for (const pref of restrictions) {
-      switch (pref) {
-        case 'Vegetariano':
-          if (d.hasMeat === true || d.vegetarian === false) return false;
-          break;
-        case 'Vegano':
-          if (d.vegan !== true) return false;
-          break;
-        case 'Sem Glúten':
-          if (d.hasGluten === true) return false;
-          break;
-        case 'Sem Lactose':
-          if (d.hasLactose === true) return false;
-          break;
-        case 'Sem Frituras':
-          if (d.usesFrying === true) return false;
-          break;
-        case 'Low Carb':
-          if (d.lowCarb === false) return false;
-          break;
-        case 'Rico em Proteína':
-          if (d.highProtein !== true) return false;
-          break;
-        default:
-          break;
-      }
-    }
-    return true;
-  }
-
   private normalizeString(str: string): string {
     return str
       .toLowerCase()
@@ -257,3 +224,4 @@ class RecipeService implements IRecipeService {
 }
 
 export const recipeService = new RecipeService();
+

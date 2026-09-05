@@ -248,7 +248,8 @@ export async function parseRecipeFromSections(title: string, thumbnail?: string)
 
   const diet = computeDietFlags(
     ingredientsClean.map((i) => i.name),
-    stepsClean
+    stepsClean,
+    titleClean
   );
 
   const servings = 4;

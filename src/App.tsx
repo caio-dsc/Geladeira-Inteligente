@@ -46,14 +46,14 @@ export default function App() {
   // Recipe manual refresh state
   const [isRefreshingRecipes, setIsRefreshingRecipes] = useState(false);
   const [recipesUpdatedAt, setRecipesUpdatedAt] = useState<number | null>(null);
-  const [recipeDietFilters, setRecipeDietFilters] = useState<string[]>([]);
 
-  const prefsForRecipes = useMemo(() => ({
-    ...user?.preferences,
-    dietaryRestrictions: recipeDietFilters.length
-      ? recipeDietFilters
-      : (user?.preferences?.dietaryRestrictions ?? []),
-  }), [user?.preferences, recipeDietFilters]);
+  // Preferências base para matching de receitas (sem prender filtros dietéticos globais,
+  // permitindo que o RecipesView filtre, combine e limpe dietas instantaneamente na memória)
+  const recipeBasePreferences = useMemo(() => {
+    if (!user?.preferences) return undefined;
+    const { dietaryRestrictions: _, ...rest } = user.preferences;
+    return rest;
+  }, [user?.preferences]);
 
   const showToast = (message: string) => {
     setToastMessage(message);
@@ -80,7 +80,7 @@ export default function App() {
       await recipeService.refreshRecipesFromFirestore();
 
       // 2) recalcula matches com inventário atual
-      await updateRecipeMatches(inventory, prefsForRecipes);
+      await updateRecipeMatches(inventory, recipeBasePreferences);
 
       setRecipesUpdatedAt(Date.now());
       showToast('Receitas atualizadas!');
@@ -90,12 +90,12 @@ export default function App() {
     } finally {
       setIsRefreshingRecipes(false);
     }
-  }, [inventory, prefsForRecipes, updateRecipeMatches]);
+  }, [inventory, recipeBasePreferences, updateRecipeMatches]);
 
   // Update recipes whenever inventory or user preferences change
   useEffect(() => {
-    updateRecipeMatches(inventory, prefsForRecipes);
-  }, [inventory, prefsForRecipes, updateRecipeMatches]);
+    updateRecipeMatches(inventory, recipeBasePreferences);
+  }, [inventory, recipeBasePreferences, updateRecipeMatches]);
 
   // Initialize data subscriptions
   useEffect(() => {
@@ -290,9 +290,6 @@ export default function App() {
             isRefreshingRecipes={isRefreshingRecipes}
             recipesUpdatedAt={recipesUpdatedAt}
             userDietaryRestrictions={user?.preferences?.dietaryRestrictions ?? []}
-            onDietaryRestrictionsChange={(next) => {
-              setRecipeDietFilters(next);
-            }}
           />
         )}
 

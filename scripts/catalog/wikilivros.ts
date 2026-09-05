@@ -28,7 +28,8 @@ export function buildWikilivrosRecipe(
   const ingredients: RecipeIngredient[] = ingLines.map((t) => ({ name: t, quantity: '', required: true }));
   const diet = computeDietFlags(
     ingredients.map((i) => i.name),
-    steps
+    steps,
+    title
   );
 
   const category = options?.category || inferCategoryFromTitle(title);
@@ -85,7 +86,8 @@ export async function fetchWikilivrosRecipes(): Promise<Recipe[]> {
     const category = inferCategoryFromTitle(titleClean);
     const diet = computeDietFlags(
       r.ingredients.map((i) => i.name),
-      r.steps
+      r.steps,
+      titleClean
     );
 
     recipes.push({

@@ -100,7 +100,8 @@ async function importTheMealDBBrazilian(): Promise<Recipe[]> {
       const steps = extractTheMealDBSteps(meal);
       const diet = computeDietFlags(
         ingredients.map((x) => x.name),
-        steps
+        steps,
+        meal.strMeal
       );
 
       // Imagem com /medium conforme doc TheMealDB
@@ -584,7 +585,7 @@ export async function generateCatalog() {
 
   for (const r of allCandidates) {
     const key = r.canonicalKey || canonicalKeyFromTitle(r.title);
-    const diet = r.diet || computeDietFlags(r.ingredients.map((i) => i.name), r.steps);
+    const diet = r.diet || computeDietFlags(r.ingredients.map((i) => i.name), r.steps, r.title);
 
     if (!canonicalMap.has(key)) {
       canonicalMap.set(key, {
@@ -627,12 +628,6 @@ export async function generateCatalog() {
         ? r.ingredients
         : existing.ingredients;
 
-      // Recalcula flags dietéticas de forma determinística combinando os ingredientes e passos finais
-      const recomputedDiet = computeDietFlags(
-        chosenIngredients.map((i) => i.name),
-        chosenSteps
-      );
-
       // Preferir título em português amigável quando disponível
       let chosenTitle = existing.title;
       const isExistingEnglish = /^[a-zA-Z\s\-&,()]+$/.test(existing.title) && isExistingTheMealDB;
@@ -640,6 +635,13 @@ export async function generateCatalog() {
       if (isExistingEnglish && isRPortuguese && r.title) {
         chosenTitle = r.title;
       }
+
+      // Recalcula flags dietéticas de forma determinística combinando os ingredientes e passos finais
+      const recomputedDiet = computeDietFlags(
+        chosenIngredients.map((i) => i.name),
+        chosenSteps,
+        chosenTitle
+      );
 
       // Tags concat + dedupe
       const tagsSet = new Set<string>([...(existing.tags || []), ...(r.tags || [])]);
@@ -667,7 +669,8 @@ export async function generateCatalog() {
       const validSteps = (r.steps || []).filter((s) => !isGarbage(s));
       const diet = computeDietFlags(
         validIngredients.map((i) => i.name),
-        validSteps
+        validSteps,
+        r.title
       );
 
       const DIETARY_TAG_NAMES = new Set([

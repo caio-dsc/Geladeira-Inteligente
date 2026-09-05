@@ -46,7 +46,8 @@ export function buildTheMealDBRecipe(meal: any, extra?: { imageUrl?: string; cat
 
   const diet = computeDietFlags(
     ingredients.map((i) => i.name),
-    steps
+    steps,
+    meal.strMeal
   );
 
   const category = extra?.category || getMealCategory(meal);

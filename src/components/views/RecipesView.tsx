@@ -3,6 +3,7 @@ import { RecipeMatch, FoodItem } from '../../types';
 import { RecipeCard } from '../recipe/RecipeCard';
 import { Input } from '../common/Input';
 import { EmptyState } from '../common/EmptyState';
+import { matchesDietFilters } from '../../services/recipeService';
 import { 
   BookOpen, 
   Search, 
@@ -114,38 +115,7 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
         const matchesCategory =
           selectedCategory === 'all' || normalizeCategory(recipe.category) === selectedCategory;
 
-        let matchesDiet = true;
-        if (dietFilters.length > 0 && recipe.diet) {
-          const d = recipe.diet;
-          for (const pref of dietFilters) {
-            switch (pref) {
-              case 'Vegetariano':
-                if (d.hasMeat === true || d.vegetarian === false) matchesDiet = false;
-                break;
-              case 'Vegano':
-                if (d.vegan !== true) matchesDiet = false;
-                break;
-              case 'Sem Glúten':
-                if (d.hasGluten === true) matchesDiet = false;
-                break;
-              case 'Sem Lactose':
-                if (d.hasLactose === true) matchesDiet = false;
-                break;
-              case 'Sem Frituras':
-                if (d.usesFrying === true) matchesDiet = false;
-                break;
-              case 'Low Carb':
-                if (d.lowCarb === false) matchesDiet = false;
-                break;
-              case 'Rico em Proteína':
-                if (d.highProtein !== true) matchesDiet = false;
-                break;
-              default:
-                break;
-            }
-            if (!matchesDiet) break;
-          }
-        }
+        const matchesDiet = matchesDietFilters(recipe.diet, dietFilters);
 
         let matchesMatch = true;
         if (filterMatch === 'ready') matchesMatch = recipe.isReadyToCook;
