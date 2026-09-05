@@ -20,20 +20,20 @@ export const Button: React.FC<ButtonProps> = ({
   disabled,
   ...props
 }) => {
-  const baseStyles = 'inline-flex items-center justify-center font-semibold rounded-2xl transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none cursor-pointer';
+  const baseStyles = 'inline-flex items-center justify-center font-semibold rounded-xl transition-all duration-150 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none cursor-pointer focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 select-none';
 
   const sizeStyles = {
-    sm: 'px-3 py-1.5 text-xs gap-1.5',
-    md: 'px-4 py-2 text-sm gap-2',
-    lg: 'px-6 py-3.5 text-base gap-2.5',
+    sm: 'px-3 py-1.5 text-xs gap-1.5 min-h-[32px]',
+    md: 'px-4 py-2 text-sm gap-2 min-h-[38px]',
+    lg: 'px-5 py-2.5 sm:px-6 sm:py-3 text-base gap-2.5 min-h-[44px]',
   };
 
   const variantStyles = {
-    primary: 'bg-linear-to-r from-emerald-500 via-emerald-400 to-emerald-500 bg-size-200 hover:bg-right text-stone-950 font-bold shadow-[0_0_20px_rgba(16,185,129,0.35)] hover:shadow-[0_0_25px_rgba(52,211,153,0.5)] border border-emerald-300/40',
-    secondary: 'bg-emerald-950/70 hover:bg-emerald-900/90 text-emerald-200 border border-emerald-500/30 hover:border-emerald-400/50 shadow-sm backdrop-blur-md',
-    outline: 'bg-emerald-950/30 hover:bg-emerald-900/50 text-emerald-300 hover:text-white border border-emerald-500/30 hover:border-emerald-400 shadow-2xs backdrop-blur-xs',
-    danger: 'bg-rose-950/70 hover:bg-rose-900/90 text-rose-200 border border-rose-500/40 hover:border-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.2)]',
-    ghost: 'text-emerald-300/80 hover:text-white hover:bg-emerald-900/40',
+    primary: 'bg-primary hover:bg-[#138a72] active:bg-primary-dark text-white font-bold shadow-subtle hover:shadow-soft border border-primary-dark/15',
+    secondary: 'bg-surface-muted hover:bg-[#e4ede8] active:bg-[#d8e5df] text-primary-dark border border-border shadow-subtle',
+    outline: 'bg-surface hover:bg-surface-muted active:bg-[#e4ede8] text-text-primary hover:text-primary border border-border hover:border-primary/40 shadow-subtle',
+    danger: 'bg-danger hover:bg-[#dc2626] active:bg-[#b91c1c] text-white border border-red-700/20 shadow-subtle hover:shadow-soft',
+    ghost: 'bg-transparent hover:bg-surface-muted active:bg-[#e4ede8] text-text-primary hover:text-primary',
   };
 
   return (
@@ -54,3 +54,4 @@ export const Button: React.FC<ButtonProps> = ({
     </button>
   );
 };
+

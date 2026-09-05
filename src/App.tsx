@@ -55,6 +55,13 @@ export default function App() {
     return rest;
   }, [user?.preferences]);
 
+  // Redireciona usuários sem privilégio de admin caso tentem acessar a aba 'admin'
+  useEffect(() => {
+    if (activeTab === 'admin' && !user?.isAdmin) {
+      setActiveTab('dashboard');
+    }
+  }, [activeTab, user?.isAdmin]);
+
   const showToast = (message: string) => {
     setToastMessage(message);
     setTimeout(() => {
@@ -302,8 +309,12 @@ export default function App() {
           />
         )}
 
-        {activeTab === 'admin' && (
-          <AdminView />
+        {activeTab === 'admin' && user?.isAdmin && (
+          <AdminView 
+            user={user} 
+            onRecipeUpdated={handleRefreshRecipes}
+            showToast={showToast}
+          />
         )}
       </main>
 

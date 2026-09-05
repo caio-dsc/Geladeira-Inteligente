@@ -34,22 +34,25 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'inventory' as NavigationTab, label: 'Minha Geladeira', icon: UtensilsCrossed },
     { id: 'recipes' as NavigationTab, label: 'Receitas', icon: BookOpen },
     { id: 'profile' as NavigationTab, label: 'Perfil', icon: UserIcon },
-    { id: 'admin' as NavigationTab, label: 'Admin', icon: ShieldCheck },
+    ...(user?.isAdmin ? [{ id: 'admin' as NavigationTab, label: 'Admin', icon: ShieldCheck }] : []),
   ];
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-[#05130b]/85 backdrop-blur-xl border-b border-emerald-500/15 transition-all">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 h-18 flex items-center justify-between">
+    <header className="sticky top-0 z-40 w-full bg-surface/90 backdrop-blur-md border-b border-border shadow-subtle transition-all">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         {/* Brand logo & title with custom symbol */}
         <div 
           onClick={() => onTabChange('dashboard')}
-          className="cursor-pointer select-none group"
+          className="cursor-pointer select-none group focus-visible:outline-hidden"
         >
-          <AppLogo size="md" />
+          <AppLogo 
+            size="md" 
+            className="[&_.text-white]:!text-text-primary [&_.text-emerald-400]:!text-primary [&_.text-emerald-400\/80]:!text-text-secondary" 
+          />
         </div>
 
         {/* Desktop navigation tabs */}
-        <nav className="hidden md:flex items-center gap-1.5 bg-[#081e13]/80 p-1.5 rounded-2xl border border-emerald-500/20 backdrop-blur-md shadow-[0_0_15px_rgba(0,0,0,0.5)]">
+        <nav className="hidden md:flex items-center gap-1 bg-surface-muted p-1 rounded-xl border border-border">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -57,14 +60,14 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 key={item.id}
                 onClick={() => onTabChange(item.id)}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 cursor-pointer select-none ${
                   isActive
-                    ? 'bg-gradient-to-r from-emerald-500 to-emerald-400 text-stone-950 shadow-[0_0_15px_rgba(16,185,129,0.4)]'
-                    : 'text-emerald-300/80 hover:text-white hover:bg-emerald-900/40'
+                    ? 'bg-surface text-primary shadow-subtle font-bold border border-border/70'
+                    : 'text-text-secondary hover:text-text-primary hover:bg-surface/60'
                 }`}
               >
-                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-stone-950' : 'text-emerald-400'}`} />
-                {item.label}
+                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-primary' : 'text-text-secondary'}`} />
+                <span>{item.label}</span>
               </button>
             );
           })}
@@ -83,15 +86,19 @@ export const Header: React.FC<HeaderProps> = ({
               {/* User avatar / profile button */}
               <button
                 onClick={() => onTabChange('profile')}
-                className="flex items-center gap-2 p-1 pl-1 pr-2 rounded-full border border-emerald-500/30 hover:border-emerald-400 bg-emerald-950/40 hover:bg-emerald-900/50 transition-all text-left group cursor-pointer"
+                className={`flex items-center gap-2 p-1 pl-1 pr-2.5 rounded-full border transition-all text-left group cursor-pointer ${
+                  activeTab === 'profile'
+                    ? 'border-primary/50 bg-primary/5 ring-2 ring-primary/10 shadow-subtle'
+                    : 'border-border hover:border-primary/30 bg-surface hover:bg-surface-muted shadow-subtle'
+                }`}
                 title="Abrir perfil"
               >
                 <img
                   src={user.avatarUrl}
                   alt={user.name}
-                  className="w-7 h-7 rounded-full object-cover border border-emerald-400/40 group-hover:scale-105 transition-transform"
+                  className="w-7 h-7 rounded-full object-cover border border-border group-hover:scale-105 transition-transform"
                 />
-                <span className="hidden sm:inline text-xs font-bold text-emerald-100 max-w-[90px] truncate">
+                <span className="hidden sm:inline text-xs font-semibold text-text-primary max-w-[90px] truncate">
                   {user.name.split(' ')[0]}
                 </span>
               </button>

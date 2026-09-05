@@ -1,0 +1,37 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Funções de verificação e autorização
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+        firestore.exists(/databases/(default)/documents/admins/$(request.auth.uid));
+    }
+
+    // Avatar do usuário (leitura pública, escrita apenas pelo dono)
+    match /users/{userId}/avatar.jpg {
+      allow read: if true;
+      allow write: if isOwner(userId);
+    }
+
+    // Fotografias de escaneamento da geladeira do usuário
+    match /users/{userId}/scans/{scanId} {
+      allow read, write: if isOwner(userId);
+    }
+
+    // Fotografias oficiais do catálogo de receitas (leitura pública, upload/escrita restrita a administradores)
+    match /recipes/{recipeId}/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

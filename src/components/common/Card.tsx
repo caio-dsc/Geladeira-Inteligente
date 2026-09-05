@@ -12,7 +12,7 @@ export const Card: React.FC<CardProps> = ({
   className = '',
   ...props
 }) => {
-  const baseStyles = 'rounded-3xl transition-all duration-200';
+  const baseStyles = 'rounded-2xl transition-all duration-200 text-left';
 
   const paddingStyles = {
     none: 'p-0',
@@ -22,11 +22,11 @@ export const Card: React.FC<CardProps> = ({
   };
 
   const variantStyles = {
-    default: 'bg-[#0b2116]/80 backdrop-blur-xl border border-emerald-500/20 text-emerald-100 shadow-[0_4px_24px_rgba(0,0,0,0.4)]',
-    flat: 'bg-[#081a11]/90 border border-emerald-500/15 text-emerald-100',
-    interactive: 'bg-[#0b2116]/80 backdrop-blur-xl border border-emerald-500/20 hover:border-emerald-400/50 hover:bg-[#0e2c1d]/90 hover:shadow-[0_0_20px_rgba(16,185,129,0.25)] cursor-pointer text-emerald-100 active:scale-[0.99]',
-    accent: 'bg-linear-to-br from-emerald-900/90 via-[#0a2717] to-emerald-950 text-white border border-emerald-500/40 shadow-[0_0_30px_rgba(16,185,129,0.2)]',
-    glow: 'bg-[#0c281b]/90 backdrop-blur-xl border border-emerald-400/40 text-white shadow-[0_0_30px_rgba(16,185,129,0.35)]',
+    default: 'bg-surface border border-border text-text-primary shadow-subtle',
+    flat: 'bg-surface-muted/70 border border-border text-text-primary',
+    interactive: 'bg-surface border border-border hover:border-primary/40 hover:shadow-soft cursor-pointer text-text-primary active:scale-[0.995]',
+    accent: 'bg-linear-to-br from-surface via-surface to-surface-muted text-text-primary border border-primary/30 shadow-soft',
+    glow: 'bg-surface border border-primary/30 text-text-primary shadow-[0_4px_20px_-2px_rgba(22,160,133,0.15)]',
   };
 
   return (
@@ -38,3 +38,4 @@ export const Card: React.FC<CardProps> = ({
     </div>
   );
 };
+

@@ -1,6 +1,6 @@
 import React from 'react';
 import { RecipeMatch } from '../../types';
-import { Clock, ChefHat, CheckCircle2, AlertTriangle, ArrowRight } from 'lucide-react';
+import { Clock, ChefHat, Users, CheckCircle2, AlertTriangle, ArrowRight } from 'lucide-react';
 import { Card } from '../common/Card';
 import { getRecipeDietBadges } from '../../services/recipeService';
 
@@ -117,6 +117,12 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onClick }) => {
               <ChefHat className="w-3.5 h-3.5 text-emerald-400" />
               {recipe.difficulty}
             </span>
+            {recipe.servings && (
+              <span className="flex items-center gap-1.5 font-medium">
+                <Users className="w-3.5 h-3.5 text-emerald-400" />
+                {recipe.servings} {recipe.servings === 1 ? 'porção' : 'porções'}
+              </span>
+            )}
           </div>
 
           {/* Ingredients availability status */}

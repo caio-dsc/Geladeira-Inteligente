@@ -747,7 +747,6 @@
         "Beef",
         "Almoço & Jantar",
         "Tradicional",
-        "Wikilivros",
         "Sem Frituras",
         "Rico em Proteína"
       ],
@@ -887,7 +886,6 @@
         "Seafood",
         "Almoço & Jantar",
         "Tradicional",
-        "Wikilivros",
         "Sem Glúten",
         "Sem Lactose",
         "Sem Frituras",
@@ -1565,7 +1563,6 @@
         "Wikilivros",
         "Sem Glúten",
         "Sem Lactose",
-        "Sem Frituras",
         "Rico em Proteína"
       ],
       "caloriesPerServing": 795,
@@ -1581,7 +1578,7 @@
         "vegan": false,
         "lowCarb": false,
         "highProtein": true,
-        "usesFrying": false
+        "usesFrying": true
       },
       "sources": [
         {
@@ -1869,11 +1866,6 @@
           "name": "2 colheres (sopa) de conhaque.",
           "quantity": "",
           "required": true
-        },
-        {
-          "name": "Rendimento: de 4 a 6 porções.",
-          "quantity": "",
-          "required": true
         }
       ],
       "steps": [
@@ -2069,42 +2061,32 @@
       "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
       "ingredients": [
         {
-          "name": "2 colheres (sopa, rasas) de margarina",
+          "name": "1 e 1/2 xícaras (chá) de mandioca bem cozida",
           "quantity": "",
           "required": true
         },
         {
-          "name": "3 colheres (sopa) de café solúvel",
+          "name": "2 colheres (sopa) de margarina",
           "quantity": "",
           "required": true
         },
         {
-          "name": "1 lata de leite em pó, instantâneo (400 gramas) --",
+          "name": "10 colheres (sopa) de açúcar",
           "quantity": "",
           "required": true
         },
         {
-          "name": "1 lata de chocolate em pó (400 gramas)",
+          "name": "1 xícara (chá) de leite em pó",
           "quantity": "",
           "required": true
         },
         {
-          "name": "1 lata de leite condensado",
+          "name": "3 colheres (sopa) de chocolate em pó",
           "quantity": "",
           "required": true
         },
         {
-          "name": "1/2 copo (tipo americano) de leite morno",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "50 gramas de grãos de café torrados (para decoração).",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Brigadeiro Doce - Para outras idéias além das receitas tradicionais em Portugal.",
+          "name": "200 g de chocolate granulado",
           "quantity": "",
           "required": true
         }
@@ -2378,17 +2360,7 @@
           "required": true
         },
         {
-          "name": "Misturar somente os polvilhos e sová-los bem com:",
-          "quantity": "",
-          "required": true
-        },
-        {
           "name": "1 copo (americano) de leite frio.",
-          "quantity": "",
-          "required": true
-        },
-        {
-          "name": "Coloque para ferver:",
           "quantity": "",
           "required": true
         },
@@ -2559,7 +2531,23 @@
         "Quando estiver borbulhando, mergulhar o abacaxi (é necessário o choque térmico).",
         "Tampar com pano de prato e deixar por 10 minutos.",
         "Tirar do fogo e deixar esfriar.",
-        "Tirar as fatias e, com uma faca, retirar o miolo e deixar escorrer. Reservar."
+        "Tirar as fatias e, com uma faca, retirar o miolo e deixar escorrer. Reservar.",
+        "Colocar para ferver, em fogo médio, 500 ml de água, juntamente com 1 kg de açúcar e o leite.",
+        "Com uma escumadeira, retirar o excesso de espuma.",
+        "Quando estiver no ponto de bala mole (checar a consistência pingando com a colher num prato com água fria), colocar os pedaços de abacaxi.",
+        "Quando levantar a fervura, retirar o doce do fogo e despejá-lo numa vasilha (que não pode ser de alumínio).",
+        "Deixar descansando até o dia seguinte.",
+        "Pôr novamente na panela e levar ao fogo.",
+        "Assim que levantar fervura, retirar os pedaços de abacaxi e colocá-los num pirex tampado, para não esfriar.",
+        "A calda é novamente levada ao ponto de bala mole, e o abacaxi volta à panela. Assim que levantar a fervura, retirar as fatias, colocá-las de volta no pirex, tampar e deixar descansar até o dia seguinte.",
+        "Repetir o procedimento por mais 2 dias (para desidratar a fruta).",
+        "Colocar para ferver, em fogo médio, a água, o açúcar e o leite.",
+        "Com uma escumadeira, tirar o excesso de espuma.",
+        "Escorrer o abacaxi e cortá-lo em cubos.",
+        "Colocá-los na panela da calda, mexendo com uma colher de pau até o ponto de bala mole, porém mais consistente.",
+        "Retirar do fogo e mexer até a calda ficar esbranquiçada.",
+        "Com um garfo, tirar pedaço por pedaço (rapidamente) e pôr para descansar sobre uma bandeja de alumínio (como as de pizza).",
+        "Deixar esfriar em temperatura ambiente."
       ],
       "tags": [
         "Outros",

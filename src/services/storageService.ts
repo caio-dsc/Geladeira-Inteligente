@@ -117,6 +117,45 @@ export class StorageService {
       return false;
     }
   }
+
+  /**
+   * Faz upload da imagem de capa de uma receita para o Cloud Storage
+   * Caminho isolado: recipes/{recipeId}/cover_{timestamp}.(jpg|png|webp)
+   */
+  public async uploadRecipeImage(
+    recipeId: string,
+    fileOrBlob: Blob | File
+  ): Promise<string> {
+    if (!recipeId) {
+      throw new Error('ID da receita é obrigatório para envio da imagem.');
+    }
+
+    // Validação básica e segura de formato de imagem
+    const rawType = (fileOrBlob.type || '').toLowerCase();
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    
+    if (rawType && !allowedTypes.includes(rawType)) {
+      throw new Error('Formato incompatível. Envie uma imagem JPEG, PNG ou WebP.');
+    }
+
+    const contentType = rawType || 'image/jpeg';
+    const ext = contentType.includes('png') ? 'png' : contentType.includes('webp') ? 'webp' : 'jpg';
+    const safePath = `recipes/${recipeId}/cover_${Date.now()}.${ext}`;
+    const storageRef = ref(storage, safePath);
+
+    const customMetadata: UploadMetadata = {
+      contentType,
+    };
+
+    try {
+      const snapshot = await uploadBytes(storageRef, fileOrBlob, customMetadata);
+      const downloadUrl = await getDownloadURL(snapshot.ref);
+      return downloadUrl;
+    } catch (error: any) {
+      console.error('Erro ao realizar upload da imagem da receita no Cloud Storage:', error);
+      throw new Error(`Falha no armazenamento da foto da receita: ${error?.message || 'Erro de permissão ou rede'}`);
+    }
+  }
 }
 
 export const storageService = new StorageService();

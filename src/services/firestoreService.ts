@@ -394,6 +394,36 @@ export class FirestoreService {
       console.warn('Aviso ao sincronizar receitas padrão:', error);
     }
   }
+
+  public async updateRecipeImage(recipeId: string, imageUrl: string): Promise<void> {
+    if (!recipeId || !imageUrl) return;
+    try {
+      const recipeRef = doc(db, 'recipes', recipeId);
+      await setDoc(recipeRef, {
+        imageUrl,
+        updatedAt: new Date().toISOString(),
+      }, { merge: true });
+    } catch (error) {
+      console.error('Erro ao atualizar imagem da receita no Firestore:', error);
+      throw error;
+    }
+  }
+
+  // ==========================================
+  // ADMINISTRADORES & PERMISSÕES
+  // ==========================================
+
+  public async checkIsAdmin(userId: string): Promise<boolean> {
+    if (!userId) return false;
+    try {
+      const adminRef = doc(db, 'admins', userId);
+      const snapshot = await getDoc(adminRef);
+      return snapshot.exists();
+    } catch (error) {
+      console.warn('Aviso ao verificar status de administrador no Firestore:', error);
+      return false;
+    }
+  }
 }
 
 export const firestoreService = new FirestoreService();

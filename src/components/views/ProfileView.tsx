@@ -587,8 +587,8 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
         )}
       </Card>
 
-      {/* Admin Panel Entry */}
-      {onNavigateTab && (
+      {/* Admin Panel Entry - apenas para administradores */}
+      {user?.isAdmin && onNavigateTab && (
         <Card className="flex items-center justify-between p-5 border-emerald-500/20 bg-[#081e13]/80">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-emerald-950 text-emerald-400 border border-emerald-500/30 flex items-center justify-center shadow-[0_0_12px_rgba(16,185,129,0.2)]">

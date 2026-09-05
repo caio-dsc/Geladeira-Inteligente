@@ -64,6 +64,15 @@ class FirebaseAuthService implements IAuthService {
    * Sincroniza o usuário autenticado do Firebase com o documento no Firestore
    */
   private async syncUserProfile(firebaseUser: FirebaseUser, customName?: string): Promise<User> {
+    // Consulta segura se o usuário consta na whitelist de administradores
+    let isAdmin = false;
+    try {
+      isAdmin = await firestoreService.checkIsAdmin(firebaseUser.uid);
+    } catch (adminErr) {
+      console.warn('Aviso ao verificar status de admin durante sync:', adminErr);
+      isAdmin = false;
+    }
+
     const existing = await firestoreService.getUser(firebaseUser.uid);
     if (existing) {
       // Atualiza eventuais dados mais recentes do Google ou Perfil
@@ -74,6 +83,7 @@ class FirebaseAuthService implements IAuthService {
         avatarUrl: existing.avatarUrl || firebaseUser.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
         age: existing.age ?? null,
         weightKg: existing.weightKg ?? null,
+        isAdmin,
       };
       await firestoreService.updateUserFields(firebaseUser.uid, {
         name: updated.name,
@@ -96,6 +106,7 @@ class FirebaseAuthService implements IAuthService {
       createdAt: new Date().toISOString(),
       age: null,
       weightKg: null,
+      isAdmin,
     };
 
     await firestoreService.setUser(firebaseUser.uid, newUser);

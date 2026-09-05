@@ -45,36 +45,36 @@ export const Modal: React.FC<ModalProps> = ({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
-          {/* Backdrop */}
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+          {/* Backdrop com desfoque moderado e tom neutro */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity"
+            className="fixed inset-0 bg-stone-900/60 backdrop-blur-xs transition-opacity"
           />
 
-          {/* Modal Dialog */}
+          {/* Modal Dialog com superfície clara, borda sutil e sombra flutuante */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 15 }}
+            initial={{ opacity: 0, scale: 0.97, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 15 }}
-            transition={{ type: 'spring', duration: 0.3, bounce: 0 }}
-            className={`relative w-full ${maxWidthStyles[maxWidth]} bg-[#081e13]/95 backdrop-blur-2xl rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.8)] border border-emerald-500/30 overflow-hidden z-10 my-auto text-emerald-50`}
+            exit={{ opacity: 0, scale: 0.97, y: 10 }}
+            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className={`relative w-full ${maxWidthStyles[maxWidth]} bg-surface rounded-2xl sm:rounded-3xl shadow-floating border border-border overflow-hidden z-10 my-auto text-text-primary text-left`}
             role="dialog"
             aria-modal="true"
           >
             {/* Header */}
             {(title || subtitle) && (
-              <div className="flex items-start justify-between p-5 sm:p-6 border-b border-emerald-500/15 bg-emerald-950/40">
+              <div className="flex items-start justify-between p-4 sm:p-6 border-b border-border bg-surface-muted/60">
                 <div>
-                  {title && <h3 className="text-lg font-bold text-white tracking-tight">{title}</h3>}
-                  {subtitle && <p className="text-xs text-emerald-300/70 mt-0.5">{subtitle}</p>}
+                  {title && <h3 className="text-lg font-bold text-text-primary tracking-tight">{title}</h3>}
+                  {subtitle && <p className="text-xs text-text-secondary mt-0.5">{subtitle}</p>}
                 </div>
                 <button
                   onClick={onClose}
-                  className="rounded-full p-2 text-emerald-400/80 hover:text-white hover:bg-emerald-800/40 transition-colors"
+                  className="rounded-xl p-2 text-text-secondary hover:text-text-primary hover:bg-surface-muted transition-colors cursor-pointer"
                   aria-label="Fechar"
                 >
                   <X className="w-5 h-5" />
@@ -83,13 +83,13 @@ export const Modal: React.FC<ModalProps> = ({
             )}
 
             {/* Body */}
-            <div className="p-5 sm:p-6 max-h-[75vh] overflow-y-auto">
+            <div className="p-4 sm:p-6 max-h-[75vh] overflow-y-auto text-text-primary">
               {children}
             </div>
 
             {/* Footer */}
             {footer && (
-              <div className="flex items-center justify-end gap-3 p-4 sm:p-5 border-t border-emerald-500/15 bg-emerald-950/50">
+              <div className="flex items-center justify-end gap-3 p-4 sm:p-5 border-t border-border bg-surface-muted/40">
                 {footer}
               </div>
             )}
@@ -99,3 +99,4 @@ export const Modal: React.FC<ModalProps> = ({
     </AnimatePresence>
   );
 };
+

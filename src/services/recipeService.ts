@@ -2,8 +2,17 @@ import { Recipe, RecipeMatch, FoodItem, UserPreferences } from '../types';
 import { MOCK_RECIPES } from '../data/mockData';
 import { firestoreService } from './firestoreService';
 import { matchesDietFilters, getRecipeDietBadges, matchesDifficultyFilter, matchesServingsFilter } from '../utils/dietFilters';
+import { calculateRecipeMatch, matchIngredients, isIngredientAvailable } from '../utils/ingredientMatcher';
 
-export { matchesDietFilters, getRecipeDietBadges, matchesDifficultyFilter, matchesServingsFilter };
+export { 
+  matchesDietFilters, 
+  getRecipeDietBadges, 
+  matchesDifficultyFilter, 
+  matchesServingsFilter,
+  matchIngredients,
+  isIngredientAvailable,
+  calculateRecipeMatch
+};
 
 export interface IRecipeService {
   getRecipes(): Promise<Recipe[]>;
@@ -68,54 +77,12 @@ class RecipeService implements IRecipeService {
     preferences?: UserPreferences
   ): Promise<RecipeMatch[]> {
     const recipes = await this.getRecipes();
-    const inv = inventory
-      .filter((i) => Number(i.quantity) > 0)
-      .map((i) => this.normalizeString(i.name));
-    const invSet = new Set(inv);
 
     const matchedList = recipes.map((recipe) => {
-      const ingredients = recipe.ingredients ?? [];
-      const matchedIngredients: string[] = [];
-      const missingIngredients: string[] = [];
-      const missingRequired: string[] = [];
-      let presentRequiredCount = 0;
-
-      const requiredIngredients = ingredients.filter((ing) => ing.required !== false);
-      const requiredIngredientsCount = requiredIngredients.length;
-
-      ingredients.forEach((ing) => {
-        const normalizedIng = this.normalizeString(ing.name);
-        const isMatched = invSet.has(normalizedIng) || inv.some((invName) => 
-          invName.includes(normalizedIng) || normalizedIng.includes(invName)
-        );
-
-        if (isMatched) {
-          matchedIngredients.push(ing.name);
-          if (ing.required !== false) {
-            presentRequiredCount += 1;
-          }
-        } else {
-          missingIngredients.push(ing.name);
-          if (ing.required !== false) {
-            missingRequired.push(ing.name);
-          }
-        }
-      });
-
-      const totalIngredients = ingredients.length;
-      const matchPercentage = requiredIngredientsCount > 0
-        ? Math.round((presentRequiredCount / requiredIngredientsCount) * 100)
-        : (totalIngredients > 0 ? Math.round((matchedIngredients.length / totalIngredients) * 100) : 0);
-
-      // isReady: todos os obrigatórios presentes com quantity > 0
-      const isReadyToCook = totalIngredients > 0 && missingRequired.length === 0;
-
+      const matchData = calculateRecipeMatch(recipe, inventory);
       return {
         ...recipe,
-        matchedIngredients,
-        missingIngredients,
-        matchPercentage,
-        isReadyToCook,
+        ...matchData,
       };
     });
 
@@ -167,50 +134,10 @@ class RecipeService implements IRecipeService {
     const recipe = recipes.find((r) => r.id === id);
     if (!recipe) return null;
 
-    const inv = inventory
-      .filter((item) => Number(item.quantity) > 0)
-      .map((item) => this.normalizeString(item.name));
-    const invSet = new Set(inv);
-
-    const ingredients = recipe.ingredients ?? [];
-    const matchedIngredients: string[] = [];
-    const missingIngredients: string[] = [];
-    const missingRequired: string[] = [];
-    let presentRequiredCount = 0;
-
-    const requiredIngredients = ingredients.filter((ing) => ing.required !== false);
-    const requiredIngredientsCount = requiredIngredients.length;
-
-    ingredients.forEach((ing) => {
-      const normalizedIng = this.normalizeString(ing.name);
-      const isMatched = invSet.has(normalizedIng) || inv.some((invName) => 
-        invName.includes(normalizedIng) || normalizedIng.includes(invName)
-      );
-
-      if (isMatched) {
-        matchedIngredients.push(ing.name);
-        if (ing.required !== false) {
-          presentRequiredCount += 1;
-        }
-      } else {
-        missingIngredients.push(ing.name);
-        if (ing.required !== false) {
-          missingRequired.push(ing.name);
-        }
-      }
-    });
-
-    const total = ingredients.length;
-    const matchPercentage = requiredIngredientsCount > 0
-      ? Math.round((presentRequiredCount / requiredIngredientsCount) * 100)
-      : (total > 0 ? Math.round((matchedIngredients.length / total) * 100) : 0);
-
+    const matchData = calculateRecipeMatch(recipe, inventory);
     return {
       ...recipe,
-      matchedIngredients,
-      missingIngredients,
-      matchPercentage,
-      isReadyToCook: total > 0 && missingRequired.length === 0,
+      ...matchData,
     };
   }
 

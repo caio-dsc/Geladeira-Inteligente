@@ -1,6 +1,12 @@
 import assert from 'node:assert/strict';
-import { matchesDietFilters, getRecipeDietBadges } from '../utils/dietFilters';
-import { RecipeDietFlags } from '../types';
+import { 
+  matchesDietFilters, 
+  getRecipeDietBadges, 
+  matchesDifficultyFilter, 
+  matchesServingsFilter 
+} from '../utils/dietFilters';
+import { RecipeDietFlags, ServingsBucket } from '../types';
+import { runIngredientMatcherTests } from '../utils/ingredientMatcher.test';
 
 console.log('🧪 Iniciando testes de matchesDietFilters e filtros dietéticos...');
 
@@ -345,6 +351,153 @@ const mockFriedGlutenRecipe: RecipeDietFlags = {
     const badges = getRecipeDietBadges(r.diet);
     assert.ok(Array.isArray(badges), `Badges de ${r.title} deve ser um array`);
   }
+
+  // 14. Testes de Filtro de Dificuldade
+  // Sem filtro de dificuldade: todas as 23 continuam disponíveis
+  const allDiff = catalog.filter((r: any) => matchesDifficultyFilter(r.difficulty, 'all'));
+  assert.equal(allDiff.length, 23, 'Sem filtro de dificuldade deve retornar todas as 23 receitas');
+  const undefDiff = catalog.filter((r: any) => matchesDifficultyFilter(r.difficulty, undefined));
+  assert.equal(undefDiff.length, 23, 'Filtro undefined de dificuldade deve retornar todas as receitas');
+
+  // Fácil: somente receitas com difficulty === 'Fácil'
+  const easyRecipes = catalog.filter((r: any) => matchesDifficultyFilter(r.difficulty, 'Fácil'));
+  assert.ok(easyRecipes.length > 0, 'Deve encontrar receitas Fáceis no catálogo');
+  for (const r of easyRecipes) {
+    assert.equal(r.difficulty, 'Fácil', `${r.title} deve ser Fácil`);
+  }
+
+  // Médio: somente receitas com difficulty === 'Médio'
+  const mediumRecipes = catalog.filter((r: any) => matchesDifficultyFilter(r.difficulty, 'Médio'));
+  assert.ok(mediumRecipes.length > 0, 'Deve encontrar receitas Médias no catálogo');
+  for (const r of mediumRecipes) {
+    assert.equal(r.difficulty, 'Médio', `${r.title} deve ser Médio`);
+  }
+
+  // Avançado: somente receitas com difficulty === 'Avançado'
+  const hardRecipes = catalog.filter((r: any) => matchesDifficultyFilter(r.difficulty, 'Avançado'));
+  for (const r of hardRecipes) {
+    assert.equal(r.difficulty, 'Avançado', `${r.title} deve ser Avançado`);
+  }
+  // Teste com mock de receita avançada para garantir funcionamento correto da regra
+  assert.equal(matchesDifficultyFilter('Avançado', 'Avançado'), true);
+  assert.equal(matchesDifficultyFilter('Fácil', 'Avançado'), false);
+
+  // 15. Testes de Filtro de Porções
+  // Sem filtro de porções: todas as 23 continuam disponíveis
+  const allServings = catalog.filter((r: any) => matchesServingsFilter(r, 'all'));
+  assert.equal(allServings.length, 23, 'Sem filtro de porções deve retornar todas as 23 receitas');
+  const undefServings = catalog.filter((r: any) => matchesServingsFilter(r, undefined));
+  assert.equal(undefServings.length, 23, 'Filtro undefined de porções deve retornar todas as receitas');
+
+  // Cada bucket de porções: somente receitas do bucket
+  const buckets: ServingsBucket[] = ['1', '2', '3-4', '5+'];
+  for (const bucket of buckets) {
+    const bucketRecipes = catalog.filter((r: any) => matchesServingsFilter(r, bucket));
+    for (const r of bucketRecipes) {
+      const b = r.servingsBucket;
+      assert.equal(b, bucket, `${r.title} deve pertencer ao bucket ${bucket}`);
+    }
+  }
+
+  // 16. Combinação: Fácil + 3–4 porções
+  const easy3to4 = catalog.filter(
+    (r: any) =>
+      matchesDifficultyFilter(r.difficulty, 'Fácil') &&
+      matchesServingsFilter(r, '3-4')
+  );
+  assert.ok(easy3to4.length > 0, 'Deve haver receitas fáceis de 3-4 porções no catálogo');
+  for (const r of easy3to4) {
+    assert.equal(r.difficulty, 'Fácil');
+    assert.equal(r.servingsBucket, '3-4');
+  }
+
+  // 17. Combinação com dieta: Vegetariano + Fácil + 3–4 porções
+  const vegEasy3to4 = catalog.filter(
+    (r: any) =>
+      matchesDietFilters(r.diet, ['Vegetariano']) &&
+      matchesDifficultyFilter(r.difficulty, 'Fácil') &&
+      matchesServingsFilter(r, '3-4')
+  );
+  assert.ok(vegEasy3to4.length <= easy3to4.length, 'Vegetariano + Fácil + 3-4 deve ser subconjunto de Fácil + 3-4');
+  for (const r of vegEasy3to4) {
+    assert.notEqual(r.diet.hasMeat, true);
+    assert.notEqual(r.diet.vegetarian, false);
+    assert.equal(r.difficulty, 'Fácil');
+    assert.equal(r.servingsBucket, '3-4');
+  }
+
+  // 18. Combinação múltipla: Vegano + Sem Glúten + Fácil + 3–4 porções
+  const veganGlutenFreeEasy3to4 = catalog.filter(
+    (r: any) =>
+      matchesDietFilters(r.diet, ['Vegano', 'Sem Glúten']) &&
+      matchesDifficultyFilter(r.difficulty, 'Fácil') &&
+      matchesServingsFilter(r, '3-4')
+  );
+  for (const r of veganGlutenFreeEasy3to4) {
+    assert.equal(r.diet.vegan, true);
+    assert.notEqual(r.diet.hasGluten, true);
+    assert.equal(r.difficulty, 'Fácil');
+    assert.equal(r.servingsBucket, '3-4');
+  }
+
+  // 19. Limpeza independente
+  // Limpar dificuldade retorna todas as dificuldades mantendo porções e dietas
+  const activeDiet = ['Vegetariano'];
+  const activeServings = '3-4';
+  const beforeDiffClear = catalog.filter(
+    (r: any) =>
+      matchesDietFilters(r.diet, activeDiet) &&
+      matchesDifficultyFilter(r.difficulty, 'Fácil') &&
+      matchesServingsFilter(r, activeServings)
+  );
+  // Limpando dificuldade (redefinindo para 'all')
+  const afterDiffClear = catalog.filter(
+    (r: any) =>
+      matchesDietFilters(r.diet, activeDiet) &&
+      matchesDifficultyFilter(r.difficulty, 'all') &&
+      matchesServingsFilter(r, activeServings)
+  );
+  assert.ok(afterDiffClear.length >= beforeDiffClear.length, 'Limpar dificuldade deve expandir ou manter os resultados');
+
+  // Limpar porções retorna todos os buckets mantendo dificuldade e dietas
+  const afterServingsClear = catalog.filter(
+    (r: any) =>
+      matchesDietFilters(r.diet, activeDiet) &&
+      matchesDifficultyFilter(r.difficulty, 'Fácil') &&
+      matchesServingsFilter(r, 'all')
+  );
+  assert.ok(afterServingsClear.length >= beforeDiffClear.length, 'Limpar porções deve expandir ou manter os resultados');
+
+  // Limpar dietas (passando []) não altera dificuldade nem porções
+  const afterDietClear = catalog.filter(
+    (r: any) =>
+      matchesDietFilters(r.diet, []) &&
+      matchesDifficultyFilter(r.difficulty, 'Fácil') &&
+      matchesServingsFilter(r, activeServings)
+  );
+  assert.ok(afterDietClear.length >= beforeDiffClear.length, 'Limpar dietas deve manter dificuldade e porções ativas');
+  for (const r of afterDietClear) {
+    assert.equal(r.difficulty, 'Fácil');
+    assert.equal(r.servingsBucket, activeServings);
+  }
+
+  // Usar do perfil (passando as restrições salvas) aplica apenas dietas
+  const profileDiet = ['Sem Frituras'];
+  const withProfileDiet = catalog.filter(
+    (r: any) =>
+      matchesDietFilters(r.diet, profileDiet) &&
+      matchesDifficultyFilter(r.difficulty, 'Fácil') &&
+      matchesServingsFilter(r, activeServings)
+  );
+  for (const r of withProfileDiet) {
+    assert.notEqual(r.diet.usesFrying, true);
+    assert.equal(r.difficulty, 'Fácil');
+    assert.equal(r.servingsBucket, activeServings);
+  }
 }
 
-console.log('✅ Todos os testes de filtros dietéticos e catálogo passaram com sucesso!');
+console.log('✅ Todos os testes de filtros dietéticos, dificuldade, porções e catálogo passaram com sucesso!');
+
+// Executa testes do matching inteligente de ingredientes
+runIngredientMatcherTests();
+

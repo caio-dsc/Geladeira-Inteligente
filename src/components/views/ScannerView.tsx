@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { motion } from 'motion/react';
 import {
   Camera,
   Upload,
@@ -18,6 +19,8 @@ import {
   AlertCircle,
   Clock,
   RefreshCw,
+  Smartphone,
+  Monitor,
 } from 'lucide-react';
 
 import { Card } from '../common/Card';
@@ -105,9 +108,16 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
 
   const fileInputRef =
     useRef<HTMLInputElement>(null);
+  const cameraInputRef =
+    useRef<HTMLInputElement>(null);
+  const [isDragging, setIsDragging] =
+    useState(false);
 
+  // Filtra imagens de amostra para exibir apenas referências de alimentos reais da geladeira
   const sampleImages =
-    scannerService.getSampleImages();
+    scannerService.getSampleImages().filter(
+      (sample) => sample.mockDetections && sample.mockDetections.length > 0
+    );
 
   /*
    * ============================================================
@@ -547,6 +557,34 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
     }
   };
 
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          setSelectedImage(event.target.result as string);
+          setScanStatus('idle');
+          setDetectedItems([]);
+          setErrorMessage('');
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSelectSample = (
     url: string
   ) => {
@@ -929,168 +967,189 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
     );
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto pb-24 md:pb-10 text-emerald-100 text-left">
-
+    <div className="space-y-6 max-w-4xl mx-auto pb-24 md:pb-10 text-text-primary text-left">
       {/* HEADER */}
-
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-
         <div>
-          <div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 bg-emerald-950/80 px-3 py-1 rounded-full border border-emerald-500/30 mb-1.5 backdrop-blur-md">
-
+          <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20 mb-2 backdrop-blur-xs">
             <Scan className="w-3.5 h-3.5" />
-
-            <span>
-              Visão Computacional de Alimentos
-            </span>
-
+            <span>Visão Computacional de Alimentos</span>
           </div>
 
-          <div className="text-xs font-bold text-rose-300">
-            DEBUG SCANNER VERSION: 2026-08-29
-          </div>
-
-          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-bold text-text-primary tracking-tight">
             Escanear Geladeira
           </h1>
 
-          <p className="text-xs sm:text-sm text-emerald-300/70">
+          <p className="text-xs sm:text-sm text-text-secondary mt-0.5">
             Identifique ingredientes automaticamente a partir de fotografias.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 text-xs font-bold text-emerald-300 bg-[#081e13] px-3.5 py-2 rounded-2xl border border-emerald-500/30 backdrop-blur-md shadow-[0_0_15px_rgba(16,185,129,0.15)]">
-
-          <Sparkles className="w-4 h-4 text-emerald-400" />
-
-          <span>
-            Custo: 1 crédito por análise
-          </span>
-
+        <div className="flex items-center gap-2 text-xs font-semibold text-primary bg-surface px-3.5 py-2 rounded-xl border border-border shadow-subtle">
+          <Sparkles className="w-4 h-4 text-primary" />
+          <span>Custo: 1 crédito por análise</span>
         </div>
-
       </div>
 
       {/* UPLOAD */}
-
       {scanStatus !== 'success' && (
         <Card
           variant="default"
           padding="none"
-          className="overflow-hidden"
+          className="overflow-hidden shadow-subtle border-border"
         >
-
           {!selectedImage ? (
+            <div className="p-5 sm:p-8 space-y-6">
+              {/* EXPERIÊNCIA MOBILE: Foco em Abrir Câmera */}
+              <div className="sm:hidden space-y-4">
+                <div className="text-center p-6 rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 space-y-3">
+                  <div className="w-16 h-16 mx-auto rounded-2xl bg-primary text-white flex items-center justify-center shadow-soft">
+                    <Camera className="w-8 h-8" />
+                  </div>
 
-            <div className="p-6 sm:p-10 text-center space-y-6">
+                  <div>
+                    <h3 className="text-base font-bold text-text-primary">
+                      Fotografar Geladeira
+                    </h3>
+                    <p className="text-xs text-text-secondary mt-1">
+                      Aponte a câmera para as prateleiras ou gavetas de alimentos.
+                    </p>
+                  </div>
 
-              <div
-                onClick={() =>
-                  fileInputRef.current?.click()
-                }
-                className="border-2 border-dashed border-emerald-500/30 hover:border-emerald-400 rounded-3xl p-8 sm:p-12 cursor-pointer bg-[#081d12]/70 hover:bg-[#0c2a1b]/90 transition-all flex flex-col items-center justify-center group shadow-[0_0_30px_rgba(0,0,0,0.4)]"
-              >
+                  <div className="pt-2 flex flex-col gap-2.5">
+                    <Button
+                      variant="primary"
+                      size="lg"
+                      onClick={() => cameraInputRef.current?.click()}
+                      className="w-full justify-center font-bold shadow-subtle py-3"
+                      leftIcon={<Camera className="w-5 h-5" />}
+                    >
+                      Abrir Câmera
+                    </Button>
 
-                <div className="w-18 h-18 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-700 text-stone-950 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-[0_0_25px_rgba(16,185,129,0.5)]">
-
-                  <Camera className="w-9 h-9" />
-
+                    <Button
+                      variant="outline"
+                      size="md"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="w-full justify-center text-xs"
+                      leftIcon={<Upload className="w-4 h-4" />}
+                    >
+                      Selecionar Foto da Galeria
+                    </Button>
+                  </div>
                 </div>
-
-                <h3 className="text-base sm:text-xl font-extrabold text-white">
-                  Tirar foto ou selecionar arquivo
-                </h3>
-
-                <p className="text-xs sm:text-sm text-emerald-300/70 mt-1 max-w-sm">
-                  Formatos aceitos: JPG, PNG ou tire uma foto direta da sua câmera.
-                </p>
-
-                <div className="mt-5 flex items-center gap-2">
-
-                  <Button
-                    variant="primary"
-                    size="md"
-                    leftIcon={
-                      <Upload className="w-4 h-4 text-stone-950" />
-                    }
-                  >
-                    Escolher Imagem
-                  </Button>
-
-                </div>
-
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  capture="environment"
-                  className="hidden"
-                  onChange={handleFileUpload}
-                />
-
               </div>
 
-              <div className="space-y-3 pt-2 text-center">
+              {/* EXPERIÊNCIA DESKTOP: Foco em Selecionar Foto / Arrastar Arquivo */}
+              <div className="hidden sm:block">
+                <div
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  onClick={() => fileInputRef.current?.click()}
+                  className={`border-2 border-dashed rounded-3xl p-10 cursor-pointer transition-all flex flex-col items-center justify-center group ${
+                    isDragging
+                      ? 'border-primary bg-primary/5 shadow-soft scale-[1.01]'
+                      : 'border-border hover:border-primary/40 bg-surface hover:bg-surface-muted shadow-subtle'
+                  }`}
+                >
+                  <div className="w-16 h-16 rounded-2xl bg-primary/10 text-primary border border-primary/20 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
+                    <Upload className="w-8 h-8" />
+                  </div>
 
-                <div className="flex items-center gap-2 justify-center text-xs font-bold text-emerald-400/80 uppercase tracking-wider">
+                  <h3 className="text-lg font-bold text-text-primary">
+                    Selecione ou arraste a foto da geladeira
+                  </h3>
 
-                  <ImageIcon className="w-3.5 h-3.5" />
+                  <p className="text-xs text-text-secondary mt-1 max-w-sm text-center">
+                    Formatos aceitos: JPG, PNG ou WebP com visualização nítida dos alimentos.
+                  </p>
 
-                  <span>
-                    Ou use uma foto de exemplo para teste
-                  </span>
+                  <div className="mt-5 flex items-center gap-3">
+                    <Button
+                      variant="primary"
+                      size="md"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        fileInputRef.current?.click();
+                      }}
+                      leftIcon={<Upload className="w-4 h-4" />}
+                    >
+                      Selecionar Foto do Computador
+                    </Button>
 
+                    <Button
+                      variant="outline"
+                      size="md"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        cameraInputRef.current?.click();
+                      }}
+                      leftIcon={<Camera className="w-4 h-4" />}
+                    >
+                      Usar Câmera / Webcam
+                    </Button>
+                  </div>
                 </div>
+              </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-xl mx-auto">
+              {/* INPUTS DE CAPTURA/ARQUIVO */}
+              <input
+                ref={cameraInputRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                className="hidden"
+                onChange={handleFileUpload}
+              />
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleFileUpload}
+              />
 
-                  {sampleImages.map(
-                    (sample) => (
+              {/* FOTOS DE AMOSTRA DE ALIMENTOS PARA TESTES RÁPIDOS */}
+              {sampleImages.length > 0 && (
+                <div className="space-y-3 pt-2 text-center">
+                  <div className="flex items-center gap-2 justify-center text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                    <ImageIcon className="w-3.5 h-3.5 text-primary" />
+                    <span>Fotos de alimentos para teste rápido</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-xl mx-auto">
+                    {sampleImages.map((sample) => (
                       <div
                         key={sample.id}
-                        onClick={() =>
-                          handleSelectSample(
-                            sample.url
-                          )
-                        }
-                        className="p-3 rounded-2xl border border-emerald-500/20 hover:border-emerald-400 bg-[#081e13]/80 hover:bg-[#0c2a1b] transition-all cursor-pointer flex items-center gap-3 text-left group"
+                        onClick={() => handleSelectSample(sample.url)}
+                        className="p-3 rounded-2xl border border-border hover:border-primary/40 bg-surface hover:bg-surface-muted transition-all cursor-pointer flex items-center gap-3 text-left group shadow-subtle"
                       >
-
                         <img
                           src={sample.url}
                           alt={sample.name}
                           referrerPolicy="no-referrer"
-                          className="w-16 h-16 rounded-xl object-cover shrink-0 ring-1 ring-emerald-500/30"
+                          className="w-16 h-16 rounded-xl object-cover shrink-0 border border-border"
                         />
 
                         <div className="flex-1 min-w-0">
-
-                          <h4 className="text-xs font-bold text-white group-hover:text-emerald-300 line-clamp-1">
+                          <h4 className="text-xs font-bold text-text-primary group-hover:text-primary line-clamp-1 transition-colors">
                             {sample.name}
                           </h4>
 
-                          <p className="text-[11px] text-emerald-300/60 line-clamp-2 mt-0.5">
+                          <p className="text-[11px] text-text-secondary line-clamp-2 mt-0.5">
                             {sample.description}
                           </p>
-
                         </div>
-
                       </div>
-                    )
-                  )}
-
+                    ))}
+                  </div>
                 </div>
-
-              </div>
-
+              )}
             </div>
-
           ) : (
-
             <div>
-
-              <div className="relative aspect-16/10 sm:aspect-21/9 w-full bg-[#05130b] overflow-hidden">
-
+              <div className="relative aspect-16/10 sm:aspect-21/9 w-full bg-surface-muted overflow-hidden">
                 <img
                   src={selectedImage}
                   alt="Geladeira para análise"
@@ -1099,69 +1158,54 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
                 />
 
                 {scanStatus === 'scanning' && (
+                  <div className="absolute inset-0 bg-surface/90 backdrop-blur-xs flex flex-col items-center justify-center p-6 text-center text-text-primary">
+                    <motion.div
+                      initial={{ top: '0%' }}
+                      animate={{ top: ['0%', '100%', '0%'] }}
+                      transition={{ repeat: Infinity, duration: 2.4, ease: 'easeInOut' }}
+                      className="absolute left-0 right-0 h-1 bg-primary shadow-[0_0_15px_rgba(22,160,133,0.6)] pointer-events-none"
+                    />
 
-                  <div className="absolute inset-0 bg-[#05130b]/80 backdrop-blur-xs flex flex-col items-center justify-center p-6 text-center text-white">
-
-                    <div className="absolute top-0 left-0 right-0 h-1 bg-emerald-400 shadow-[0_0_20px_#34d399] animate-bounce" />
-
-                    <div className="relative w-16 h-16 rounded-full border-4 border-emerald-400/30 flex items-center justify-center mb-4">
-
-                      <div className="w-10 h-10 rounded-full border-4 border-emerald-400 border-t-transparent animate-spin" />
-
+                    <div className="relative w-14 h-14 rounded-full border-4 border-primary/20 flex items-center justify-center mb-4">
+                      <div className="w-9 h-9 rounded-full border-4 border-primary border-t-transparent animate-spin" />
                     </div>
 
-                    <h4 className="text-lg font-bold text-white">
-                      Analisando alimentos...
+                    <h4 className="text-base font-bold text-text-primary">
+                      Analisando alimentos com IA...
                     </h4>
 
-                    <p className="text-xs text-emerald-300 mt-1 max-w-sm animate-pulse">
-                      {progressMessage ||
-                        'Identificando alimentos...'}
+                    <p className="text-xs text-text-secondary mt-1 max-w-sm animate-pulse font-medium">
+                      {progressMessage || 'Identificando alimentos...'}
                     </p>
-
                   </div>
-
                 )}
 
                 {scanStatus !== 'scanning' && (
-
                   <button
                     onClick={handleResetScanner}
-                    className="absolute top-3 right-3 p-2 rounded-full bg-black/70 hover:bg-black text-white backdrop-blur-md transition-colors"
+                    className="absolute top-3 right-3 p-2 rounded-full bg-surface/90 hover:bg-surface text-text-primary border border-border shadow-subtle backdrop-blur-md transition-colors cursor-pointer"
                     title="Remover imagem"
                   >
-
                     <X className="w-4 h-4" />
-
                   </button>
-
                 )}
-
               </div>
 
               {scanStatus !== 'scanning' && (
-
-                <div className="p-4 sm:p-6 bg-[#081e13] flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-emerald-500/20">
-
-                  <div className="text-xs text-emerald-300/70 text-center sm:text-left">
-
-                    <span className="font-bold text-white block">
+                <div className="p-4 sm:p-5 bg-surface flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-border">
+                  <div className="text-xs text-text-secondary text-center sm:text-left">
+                    <span className="font-bold text-text-primary block">
                       Imagem pronta para reconhecimento
                     </span>
-
                     A IA identificará apenas alimentos. Você confirmará as quantidades.
-
                   </div>
 
                   <div className="flex items-center gap-2.5 w-full sm:w-auto">
-
                     <Button
                       variant="outline"
                       onClick={handleResetScanner}
                       className="flex-1 sm:flex-none text-xs"
-                      leftIcon={
-                        <RotateCcw className="w-3.5 h-3.5" />
-                      }
+                      leftIcon={<RotateCcw className="w-3.5 h-3.5" />}
                     >
                       Trocar Foto
                     </Button>
@@ -1170,23 +1214,15 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
                       variant="primary"
                       onClick={handleStartScan}
                       className="flex-1 sm:flex-none font-bold"
-                      leftIcon={
-                        <Sparkles className="w-4 h-4 text-stone-950" />
-                      }
+                      leftIcon={<Sparkles className="w-4 h-4" />}
                     >
                       Analisar Geladeira (1 Crédito)
                     </Button>
-
                   </div>
-
                 </div>
-
               )}
-
             </div>
-
           )}
-
         </Card>
       )}
 
@@ -1197,18 +1233,18 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
           errorMessage.toLowerCase().includes('busy') ||
           errorMessage.toLowerCase().includes('503') ||
           errorMessage.toLowerCase().includes('demanda') ? (
-            <div className="flex flex-col items-center justify-center p-6 sm:p-10 text-center rounded-3xl border border-amber-500/30 bg-[#1f1508]/85 backdrop-blur-md shadow-[0_0_30px_rgba(245,158,11,0.15)]">
-              <div className="w-14 h-14 rounded-2xl bg-amber-950 text-amber-400 flex items-center justify-center mb-3.5 border border-amber-500/40 shadow-[0_0_15px_rgba(245,158,11,0.3)]">
-                <Clock className="w-7 h-7" />
+            <div className="flex flex-col items-center justify-center p-6 sm:p-8 text-center rounded-2xl border border-amber-500/30 bg-amber-500/10 backdrop-blur-xs shadow-subtle">
+              <div className="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-700 flex items-center justify-center mb-3 border border-amber-500/30">
+                <Clock className="w-6 h-6" />
               </div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-semibold mb-2">
-                <RefreshCw className={`w-3.5 h-3.5 text-amber-400 ${retryIn ? 'animate-spin' : ''}`} />
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/25 text-amber-800 text-xs font-semibold mb-2">
+                <RefreshCw className={`w-3.5 h-3.5 text-amber-700 ${retryIn ? 'animate-spin' : ''}`} />
                 {retryIn ? `Aguardando cooldown (${retryIn}s)` : 'Alta Demanda do Modelo de IA'}
               </div>
-              <h4 className="text-base sm:text-lg font-bold text-white mb-1.5">
+              <h4 className="text-base font-bold text-text-primary mb-1">
                 Servidor temporariamente ocupado
               </h4>
-              <p className="text-xs sm:text-sm text-amber-200/80 max-w-md mb-5 leading-relaxed">
+              <p className="text-xs sm:text-sm text-text-secondary max-w-md mb-5 leading-relaxed">
                 O modelo de IA recebeu muitas requisições simultâneas. <strong>Sua foto continua preservada</strong> para que você possa tentar novamente sem precisar tirar outra.
               </p>
               <div className="flex flex-wrap items-center justify-center gap-3">
@@ -1217,7 +1253,7 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
                   disabled={retryIn !== null && retryIn > 0}
                   variant="primary"
                   size="md"
-                  leftIcon={<RefreshCw className={`w-4 h-4 text-stone-950 ${retryIn ? 'animate-spin' : ''}`} />}
+                  leftIcon={<RefreshCw className={`w-4 h-4 ${retryIn ? 'animate-spin' : ''}`} />}
                 >
                   {retryIn !== null && retryIn > 0
                     ? `Aguarde ${retryIn}s para tentar...`
@@ -1267,316 +1303,235 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
       )}
 
       {/* RESULTADOS */}
-
       {scanStatus === 'success' && (
-
-        <div className="space-y-6">
-
-          <div className="p-4 sm:p-5 rounded-3xl bg-[#0a2618] border border-emerald-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-[0_0_25px_rgba(16,185,129,0.2)]">
-
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2 }}
+          className="space-y-6"
+        >
+          <div className="p-4 sm:p-5 rounded-2xl bg-primary/10 border border-primary/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-subtle">
             <div className="flex items-center gap-3">
-
-              <div className="w-11 h-11 rounded-2xl bg-emerald-500 text-stone-950 flex items-center justify-center font-bold shadow-[0_0_15px_rgba(16,185,129,0.5)]">
-
+              <div className="w-11 h-11 rounded-xl bg-primary text-white flex items-center justify-center font-bold shadow-subtle shrink-0">
                 <CheckCircle2 className="w-6 h-6" />
-
               </div>
 
               <div>
-
-                <h3 className="text-sm sm:text-base font-extrabold text-white">
+                <h3 className="text-sm sm:text-base font-bold text-text-primary">
                   {detectedItems.length} {detectedItems.length === 1 ? 'Alimento Identificado' : 'Alimentos Identificados'} com Sucesso!
                 </h3>
 
-                <p className="text-xs text-emerald-300/80">
+                <p className="text-xs text-text-secondary">
                   Revise a lista abaixo e selecione quais deseja sincronizar com o estoque.
                 </p>
-
               </div>
-
             </div>
 
             <Button
               variant="outline"
               size="sm"
               onClick={handleResetScanner}
-              leftIcon={
-                <RotateCcw className="w-3.5 h-3.5" />
-              }
-              className="text-xs"
+              leftIcon={<RotateCcw className="w-3.5 h-3.5" />}
+              className="text-xs shrink-0"
             >
               Nova Análise
             </Button>
-
           </div>
 
           <Card
             variant="default"
             padding="none"
-            className="overflow-hidden"
+            className="overflow-hidden shadow-subtle border-border"
           >
-
             {/* CABEÇALHO */}
-
-            <div className="p-3.5 sm:p-4 border-b border-emerald-500/15 flex items-center justify-between bg-emerald-950/40">
-
+            <div className="p-3.5 sm:p-4 border-b border-border flex items-center justify-between bg-surface-muted/60">
               <button
-                onClick={() =>
-                  handleSelectAll(
-                    !allSelected
-                  )
-                }
-                className="flex items-center gap-1.5 text-xs font-bold text-emerald-300 hover:text-white cursor-pointer"
+                onClick={() => handleSelectAll(!allSelected)}
+                className="flex items-center gap-1.5 text-xs font-semibold text-text-primary hover:text-primary cursor-pointer transition-colors"
               >
-
                 {allSelected ? (
-                  <CheckSquare className="w-4 h-4 text-emerald-400" />
+                  <CheckSquare className="w-4 h-4 text-primary" />
                 ) : (
-                  <Square className="w-4 h-4 text-emerald-700" />
+                  <Square className="w-4 h-4 text-text-secondary" />
                 )}
 
-                <span>
-                  Selecionar todos
-                </span>
-
+                <span>Selecionar todos</span>
               </button>
 
-              <span className="text-xs text-emerald-300/70 font-medium">
+              <span className="text-xs text-text-secondary font-medium">
                 {selectedCount} de {detectedItems.length} selecionados
               </span>
-
             </div>
 
             {/* LISTA */}
+            <div className="divide-y divide-border/60">
+              {detectedItems.map((item) => {
+                const delta = getDelta(item.unit);
+                const minQty = getMinQty(item.unit);
 
-            <div className="divide-y divide-emerald-500/10">
+                return (
+                  <div
+                    key={item.id}
+                    onClick={() => handleToggleItem(item.id)}
+                    className={`p-4 sm:p-5 transition-all cursor-pointer ${
+                      item.selected
+                        ? 'bg-primary/5 hover:bg-primary/8'
+                        : 'bg-surface hover:bg-surface-muted/50 opacity-70'
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      {/* CHECKBOX */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleItem(item.id);
+                        }}
+                        className="mt-1 shrink-0 cursor-pointer text-primary transition-colors"
+                        aria-label={
+                          item.selected
+                            ? 'Desmarcar alimento'
+                            : 'Selecionar alimento'
+                        }
+                      >
+                        {item.selected ? (
+                          <CheckSquare className="w-5 h-5 text-primary" />
+                        ) : (
+                          <Square className="w-5 h-5 text-border" />
+                        )}
+                      </button>
 
-              {detectedItems.map(
-                (item) => {
+                      {/* ÍCONE DA CATEGORIA */}
+                      <div className="mt-0.5 w-10 h-10 rounded-xl bg-surface-muted border border-border flex items-center justify-center shrink-0">
+                        {getCategoryIcon(item.category)}
+                      </div>
 
-                  const isFrozen =
-                    item.state ===
-                    'frozen';
+                      {/* BLOCO DO ITEM COM NOME, CATEGORIA, PRECISÃO E CONTROLE DE QUANTIDADE */}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-3">
+                          <h4 className="text-sm sm:text-base font-bold text-text-primary truncate">
+                            {item.name}
+                          </h4>
 
-                  const isInt = isIntegerUnit(item.unit);
-                  const delta = getDelta(item.unit);
-                  const minQty = getMinQty(item.unit);
-
-                  return (
-
-                    <div
-                      key={item.id}
-                      onClick={() =>
-                        handleToggleItem(
-                          item.id
-                        )
-                      }
-                      className={`p-4 sm:p-5 transition-all cursor-pointer rounded-2xl border ${
-                        item.selected
-                          ? 'bg-[#0b281b]/95 border-emerald-500/40 shadow-sm'
-                          : 'bg-[#081e13]/60 border-emerald-900/40 opacity-75'
-                      }`}
-                    >
-
-                      <div className="flex items-start gap-3">
-
-                        {/* CHECKBOX */}
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleToggleItem(
-                              item.id
-                            );
-                          }}
-                          className="mt-1 shrink-0 cursor-pointer text-emerald-400 hover:text-emerald-300 transition-colors"
-                          aria-label={
-                            item.selected
-                              ? 'Desmarcar alimento'
-                              : 'Selecionar alimento'
-                          }
-                        >
-                          {item.selected ? (
-                            <CheckSquare className="w-5 h-5 text-emerald-400" />
-                          ) : (
-                            <Square className="w-5 h-5 text-emerald-800" />
-                          )}
-                        </button>
-
-                        {/* ÍCONE DA CATEGORIA */}
-                        <div className="mt-0.5 w-10 h-10 rounded-xl bg-emerald-950/90 border border-emerald-500/30 flex items-center justify-center shrink-0">
-                          {getCategoryIcon(
-                            item.category
-                          )}
-                        </div>
-
-                        {/* BLOCO DO ITEM COM NOME, CATEGORIA, PRECISÃO E CONTROLE DE QUANTIDADE */}
-                        <div className="min-w-0 flex-1">
-                          {/* LINHA 1: Nome à esquerda + Controles de quantidade (- input +) à direita */}
-                          <div className="flex items-center justify-between gap-3">
-                            <h4 className="text-sm sm:text-base font-bold text-white truncate">
-                              {item.name}
-                            </h4>
-
-                            <div
-                              className="flex items-center gap-1 sm:gap-1.5 shrink-0"
-                              onClick={(e) => e.stopPropagation()}
+                          <div
+                            className="flex items-center gap-1 sm:gap-1.5 shrink-0"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleQuantityChange(item.id, -delta);
+                              }}
+                              disabled={item.quantity <= minQty}
+                              className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg border border-border bg-surface text-text-primary hover:bg-surface-muted disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center font-bold text-sm transition-colors cursor-pointer"
+                              aria-label={`Diminuir quantidade de ${item.name}`}
                             >
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleQuantityChange(item.id, -delta);
-                                }}
-                                disabled={item.quantity <= minQty}
-                                className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg border border-emerald-500/30 bg-emerald-950 text-emerald-300 hover:bg-emerald-900 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center font-bold text-sm transition-colors"
-                                aria-label={`Diminuir quantidade de ${item.name}`}
-                              >
-                                −
-                              </button>
+                              −
+                            </button>
 
-                              <input
-                                type="number"
-                                min={minQty}
-                                step={delta}
-                                value={item.quantity}
-                                onClick={(e) => e.stopPropagation()}
-                                onChange={(e) => {
-                                  e.stopPropagation();
-                                  handleQuantityInputChange(item.id, e.target.value);
-                                }}
-                                className="w-12 sm:w-14 h-7 sm:h-8 rounded-lg border border-emerald-500/30 bg-[#05130b] text-white text-center text-xs sm:text-sm font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-                                aria-label={`Quantidade de ${item.name}`}
-                              />
-
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleQuantityChange(item.id, delta);
-                                }}
-                                className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg border border-emerald-500/30 bg-emerald-950 text-emerald-300 hover:bg-emerald-900 hover:text-white flex items-center justify-center font-bold text-sm transition-colors"
-                                aria-label={`Aumentar quantidade de ${item.name}`}
-                              >
-                                +
-                              </button>
-
-                              <span className="text-[10px] sm:text-xs font-bold uppercase text-emerald-400/80 ml-0.5 min-w-[20px] text-center">
-                                {item.unit}
-                              </span>
-                            </div>
-                          </div>
-
-                          {/* LINHA 2: Categoria + Confiança + Botão Editar */}
-                          <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-emerald-300/70 mt-1">
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium">{getCategoryLabel(item.category)}</span>
-                              <span className="text-emerald-600">•</span>
-
-                              <span className="text-[11px] text-emerald-400 font-semibold">
-                                {(item.confidence * 100).toFixed(0)}% de precisão
-                              </span>
-                            </div>
+                            <input
+                              type="number"
+                              min={minQty}
+                              step={delta}
+                              value={item.quantity}
+                              onClick={(e) => e.stopPropagation()}
+                              onChange={(e) => {
+                                e.stopPropagation();
+                                handleQuantityInputChange(item.id, e.target.value);
+                              }}
+                              className="w-12 sm:w-14 h-7 sm:h-8 rounded-lg border border-border bg-surface text-text-primary text-center text-xs sm:text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/20"
+                              aria-label={`Quantidade de ${item.name}`}
+                            />
 
                             <button
                               type="button"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleOpenEditModal(item);
+                                handleQuantityChange(item.id, delta);
                               }}
-                              className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-400 hover:text-emerald-200 bg-emerald-950/70 hover:bg-emerald-900 px-2 py-0.5 rounded-md border border-emerald-500/30 transition-colors shadow-sm"
-                              aria-label={`Editar ${item.name}`}
+                              className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg border border-border bg-surface text-text-primary hover:bg-surface-muted flex items-center justify-center font-bold text-sm transition-colors cursor-pointer"
+                              aria-label={`Aumentar quantidade de ${item.name}`}
                             >
-                              <Pencil className="w-3 h-3 text-emerald-400" />
-                              Editar
+                              +
                             </button>
+
+                            <span className="text-[10px] sm:text-xs font-bold uppercase text-primary ml-0.5 min-w-[20px] text-center">
+                              {item.unit}
+                            </span>
                           </div>
                         </div>
 
+                        {/* LINHA 2: Categoria + Confiança + Botão Editar */}
+                        <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-text-secondary mt-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-text-secondary">{getCategoryLabel(item.category)}</span>
+                            <span className="text-border">•</span>
+
+                            <span className="text-[11px] text-primary font-semibold">
+                              {(item.confidence * 100).toFixed(0)}% de precisão
+                            </span>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenEditModal(item);
+                            }}
+                            className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary hover:text-primary-dark bg-primary/10 hover:bg-primary/15 px-2 py-0.5 rounded-md border border-primary/20 transition-colors shadow-xs cursor-pointer"
+                            aria-label={`Editar ${item.name}`}
+                          >
+                            <Pencil className="w-3 h-3 text-primary" />
+                            Editar
+                          </button>
+                        </div>
                       </div>
-
                     </div>
-
-                  );
-
-                }
-              )}
-
+                  </div>
+                );
+              })}
             </div>
 
             {/* RODAPÉ */}
-
-            <div className="p-4 bg-emerald-950/50 border-t border-emerald-500/15 flex flex-col sm:flex-row items-center justify-between gap-3">
-
-              <div className="text-xs text-emerald-300/70 text-center sm:text-left">
-
+            <div className="p-4 bg-surface-muted/60 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="text-xs text-text-secondary text-center sm:text-left">
                 Os itens adicionados atualizarão instantaneamente o cálculo das receitas compatíveis.
-
               </div>
 
               <Button
                 variant="primary"
                 size="md"
-                onClick={
-                  handleSaveToInventory
-                }
+                onClick={handleSaveToInventory}
                 isLoading={isSaving}
-                disabled={
-                  selectedCount === 0
-                }
-                leftIcon={
-                  <Plus className="w-4 h-4 text-stone-950" />
-                }
+                disabled={selectedCount === 0}
+                leftIcon={<Plus className="w-4 h-4" />}
                 className="w-full sm:w-auto font-bold"
               >
-
                 Adicionar {selectedCount}{' '}
-                {selectedCount === 1
-                  ? 'Item'
-                  : 'Itens'}{' '}
-                à Geladeira
-
+                {selectedCount === 1 ? 'Item' : 'Itens'} à Geladeira
               </Button>
-
             </div>
-
           </Card>
-
-        </div>
-
+        </motion.div>
       )}
 
       {/* MODO DEMONSTRAÇÃO */}
-
-      <div className="p-3.5 rounded-2xl bg-[#081e13]/70 border border-emerald-500/20 text-xs text-emerald-300/70 flex items-center justify-between">
-
+      <div className="p-3.5 rounded-2xl bg-surface border border-border text-xs text-text-secondary flex items-center justify-between shadow-subtle">
         <span className="flex items-center gap-1.5 font-medium">
-
-          <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-
+          <Sparkles className="w-3.5 h-3.5 text-primary" />
           Modo Demonstração: Simular falha de captura de foto
-
         </span>
 
         <label className="relative inline-flex items-center cursor-pointer">
-
           <input
             type="checkbox"
-            checked={
-              simulatedErrorToggle
-            }
-            onChange={(e) =>
-              setSimulatedErrorToggle(
-                e.target.checked
-              )
-            }
+            checked={simulatedErrorToggle}
+            onChange={(e) => setSimulatedErrorToggle(e.target.checked)}
             className="sr-only peer"
           />
-
-          <div className="w-9 h-5 bg-emerald-950 border border-emerald-500/40 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-rose-600" />
-
+          <div className="w-9 h-5 bg-border peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-rose-500" />
         </label>
-
       </div>
 
       {/* MODAL DE EDIÇÃO DO ITEM DETECTADO */}
@@ -1590,8 +1545,8 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
         {editingItem && (
           <form onSubmit={handleSaveEditModal} className="space-y-4">
             {editError && (
-              <div className="p-3 rounded-xl bg-rose-950/50 border border-rose-500/30 flex items-center gap-2 text-xs text-rose-300">
-                <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
+              <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 flex items-center gap-2 text-xs text-rose-700">
+                <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
                 <span>{editError}</span>
               </div>
             )}
@@ -1610,29 +1565,29 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5 text-left">
-                <label className="block text-xs font-semibold text-emerald-200/90">
+                <label className="block text-xs font-semibold text-text-primary">
                   Categoria *
                 </label>
                 <select
                   value={editCategory}
                   onChange={(e) => setEditCategory(e.target.value as CategoryType)}
-                  className="w-full rounded-2xl border border-emerald-500/25 bg-[#081d12]/90 px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-400/30 backdrop-blur-md"
+                  className="w-full rounded-xl border border-border bg-surface px-3.5 py-2.5 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 shadow-xs"
                 >
-                  <option value="vegetables" className="bg-stone-900">Legumes & Verduras</option>
-                  <option value="fruits" className="bg-stone-900">Frutas</option>
-                  <option value="dairy" className="bg-stone-900">Laticínios</option>
-                  <option value="proteins" className="bg-stone-900">Proteínas & Ovos</option>
-                  <option value="drinks" className="bg-stone-900">Bebidas</option>
-                  <option value="pantry" className="bg-stone-900">Despensa & Grãos</option>
-                  <option value="condiments" className="bg-stone-900">Temperos & Molhos</option>
-                  <option value="bakery" className="bg-stone-900">Pães & Massas</option>
-                  <option value="other" className="bg-stone-900">Outros</option>
+                  <option value="vegetables">Legumes & Verduras</option>
+                  <option value="fruits">Frutas</option>
+                  <option value="dairy">Laticínios</option>
+                  <option value="proteins">Proteínas & Ovos</option>
+                  <option value="drinks">Bebidas</option>
+                  <option value="pantry">Despensa & Grãos</option>
+                  <option value="condiments">Temperos & Molhos</option>
+                  <option value="bakery">Pães & Massas</option>
+                  <option value="other">Outros</option>
                 </select>
               </div>
 
               <div className="grid grid-cols-2 gap-2">
                 <div className="space-y-1.5 text-left">
-                  <label className="block text-xs font-semibold text-emerald-200/90">
+                  <label className="block text-xs font-semibold text-text-primary">
                     Quantidade *
                   </label>
                   <input
@@ -1645,27 +1600,27 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
                       setEditQuantity(isNaN(val) ? 1 : val);
                       setEditError('');
                     }}
-                    className="w-full rounded-2xl border border-emerald-500/25 bg-[#081d12]/90 px-3 py-2.5 text-sm text-white text-center font-bold focus:outline-none focus:ring-2 focus:ring-emerald-400/30 backdrop-blur-md"
+                    className="w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-text-primary text-center font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 shadow-xs"
                     required
                   />
                 </div>
 
                 <div className="space-y-1.5 text-left">
-                  <label className="block text-xs font-semibold text-emerald-200/90">
+                  <label className="block text-xs font-semibold text-text-primary">
                     Unidade *
                   </label>
                   <select
                     value={editUnit}
                     onChange={(e) => setEditUnit(e.target.value as FoodItem['unit'])}
-                    className="w-full rounded-2xl border border-emerald-500/25 bg-[#081d12]/90 px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-400/30 backdrop-blur-md"
+                    className="w-full rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 shadow-xs"
                   >
-                    <option value="un" className="bg-stone-900">un</option>
-                    <option value="kg" className="bg-stone-900">kg</option>
-                    <option value="g" className="bg-stone-900">g</option>
-                    <option value="L" className="bg-stone-900">L</option>
-                    <option value="ml" className="bg-stone-900">ml</option>
-                    <option value="pct" className="bg-stone-900">pct</option>
-                    <option value="fatias" className="bg-stone-900">fatias</option>
+                    <option value="un">un</option>
+                    <option value="kg">kg</option>
+                    <option value="g">g</option>
+                    <option value="L">L</option>
+                    <option value="ml">ml</option>
+                    <option value="pct">pct</option>
+                    <option value="fatias">fatias</option>
                   </select>
                 </div>
               </div>
@@ -1673,33 +1628,33 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5 text-left">
-                <label className="block text-xs font-semibold text-emerald-200/90">
+                <label className="block text-xs font-semibold text-text-primary">
                   Local de Armazenamento
                 </label>
                 <select
                   value={editLocation}
                   onChange={(e) => setEditLocation(e.target.value as StorageLocation)}
-                  className="w-full rounded-2xl border border-emerald-500/25 bg-[#081d12]/90 px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-400/30 backdrop-blur-md"
+                  className="w-full rounded-xl border border-border bg-surface px-3.5 py-2.5 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 shadow-xs"
                 >
-                  <option value="geladeira" className="bg-stone-900">Geladeira (Principal)</option>
-                  <option value="freezer" className="bg-stone-900">Freezer / Congelador</option>
-                  <option value="gaveta_legumes" className="bg-stone-900">Gaveta de Legumes</option>
-                  <option value="porta" className="bg-stone-900">Porta da Geladeira</option>
-                  <option value="despensa" className="bg-stone-900">Despensa</option>
+                  <option value="geladeira">Geladeira (Principal)</option>
+                  <option value="freezer">Freezer / Congelador</option>
+                  <option value="gaveta_legumes">Gaveta de Legumes</option>
+                  <option value="porta">Porta da Geladeira</option>
+                  <option value="despensa">Despensa</option>
                 </select>
               </div>
 
               <div className="space-y-1.5 text-left">
-                <label className="block text-xs font-semibold text-emerald-200/90">
+                <label className="block text-xs font-semibold text-text-primary">
                   Estado
                 </label>
                 <select
                   value={editState}
                   onChange={(e) => setEditState(e.target.value as FreshnessState)}
-                  className="w-full rounded-2xl border border-emerald-500/25 bg-[#081d12]/90 px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-400/30 backdrop-blur-md"
+                  className="w-full rounded-xl border border-border bg-surface px-3.5 py-2.5 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 shadow-xs"
                 >
-                  <option value="fresh" className="bg-stone-900">Fresco / Refrigerado</option>
-                  <option value="frozen" className="bg-stone-900">Congelado</option>
+                  <option value="fresh">Fresco / Refrigerado</option>
+                  <option value="frozen">Congelado</option>
                 </select>
               </div>
             </div>
@@ -1711,7 +1666,7 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
               onChange={(e) => setEditExpiryDate(e.target.value)}
             />
 
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-emerald-500/20">
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-border">
               <Button
                 type="button"
                 variant="ghost"
@@ -1724,7 +1679,7 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
                 type="submit"
                 variant="primary"
                 size="md"
-                leftIcon={<Save className="w-4 h-4 text-stone-950" />}
+                leftIcon={<Save className="w-4 h-4" />}
               >
                 Salvar Alterações
               </Button>
@@ -1732,7 +1687,6 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
           </form>
         )}
       </Modal>
-
     </div>
   );
 };

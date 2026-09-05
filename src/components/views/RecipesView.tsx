@@ -3,7 +3,12 @@ import { RecipeMatch, FoodItem } from '../../types';
 import { RecipeCard } from '../recipe/RecipeCard';
 import { Input } from '../common/Input';
 import { EmptyState } from '../common/EmptyState';
-import { matchesDietFilters } from '../../services/recipeService';
+import { 
+  matchesDietFilters, 
+  matchesDifficultyFilter, 
+  matchesServingsFilter 
+} from '../../services/recipeService';
+import { DifficultyFilterValue, ServingsFilterValue } from '../../utils/dietFilters';
 import { 
   BookOpen, 
   Search, 
@@ -11,7 +16,9 @@ import {
   CheckCircle2, 
   Utensils,
   RefreshCcw,
-  Loader2
+  Loader2,
+  ChefHat,
+  Users
 } from 'lucide-react';
 
 export interface RecipesViewProps {
@@ -53,6 +60,8 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
   const [filterMatch, setFilterMatch] = useState<'all' | 'ready' | 'high'>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [dietFilters, setDietFilters] = useState<string[]>(userDietaryRestrictions ?? []);
+  const [difficultyFilter, setDifficultyFilter] = useState<DifficultyFilterValue>('all');
+  const [servingsFilter, setServingsFilter] = useState<ServingsFilterValue>('all');
 
   // se o perfil mudar (ex.: voltou do Profile), sincroniza
   useEffect(() => {
@@ -116,12 +125,21 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
           selectedCategory === 'all' || normalizeCategory(recipe.category) === selectedCategory;
 
         const matchesDiet = matchesDietFilters(recipe.diet, dietFilters);
+        const matchesDifficulty = matchesDifficultyFilter(recipe.difficulty, difficultyFilter);
+        const matchesServings = matchesServingsFilter(recipe, servingsFilter);
 
         let matchesMatch = true;
         if (filterMatch === 'ready') matchesMatch = recipe.isReadyToCook;
         if (filterMatch === 'high') matchesMatch = recipe.matchPercentage >= 60;
 
-        return matchesSearch && matchesCategory && matchesDiet && matchesMatch;
+        return (
+          matchesSearch &&
+          matchesCategory &&
+          matchesDiet &&
+          matchesDifficulty &&
+          matchesServings &&
+          matchesMatch
+        );
       })
       .sort((a, b) => {
         // 1. isReadyToCook desc (Prontas primeiro)
@@ -135,7 +153,7 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
         // 3. title asc (ordem alfabética)
         return a.title.localeCompare(b.title, 'pt-BR');
       });
-  }, [recipes, searchTerm, selectedCategory, dietFilters, filterMatch]);
+  }, [recipes, searchTerm, selectedCategory, dietFilters, difficultyFilter, servingsFilter, filterMatch]);
 
   const groupedByCategory = useMemo(() => {
     const groups: Record<string, RecipeMatch[]> = {};
@@ -277,6 +295,65 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
               {cat.label}
             </button>
           ))}
+        </div>
+
+        {/* Dificuldade & Porções */}
+        <div className="pt-2 border-t border-emerald-500/10 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-4">
+            {/* Dificuldade */}
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-bold text-emerald-400/80 uppercase tracking-wider flex items-center gap-1">
+                <ChefHat className="w-3.5 h-3.5 text-emerald-400" />
+                Dificuldade:
+              </span>
+              <select
+                id="recipe-difficulty-select"
+                value={difficultyFilter}
+                onChange={(e) => setDifficultyFilter(e.target.value as DifficultyFilterValue)}
+                className="rounded-xl border border-emerald-500/30 bg-[#081d12] px-3 py-1.5 text-xs font-semibold text-white focus:outline-none focus:ring-2 focus:ring-emerald-400/30 cursor-pointer"
+              >
+                <option value="all">Todas</option>
+                <option value="Fácil">Fácil</option>
+                <option value="Médio">Médio</option>
+                <option value="Avançado">Avançado</option>
+              </select>
+            </div>
+
+            {/* Porções */}
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-bold text-emerald-400/80 uppercase tracking-wider flex items-center gap-1">
+                <Users className="w-3.5 h-3.5 text-emerald-400" />
+                Porções:
+              </span>
+              <select
+                id="recipe-servings-select"
+                value={servingsFilter}
+                onChange={(e) => setServingsFilter(e.target.value as ServingsFilterValue)}
+                className="rounded-xl border border-emerald-500/30 bg-[#081d12] px-3 py-1.5 text-xs font-semibold text-white focus:outline-none focus:ring-2 focus:ring-emerald-400/30 cursor-pointer"
+              >
+                <option value="all">Todas</option>
+                <option value="1">1 porção</option>
+                <option value="2">2 porções</option>
+                <option value="3-4">3–4 porções</option>
+                <option value="5+">5+ porções</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Limpar dificuldade e porções se algum estiver diferente de 'all' */}
+          {(difficultyFilter !== 'all' || servingsFilter !== 'all') && (
+            <button
+              type="button"
+              onClick={() => {
+                setDifficultyFilter('all');
+                setServingsFilter('all');
+              }}
+              className="text-[11px] font-bold text-rose-300/80 hover:text-rose-200 transition cursor-pointer"
+              title="Redefinir dificuldade e porções"
+            >
+              Limpar dificuldade & porções
+            </button>
+          )}
         </div>
 
         {/* Diet Chips */}

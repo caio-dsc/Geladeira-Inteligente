@@ -124,6 +124,7 @@ export interface User {
   createdAt: string;
   age?: number | null;
   weightKg?: number | null;
+  isAdmin?: boolean;
 }
 
 export interface DetectedFoodItem {
