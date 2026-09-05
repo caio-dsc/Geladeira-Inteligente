@@ -1,9 +1,9 @@
 import { Recipe, RecipeMatch, FoodItem, UserPreferences } from '../types';
 import { MOCK_RECIPES } from '../data/mockData';
 import { firestoreService } from './firestoreService';
-import { matchesDietFilters, getRecipeDietBadges } from '../utils/dietFilters';
+import { matchesDietFilters, getRecipeDietBadges, matchesDifficultyFilter, matchesServingsFilter } from '../utils/dietFilters';
 
-export { matchesDietFilters, getRecipeDietBadges };
+export { matchesDietFilters, getRecipeDietBadges, matchesDifficultyFilter, matchesServingsFilter };
 
 export interface IRecipeService {
   getRecipes(): Promise<Recipe[]>;

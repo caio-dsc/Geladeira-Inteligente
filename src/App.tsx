@@ -47,11 +47,11 @@ export default function App() {
   const [isRefreshingRecipes, setIsRefreshingRecipes] = useState(false);
   const [recipesUpdatedAt, setRecipesUpdatedAt] = useState<number | null>(null);
 
-  // Preferências base para matching de receitas (sem prender filtros dietéticos globais,
-  // permitindo que o RecipesView filtre, combine e limpe dietas instantaneamente na memória)
+  // Preferências base para matching de receitas (sem pré-filtrar dietas, dificuldade ou porções globais,
+  // permitindo que o RecipesView filtre, combine e limpe instantaneamente na memória)
   const recipeBasePreferences = useMemo(() => {
     if (!user?.preferences) return undefined;
-    const { dietaryRestrictions: _, ...rest } = user.preferences;
+    const { dietaryRestrictions: _, cookingLevel: __, defaultServings: ___, ...rest } = user.preferences;
     return rest;
   }, [user?.preferences]);
 

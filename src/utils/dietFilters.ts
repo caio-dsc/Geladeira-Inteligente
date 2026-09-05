@@ -1,4 +1,8 @@
-import { RecipeDietFlags } from '../types';
+import { RecipeDietFlags, ServingsBucket } from '../types';
+import { servingsBucketFromServings } from './recipeUtils';
+
+export type DifficultyFilterValue = 'all' | 'Fácil' | 'Médio' | 'Avançado';
+export type ServingsFilterValue = 'all' | ServingsBucket;
 
 /**
  * Validação pura e unificada de filtros dietéticos com lógica AND (interseção).
@@ -128,3 +132,39 @@ export function getRecipeDietBadges(diet?: RecipeDietFlags): string[] {
 
   return badges;
 }
+
+/**
+ * Validação do filtro de dificuldade.
+ * Quando 'all' ou 'Todas', aceita qualquer dificuldade.
+ * Caso contrário, exige correspondência exata com recipe.difficulty.
+ */
+export function matchesDifficultyFilter(
+  recipeDifficulty?: string,
+  filter?: DifficultyFilterValue | string
+): boolean {
+  if (!filter || filter === 'all' || filter === 'Todas') {
+    return true;
+  }
+  return recipeDifficulty === filter;
+}
+
+/**
+ * Validação do filtro de porções utilizando recipe.servingsBucket como fonte principal,
+ * com fallback para servingsBucketFromServings(recipe.servings).
+ * Quando 'all' ou 'Todas', aceita qualquer quantidade de porções.
+ */
+export function matchesServingsFilter(
+  recipe: { servingsBucket?: ServingsBucket; servings?: number },
+  filter?: ServingsFilterValue | string
+): boolean {
+  if (!filter || filter === 'all' || filter === 'Todas') {
+    return true;
+  }
+  const bucket =
+    recipe.servingsBucket && recipe.servingsBucket !== 'unknown'
+      ? recipe.servingsBucket
+      : servingsBucketFromServings(recipe.servings);
+
+  return bucket === filter;
+}
+
