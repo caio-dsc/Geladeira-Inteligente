@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Recipe } from '../../types';
 import { Modal } from '../common/Modal';
 import { Button } from '../common/Button';
-import { storageService } from '../../services/storageService';
+import { imageUploadService } from '../../services/imageUploadService';
+import { optimizeImageForUpload } from '../../utils/imageOptimizer';
 import { firestoreService } from '../../services/firestoreService';
 import { 
   Upload, 
@@ -149,30 +150,38 @@ export const RecipePhotoModal: React.FC<RecipePhotoModalProps> = ({
       setErrorMessage(null);
       setUploadProgress(0);
 
-      // 1. Upload seguro para o Firebase Cloud Storage com acompanhamento de progresso
-      setUploadStep('Iniciando envio para o Firebase Storage...');
-      const downloadUrl = await storageService.uploadRecipeImage(
+      // 1. Otimização e validação no cliente (Canvas/redimensionamento/WebP/JPEG)
+      setUploadStep('Otimizando imagem para alta velocidade...');
+      const optimizedFile = await optimizeImageForUpload(selectedFile, {
+        maxWidth: 1200,
+        maxHeight: 1200,
+        quality: 0.85,
+      });
+
+      // 2. Upload seguro para o Cloudinary com monitoramento de progresso real
+      setUploadStep('Iniciando envio para o servidor de imagens...');
+      const secureUrl = await imageUploadService.uploadRecipeImage(
         recipe.id,
-        selectedFile,
+        optimizedFile,
         (pct) => {
           setUploadProgress(pct);
-          setUploadStep(`Enviando foto para o Firebase Storage (${Math.round(pct)}%)...`);
+          setUploadStep(`Enviando foto (${Math.round(pct)}%)...`);
         },
-        20000 // 20s de timeout seguro para evitar retenção indefinida
+        35000 // 35s timeout seguro
       );
 
-      // 2. Atualização atômica no Cloud Firestore com merge
+      // 3. Atualização atômica no Cloud Firestore com merge
       setUploadStep('Gravando referência no Firestore...');
-      await firestoreService.updateRecipeImage(recipe.id, downloadUrl);
+      await firestoreService.updateRecipeImage(recipe.id, secureUrl);
 
-      // 3. Notificação do sucesso
+      // 4. Notificação do sucesso
       setUploadStep('Foto atualizada com sucesso!');
-      onSuccess(recipe.id, downloadUrl);
+      onSuccess(recipe.id, secureUrl);
       onClose();
     } catch (err: any) {
       console.error('Erro ao salvar foto da receita:', err);
       setErrorMessage(
-        err?.message || 'Falha ao salvar a nova foto. Verifique a conexão e as permissões de administrador.'
+        err?.message || 'Falha ao salvar a nova foto. Verifique a conexão e tente novamente.'
       );
     } finally {
       setIsUploading(false);
@@ -210,8 +219,8 @@ export const RecipePhotoModal: React.FC<RecipePhotoModalProps> = ({
       subtitle={recipe.title}
       maxWidth="lg"
       footer={
-        <div className="flex w-full items-center justify-between gap-3">
-          <div>
+        <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 w-full">
+          <div className="w-full sm:w-auto">
             {recipe.imageUrl?.trim() && !previewUrl && (
               <Button
                 variant="danger"
@@ -219,6 +228,7 @@ export const RecipePhotoModal: React.FC<RecipePhotoModalProps> = ({
                 onClick={handleRemovePhoto}
                 disabled={isUploading}
                 leftIcon={<Trash2 className="w-4 h-4" />}
+                className="w-full sm:w-auto justify-center"
               >
                 Remover Foto
               </Button>
@@ -230,17 +240,19 @@ export const RecipePhotoModal: React.FC<RecipePhotoModalProps> = ({
                 onClick={handleDiscardSelection}
                 disabled={isUploading}
                 leftIcon={<RotateCcw className="w-4 h-4" />}
+                className="w-full sm:w-auto justify-center"
               >
                 Descartar Seleção
               </Button>
             )}
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
             <Button 
               variant="outline" 
               onClick={onClose} 
               disabled={isUploading}
+              className="w-full sm:w-auto justify-center"
             >
               Cancelar
             </Button>
@@ -250,6 +262,7 @@ export const RecipePhotoModal: React.FC<RecipePhotoModalProps> = ({
               disabled={!selectedFile || isUploading}
               isLoading={isUploading}
               leftIcon={<CheckCircle2 className="w-4 h-4" />}
+              className="w-full sm:w-auto justify-center"
             >
               {isUploading ? 'Salvando...' : errorMessage ? 'Tentar Novamente' : 'Salvar Nova Foto'}
             </Button>

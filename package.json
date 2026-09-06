@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
+    "test": "npm run test:diet && npm run test:filter && tsx src/utils/foodTaxonomy.test.ts && tsx src/services/imageUploadService.test.ts",
     "test:diet": "tsx scripts/catalog/dietHeuristics.test.ts",
     "test:filter": "tsx src/services/recipeDietFilters.test.ts",
     "generate": "tsx scripts/recipes/generateCatalog.ts",
