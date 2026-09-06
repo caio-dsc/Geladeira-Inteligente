@@ -1,4 +1,12 @@
-import { ref, uploadBytes, getDownloadURL, deleteObject, UploadMetadata } from 'firebase/storage';
+import {
+  ref,
+  uploadBytes,
+  uploadBytesResumable,
+  getDownloadURL,
+  deleteObject,
+  UploadMetadata,
+  UploadTask,
+} from 'firebase/storage';
 import { storage } from './firebaseConfig';
 
 /**
@@ -121,10 +129,13 @@ export class StorageService {
   /**
    * Faz upload da imagem de capa de uma receita para o Cloud Storage
    * Caminho isolado: recipes/{recipeId}/cover_{timestamp}.(jpg|png|webp)
+   * Suporta acompanhamento de progresso e cancelamento automático por timeout
    */
   public async uploadRecipeImage(
     recipeId: string,
-    fileOrBlob: Blob | File
+    fileOrBlob: Blob | File,
+    onProgress?: (progressPercent: number) => void,
+    timeoutMs: number = 20000
   ): Promise<string> {
     if (!recipeId) {
       throw new Error('ID da receita é obrigatório para envio da imagem.');
@@ -147,14 +158,74 @@ export class StorageService {
       contentType,
     };
 
-    try {
-      const snapshot = await uploadBytes(storageRef, fileOrBlob, customMetadata);
-      const downloadUrl = await getDownloadURL(snapshot.ref);
-      return downloadUrl;
-    } catch (error: any) {
-      console.error('Erro ao realizar upload da imagem da receita no Cloud Storage:', error);
-      throw new Error(`Falha no armazenamento da foto da receita: ${error?.message || 'Erro de permissão ou rede'}`);
-    }
+    return new Promise<string>((resolve, reject) => {
+      let isSettled = false;
+      const uploadTask: UploadTask = uploadBytesResumable(storageRef, fileOrBlob, customMetadata);
+
+      // Timeout determinístico para evitar loop de 2 minutos do retry padrão do Firebase SDK
+      const timer = setTimeout(() => {
+        if (!isSettled) {
+          isSettled = true;
+          try {
+            uploadTask.cancel();
+          } catch {
+            // Ignora erro de cancelamento
+          }
+          reject(
+            new Error(
+              'Tempo limite de conexão com o Firebase Storage excedido (timeout). O bucket de armazenamento pode não estar provisionado ou ativo no projeto.'
+            )
+          );
+        }
+      }, timeoutMs);
+
+      uploadTask.on(
+        'state_changed',
+        (snapshot) => {
+          if (snapshot.totalBytes > 0 && onProgress) {
+            const percent = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            onProgress(Math.min(100, Math.max(0, percent)));
+          }
+        },
+        (error: any) => {
+          clearTimeout(timer);
+          if (isSettled) return;
+          isSettled = true;
+
+          let friendlyMsg = error?.message || 'Falha no upload para o Storage.';
+          if (
+            error?.code === 'storage/retry-limit-exceeded' ||
+            error?.code === 'storage/canceled'
+          ) {
+            friendlyMsg =
+              'Tempo limite de conexão excedido. O serviço do Firebase Storage não respondeu no tempo esperado (bucket não provisionado ou inacessível).';
+          } else if (error?.code === 'storage/unauthorized') {
+            friendlyMsg =
+              'Permissão negada no Firebase Storage. Apenas administradores autorizados podem salvar fotos de receitas.';
+          } else if (error?.code === 'storage/unknown') {
+            friendlyMsg =
+              'Erro de comunicação com o bucket do Firebase Storage (possível bucket inexistente ou bloqueio de rede).';
+          }
+          reject(new Error(`Falha no armazenamento da foto da receita: ${friendlyMsg}`));
+        },
+        async () => {
+          clearTimeout(timer);
+          if (isSettled) return;
+          isSettled = true;
+
+          try {
+            const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
+            resolve(downloadUrl);
+          } catch (err: any) {
+            reject(
+              new Error(
+                `Falha ao obter link público da imagem: ${err?.message || 'Erro desconhecido'}`
+              )
+            );
+          }
+        }
+      );
+    });
   }
 }
 

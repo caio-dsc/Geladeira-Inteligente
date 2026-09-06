@@ -1,5 +1,6 @@
 import { DetectedFoodItem } from '../types';
 import { SAMPLE_FRIDGE_IMAGES } from '../data/mockData';
+import { resolveFoodCategory } from '../utils/foodTaxonomy';
 
 export class ScanServiceError extends Error {
   status?: number;
@@ -558,7 +559,12 @@ class HuggingFaceScannerService implements IScannerService {
 
       const finalState = normalizeFreshness(item.state);
       const finalLocation = (item.location as DetectedFoodItem['location']) ?? null;
-      const finalCategory = item.category as DetectedFoodItem['category'];
+      
+      // Aplica taxonomia determinística para corrigir alucinações da IA (ex: Banana -> fruits)
+      const resolvedCategory = resolveFoodCategory(cleanedName, item.category as DetectedFoodItem['category']);
+      const finalCategory = (ALLOWED_CATEGORIES.includes(resolvedCategory as any)
+        ? resolvedCategory
+        : item.category) as DetectedFoodItem['category'];
 
       individualValidItems.push({
         name: cleanedName,

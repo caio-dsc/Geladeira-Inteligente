@@ -1541,9 +1541,30 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
         title="Editar Alimento Detectado"
         subtitle="Ajuste o nome, categoria e detalhes do alimento antes de salvar"
         maxWidth="md"
+        footer={
+          <div className="flex items-center justify-end gap-3 w-full">
+            <Button
+              type="button"
+              variant="ghost"
+              size="md"
+              onClick={() => setEditingItem(null)}
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="submit"
+              form="edit-food-form"
+              variant="primary"
+              size="md"
+              leftIcon={<Save className="w-4 h-4" />}
+            >
+              Salvar Alterações
+            </Button>
+          </div>
+        }
       >
         {editingItem && (
-          <form onSubmit={handleSaveEditModal} className="space-y-4">
+          <form id="edit-food-form" onSubmit={handleSaveEditModal} className="space-y-4">
             {editError && (
               <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 flex items-center gap-2 text-xs text-rose-700">
                 <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
@@ -1665,25 +1686,6 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
               value={editExpiryDate}
               onChange={(e) => setEditExpiryDate(e.target.value)}
             />
-
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-border">
-              <Button
-                type="button"
-                variant="ghost"
-                size="md"
-                onClick={() => setEditingItem(null)}
-              >
-                Cancelar
-              </Button>
-              <Button
-                type="submit"
-                variant="primary"
-                size="md"
-                leftIcon={<Save className="w-4 h-4" />}
-              >
-                Salvar Alterações
-              </Button>
-            </div>
           </form>
         )}
       </Modal>

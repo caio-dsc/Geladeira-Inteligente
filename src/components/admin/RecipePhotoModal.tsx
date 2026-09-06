@@ -30,6 +30,7 @@ export const RecipePhotoModal: React.FC<RecipePhotoModalProps> = ({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [uploadStep, setUploadStep] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState<boolean>(false);
@@ -45,6 +46,7 @@ export const RecipePhotoModal: React.FC<RecipePhotoModalProps> = ({
       setPreviewUrl(null);
       setErrorMessage(null);
       setIsUploading(false);
+      setUploadProgress(0);
       setUploadStep('');
       setIsDragging(false);
     }
@@ -145,10 +147,19 @@ export const RecipePhotoModal: React.FC<RecipePhotoModalProps> = ({
     try {
       setIsUploading(true);
       setErrorMessage(null);
+      setUploadProgress(0);
 
-      // 1. Upload seguro para o Firebase Cloud Storage
-      setUploadStep('Enviando imagem para o Firebase Storage...');
-      const downloadUrl = await storageService.uploadRecipeImage(recipe.id, selectedFile);
+      // 1. Upload seguro para o Firebase Cloud Storage com acompanhamento de progresso
+      setUploadStep('Iniciando envio para o Firebase Storage...');
+      const downloadUrl = await storageService.uploadRecipeImage(
+        recipe.id,
+        selectedFile,
+        (pct) => {
+          setUploadProgress(pct);
+          setUploadStep(`Enviando foto para o Firebase Storage (${Math.round(pct)}%)...`);
+        },
+        20000 // 20s de timeout seguro para evitar retenção indefinida
+      );
 
       // 2. Atualização atômica no Cloud Firestore com merge
       setUploadStep('Gravando referência no Firestore...');
@@ -240,7 +251,7 @@ export const RecipePhotoModal: React.FC<RecipePhotoModalProps> = ({
               isLoading={isUploading}
               leftIcon={<CheckCircle2 className="w-4 h-4" />}
             >
-              {isUploading ? 'Salvando...' : 'Salvar Nova Foto'}
+              {isUploading ? 'Salvando...' : errorMessage ? 'Tentar Novamente' : 'Salvar Nova Foto'}
             </Button>
           </div>
         </div>
@@ -255,11 +266,26 @@ export const RecipePhotoModal: React.FC<RecipePhotoModalProps> = ({
           </div>
         )}
 
-        {/* Mensagem de progresso do upload */}
+        {/* Mensagem e barra de progresso do upload */}
         {isUploading && (
-          <div className="p-3 rounded-xl bg-emerald-950/70 border border-emerald-500/30 text-emerald-300 text-xs flex items-center gap-2.5 animate-pulse">
-            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
-            <span>{uploadStep}</span>
+          <div className="space-y-2 p-3 rounded-xl bg-emerald-950/70 border border-emerald-500/30 text-emerald-300 text-xs">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400 animate-spin" />
+                <span>{uploadStep}</span>
+              </div>
+              {uploadProgress > 0 && (
+                <span className="font-mono font-bold text-emerald-400">{Math.round(uploadProgress)}%</span>
+              )}
+            </div>
+            {uploadProgress > 0 && (
+              <div className="w-full bg-emerald-950 rounded-full h-1.5 overflow-hidden border border-emerald-500/20">
+                <div
+                  className="bg-emerald-400 h-1.5 rounded-full transition-all duration-300"
+                  style={{ width: `${uploadProgress}%` }}
+                />
+              </div>
+            )}
           </div>
         )}
 

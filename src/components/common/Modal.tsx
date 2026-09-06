@@ -45,7 +45,7 @@ export const Modal: React.FC<ModalProps> = ({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 md:p-6 overflow-hidden sm:overflow-y-auto">
           {/* Backdrop com desfoque moderado e tom neutro */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -55,19 +55,19 @@ export const Modal: React.FC<ModalProps> = ({
             className="fixed inset-0 bg-stone-900/60 backdrop-blur-xs transition-opacity"
           />
 
-          {/* Modal Dialog com superfície clara, borda sutil e sombra flutuante */}
+          {/* Modal Dialog estruturado em flex column com viewport dinâmica e scroll contido */}
           <motion.div
             initial={{ opacity: 0, scale: 0.97, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.97, y: 10 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className={`relative w-full ${maxWidthStyles[maxWidth]} bg-surface rounded-2xl sm:rounded-3xl shadow-floating border border-border overflow-hidden z-10 my-auto text-text-primary text-left`}
+            className={`relative w-full ${maxWidthStyles[maxWidth]} max-h-[calc(100dvh-1.25rem)] sm:max-h-[88vh] flex flex-col bg-surface rounded-2xl sm:rounded-3xl shadow-floating border border-border overflow-hidden z-10 text-text-primary text-left`}
             role="dialog"
             aria-modal="true"
           >
-            {/* Header */}
+            {/* Header fixo */}
             {(title || subtitle) && (
-              <div className="flex items-start justify-between p-4 sm:p-6 border-b border-border bg-surface-muted/60">
+              <div className="flex items-start justify-between p-4 sm:p-5 border-b border-border bg-surface-muted/60 flex-shrink-0">
                 <div>
                   {title && <h3 className="text-lg font-bold text-text-primary tracking-tight">{title}</h3>}
                   {subtitle && <p className="text-xs text-text-secondary mt-0.5">{subtitle}</p>}
@@ -82,14 +82,14 @@ export const Modal: React.FC<ModalProps> = ({
               </div>
             )}
 
-            {/* Body */}
-            <div className="p-4 sm:p-6 max-h-[75vh] overflow-y-auto text-text-primary">
+            {/* Body rolável isolado */}
+            <div className="p-4 sm:p-6 flex-1 overflow-y-auto overscroll-contain text-text-primary">
               {children}
             </div>
 
-            {/* Footer */}
+            {/* Footer com ações fixas */}
             {footer && (
-              <div className="flex items-center justify-end gap-3 p-4 sm:p-5 border-t border-border bg-surface-muted/40">
+              <div className="flex items-center justify-end gap-3 p-3.5 sm:p-5 border-t border-border bg-surface-muted/40 flex-shrink-0 mt-auto">
                 {footer}
               </div>
             )}
