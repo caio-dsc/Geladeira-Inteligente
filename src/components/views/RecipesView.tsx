@@ -115,11 +115,13 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
   const filteredRecipes = useMemo(() => {
     return recipes
       .filter((recipe) => {
+        const titleStr = typeof recipe.title === 'string' ? recipe.title : '';
+        const descStr = typeof recipe.description === 'string' ? recipe.description : '';
         const matchesSearch = 
-          recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          recipe.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (recipe.aliases && recipe.aliases.some((a) => a.toLowerCase().includes(searchTerm.toLowerCase()))) ||
-          recipe.ingredients.some((ing) => ing.name.toLowerCase().includes(searchTerm.toLowerCase()));
+          titleStr.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          descStr.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (Array.isArray(recipe.aliases) && recipe.aliases.some((a) => typeof a === 'string' && a.toLowerCase().includes(searchTerm.toLowerCase()))) ||
+          (Array.isArray(recipe.ingredients) && recipe.ingredients.some((ing) => typeof ing?.name === 'string' && ing.name.toLowerCase().includes(searchTerm.toLowerCase())));
 
         const matchesCategory =
           selectedCategory === 'all' || normalizeCategory(recipe.category) === selectedCategory;
@@ -151,7 +153,9 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
           return b.matchPercentage - a.matchPercentage;
         }
         // 3. title asc (ordem alfabética)
-        return a.title.localeCompare(b.title, 'pt-BR');
+        const titleA = typeof a.title === 'string' ? a.title : '';
+        const titleB = typeof b.title === 'string' ? b.title : '';
+        return titleA.localeCompare(titleB, 'pt-BR');
       });
   }, [recipes, searchTerm, selectedCategory, dietFilters, difficultyFilter, servingsFilter, filterMatch]);
 
@@ -169,7 +173,9 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
         if (readyDiff !== 0) return readyDiff;
         const matchDiff = (b.matchPercentage || 0) - (a.matchPercentage || 0);
         if (matchDiff !== 0) return matchDiff;
-        return a.title.localeCompare(b.title, 'pt-BR');
+        const titleA = typeof a.title === 'string' ? a.title : '';
+        const titleB = typeof b.title === 'string' ? b.title : '';
+        return titleA.localeCompare(titleB, 'pt-BR');
       });
     }
 

@@ -29,6 +29,19 @@ class RecipeService implements IRecipeService {
     // Inicialização síncrona com fallback local MOCK_RECIPES.
   }
 
+  private normalizeRecipe(r: Recipe): Recipe {
+    return {
+      ...r,
+      title: typeof r.title === 'string' && r.title.trim() ? r.title : (r.id || 'Receita sem título'),
+      description: typeof r.description === 'string' ? r.description : '',
+      category: typeof r.category === 'string' ? r.category : 'Outros',
+      ingredients: Array.isArray(r.ingredients) ? r.ingredients : [],
+      steps: Array.isArray(r.steps) ? r.steps : (Array.isArray((r as any).instructions) ? (r as any).instructions : []),
+      aliases: Array.isArray(r.aliases) ? r.aliases : [],
+      tags: Array.isArray(r.tags) ? r.tags : [],
+    };
+  }
+
   private async initRecipes(): Promise<void> {
     let baseRecipes: Recipe[] = MOCK_RECIPES;
     try {
@@ -50,13 +63,26 @@ class RecipeService implements IRecipeService {
       console.warn('Aviso ao carregar receitas do Firestore:', e);
     }
 
-    const merged = [...baseRecipes, ...(remoteRecipes || [])];
-
-    // dedupe por id (se quiser, dá para trocar por canonicalKey depois)
     const map = new Map<string, Recipe>();
-    for (const r of merged) map.set(r.id, r);
 
-    this.recipes = Array.from(map.values());
+    for (const recipe of baseRecipes) {
+      map.set(recipe.id, recipe);
+    }
+
+    for (const remote of remoteRecipes || []) {
+      const base = map.get(remote.id);
+
+      if (base) {
+        map.set(remote.id, {
+          ...base,
+          ...remote,
+        });
+      } else {
+        map.set(remote.id, remote);
+      }
+    }
+
+    this.recipes = Array.from(map.values()).map((r) => this.normalizeRecipe(r));
     this.isLoadedFromFirestore = true;
   }
 

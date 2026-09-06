@@ -108,9 +108,11 @@ export const AdminView: React.FC<AdminViewProps> = ({
       // Filtro de busca de texto
       if (searchTerm.trim()) {
         const query = searchTerm.toLowerCase().trim();
-        const matchTitle = r.title.toLowerCase().includes(query);
-        const matchCategory = (r.category || '').toLowerCase().includes(query);
-        const matchTags = r.tags ? r.tags.some((t) => t.toLowerCase().includes(query)) : false;
+        const titleStr = typeof r.title === 'string' ? r.title : '';
+        const catStr = typeof r.category === 'string' ? r.category : '';
+        const matchTitle = titleStr.toLowerCase().includes(query);
+        const matchCategory = catStr.toLowerCase().includes(query);
+        const matchTags = Array.isArray(r.tags) ? r.tags.some((t) => typeof t === 'string' && t.toLowerCase().includes(query)) : false;
         if (!matchTitle && !matchCategory && !matchTags) return false;
       }
 

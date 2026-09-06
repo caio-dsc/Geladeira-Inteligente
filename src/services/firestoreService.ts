@@ -376,6 +376,10 @@ export class FirestoreService {
       snapshot.forEach((docSnap) => {
         const data = docSnap.data();
 
+        if (!data || typeof data !== 'object') {
+          return;
+        }
+
         if (typeof data.title !== 'string' || !data.title.trim()) {
           console.warn(
             '[Firestore] Receita sem título:',
