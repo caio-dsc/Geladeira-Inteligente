@@ -6,8 +6,18 @@ import {
   deleteObject,
   UploadMetadata,
   UploadTask,
+  getStorage as getFirebaseStorage,
+  FirebaseStorage,
 } from 'firebase/storage';
-import { storage } from './firebaseConfig';
+import { app } from './firebaseConfig';
+
+let _storageInstance: FirebaseStorage | null = null;
+const getStorageInstance = (): FirebaseStorage => {
+  if (!_storageInstance) {
+    _storageInstance = getFirebaseStorage(app);
+  }
+  return _storageInstance;
+};
 
 /**
  * Serviço de Cloud Storage
@@ -29,7 +39,7 @@ export class StorageService {
    */
   public getAvatarImageRef(userId: string) {
     const safePath = `users/${userId}/avatar.jpg`;
-    return ref(storage, safePath);
+    return ref(getStorageInstance(), safePath);
   }
 
   /**
@@ -62,7 +72,7 @@ export class StorageService {
    */
   public getScanImageRef(userId: string, scanId: string) {
     const safePath = `users/${userId}/scans/${scanId}.jpg`;
-    return ref(storage, safePath);
+    return ref(getStorageInstance(), safePath);
   }
 
   /**
@@ -152,7 +162,7 @@ export class StorageService {
     const contentType = rawType || 'image/jpeg';
     const ext = contentType.includes('png') ? 'png' : contentType.includes('webp') ? 'webp' : 'jpg';
     const safePath = `recipes/${recipeId}/cover_${Date.now()}.${ext}`;
-    const storageRef = ref(storage, safePath);
+    const storageRef = ref(getStorageInstance(), safePath);
 
     const customMetadata: UploadMetadata = {
       contentType,

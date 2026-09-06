@@ -2,7 +2,6 @@ import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { initializeAppCheck, ReCaptchaEnterpriseProvider, AppCheck } from 'firebase/app-check';
 import { getAuth, GoogleAuthProvider, Auth, browserLocalPersistence, setPersistence } from 'firebase/auth';
 import { initializeFirestore, getFirestore, Firestore, setLogLevel } from 'firebase/firestore';
-import { getStorage, FirebaseStorage } from 'firebase/storage';
 import firebaseConfigData from '../../firebase-applet-config.json';
 
 // Define nível de log do Firestore para evitar alertas benignos de handshake inicial
@@ -18,7 +17,6 @@ try {
  * 2. Firebase App Check (reCAPTCHA Enterprise Provider + Debug mode)
  * 3. Firebase Authentication (Google Auth & Session Persistence)
  * 4. Cloud Firestore (Base de dados NoSQL estruturada com fallback de conexão inteligente)
- * 5. Cloud Storage (Armazenamento para fotos de escaneamento)
  */
 
 export interface FirebaseConfig {
@@ -105,8 +103,5 @@ try {
 
 export const db: Firestore = firestoreInstance;
 
-// 5. Instância do Cloud Storage para imagens de geladeira
-export const storage: FirebaseStorage = getStorage(app);
-
-export const isFirebaseInitialized = Boolean(app && auth && db && storage);
+export const isFirebaseInitialized = Boolean(app && auth && db);
 
