@@ -125,7 +125,9 @@ class RecipeService implements IRecipeService {
       if (b.matchPercentage !== a.matchPercentage) {
         return b.matchPercentage - a.matchPercentage;
       }
-      return a.title.localeCompare(b.title, 'pt-BR');
+      const titleA = typeof a.title === 'string' ? a.title : '';
+      const titleB = typeof b.title === 'string' ? b.title : '';
+      return titleA.localeCompare(titleB, 'pt-BR');
     });
   }
 

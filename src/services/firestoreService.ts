@@ -372,9 +372,24 @@ export class FirestoreService {
       const recipesRef = collection(db, 'recipes');
       const snapshot = await getDocs(recipesRef);
       const recipes: Recipe[] = [];
+
       snapshot.forEach((docSnap) => {
-        recipes.push({ id: docSnap.id, ...(docSnap.data() as Omit<Recipe, 'id'>) });
+        const data = docSnap.data();
+
+        if (typeof data.title !== 'string' || !data.title.trim()) {
+          console.warn(
+            '[Firestore] Receita sem título:',
+            docSnap.id,
+            data
+          );
+        }
+
+        recipes.push({
+          id: docSnap.id,
+          ...(data as Omit<Recipe, 'id'>),
+        });
       });
+
       return recipes;
     } catch (error) {
       console.warn('Erro ao obter receitas do Firestore:', error);
@@ -395,16 +410,26 @@ export class FirestoreService {
     }
   }
 
-  public async updateRecipeImage(recipeId: string, imageUrl: string): Promise<void> {
-    if (!recipeId || !imageUrl) return;
+  public async updateRecipeImage(
+    recipeId: string,
+    imageUrl: string
+  ): Promise<void> {
+    if (!recipeId) return;
     try {
       const recipeRef = doc(db, 'recipes', recipeId);
-      await setDoc(recipeRef, {
-        imageUrl,
-        updatedAt: new Date().toISOString(),
-      }, { merge: true });
+      await setDoc(
+        recipeRef,
+        {
+          imageUrl: imageUrl.trim(),
+          updatedAt: new Date().toISOString(),
+        },
+        { merge: true }
+      );
     } catch (error) {
-      console.error('Erro ao atualizar imagem da receita no Firestore:', error);
+      console.error(
+        'Erro ao atualizar imagem da receita no Firestore:',
+        error
+      );
       throw error;
     }
   }
