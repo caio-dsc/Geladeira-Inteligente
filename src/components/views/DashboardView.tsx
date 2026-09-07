@@ -36,6 +36,7 @@ export interface DashboardViewProps {
   onOpenFoodModal: () => void;
   onSelectRecipe: (recipe: RecipeMatch) => void;
   onOpenCreditsModal: () => void;
+  onOpenQuickGuide?: () => void;
 }
 
 export const DashboardView: React.FC<DashboardViewProps> = ({
@@ -46,6 +47,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   onOpenFoodModal,
   onSelectRecipe,
   onOpenCreditsModal,
+  onOpenQuickGuide,
 }) => {
   // Real inventory metrics
   const freshCount = useMemo(() => inventory.filter((i) => i.state === 'fresh').length, [inventory]);
@@ -439,9 +441,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </Card>
         </div>
 
-        {/* Dismissible / Expandable "Como Funciona" Onboarding (Requirement 8) */}
+        {/* Guia Rápido / Onboarding */}
         <div className="pt-2">
           <HowItWorksGuide
+            onOpenQuickGuide={onOpenQuickGuide}
             onNavigateToScanner={() => onNavigate('scanner')}
             onNavigateToInventory={() => onNavigate('inventory')}
             onNavigateToRecipes={() => onNavigate('recipes')}

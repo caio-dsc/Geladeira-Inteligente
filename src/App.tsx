@@ -25,6 +25,7 @@ import { AdminView } from './components/views/AdminView';
 
 import { FoodFormModal } from './components/food/FoodFormModal';
 import { RecipeDetailModal } from './components/recipe/RecipeDetailModal';
+import { QuickGuideModal } from './components/common/QuickGuideModal';
 import { CheckCircle2, X } from 'lucide-react';
 
 export default function App() {
@@ -39,6 +40,32 @@ export default function App() {
   const [editingFoodItem, setEditingFoodItem] = useState<FoodItem | null>(null);
   const [selectedRecipe, setSelectedRecipe] = useState<RecipeMatch | null>(null);
   const [isCreditsModalOpen, setIsCreditsModalOpen] = useState(false);
+  const [isQuickGuideOpen, setIsQuickGuideOpen] = useState(false);
+
+  // Exibe o Guia Rápido automaticamente na primeira vez que o usuário entra na conta após o login
+  useEffect(() => {
+    if (user?.id) {
+      try {
+        const hasSeenGuide = localStorage.getItem(`geladeira_quick_guide_seen_${user.id}`);
+        if (!hasSeenGuide) {
+          setIsQuickGuideOpen(true);
+        }
+      } catch {
+        // ignora erro de acesso ao localStorage
+      }
+    }
+  }, [user?.id]);
+
+  const handleCloseQuickGuide = useCallback(() => {
+    setIsQuickGuideOpen(false);
+    if (user?.id) {
+      try {
+        localStorage.setItem(`geladeira_quick_guide_seen_${user.id}`, 'true');
+      } catch {
+        // ignora erro de gravação
+      }
+    }
+  }, [user?.id]);
 
   // Toast notifications
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -248,6 +275,7 @@ export default function App() {
             }}
             onSelectRecipe={setSelectedRecipe}
             onOpenCreditsModal={() => setIsCreditsModalOpen(true)}
+            onOpenQuickGuide={() => setIsQuickGuideOpen(true)}
           />
         )}
 
@@ -306,6 +334,7 @@ export default function App() {
             onSignOut={handleSignOut}
             onUpdateUser={setUser}
             onNavigateTab={setActiveTab}
+            onOpenQuickGuide={() => setIsQuickGuideOpen(true)}
           />
         )}
 
@@ -347,6 +376,11 @@ export default function App() {
         onClose={() => setIsCreditsModalOpen(false)}
         credits={user.credits}
         onAddCredits={handleAddCredits}
+      />
+
+      <QuickGuideModal
+        isOpen={isQuickGuideOpen}
+        onClose={handleCloseQuickGuide}
       />
 
       {/* Global Toast Notification */}

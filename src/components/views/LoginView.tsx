@@ -13,7 +13,9 @@ import {
   ArrowRight,
   ArrowDown,
   Check,
-  Refrigerator
+  Refrigerator,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { Button } from '../common/Button';
 import { Input } from '../common/Input';
@@ -168,7 +170,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
                     <UtensilsCrossed className="w-4 h-4 text-primary" />
                     Estoque Identificado (Exemplo)
                   </span>
-                  <span className="text-primary font-bold">4 itens frescos</span>
+                  <span className="text-primary font-bold">3 itens frescos</span>
                 </div>
 
                 <div className="space-y-2">
@@ -552,10 +554,15 @@ export const LoginView: React.FC<LoginViewProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowPassword((s) => !s)}
-                  className="p-1 rounded-md hover:bg-surface-muted text-sm cursor-pointer"
+                  className="p-1 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-muted transition-colors cursor-pointer flex items-center justify-center"
                   title={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                  aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
                 >
-                  {showPassword ? '🙈' : '👁️'}
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4 text-text-secondary" />
+                  ) : (
+                    <Eye className="w-4 h-4 text-text-secondary" />
+                  )}
                 </button>
               }
             />

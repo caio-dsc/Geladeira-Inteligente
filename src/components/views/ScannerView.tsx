@@ -1516,11 +1516,11 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
         </motion.div>
       )}
 
-      {/* MODO DEMONSTRAÇÃO */}
+      {/* SIMULAÇÃO DE ERRO */}
       <div className="p-3.5 rounded-2xl bg-surface border border-border text-xs text-text-secondary flex items-center justify-between shadow-subtle">
         <span className="flex items-center gap-1.5 font-medium">
           <Sparkles className="w-3.5 h-3.5 text-primary" />
-          Modo Demonstração: Simular falha de captura de foto
+          Simular falha de captura de foto
         </span>
 
         <label className="relative inline-flex items-center cursor-pointer">

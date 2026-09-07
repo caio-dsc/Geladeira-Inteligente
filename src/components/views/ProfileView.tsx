@@ -20,6 +20,7 @@ import {
   Scale,
   Ruler,
   ShieldCheck,
+  HelpCircle,
   X
 } from 'lucide-react';
 
@@ -65,6 +66,7 @@ export interface ProfileViewProps {
   onSignOut: () => void;
   onUpdateUser: (user: User) => void;
   onNavigateTab?: (tab: NavigationTab) => void;
+  onOpenQuickGuide?: () => void;
 }
 
 export const ProfileView: React.FC<ProfileViewProps> = ({
@@ -72,6 +74,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   onSignOut,
   onUpdateUser,
   onNavigateTab,
+  onOpenQuickGuide,
 }) => {
   // Profile info editing state
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -616,6 +619,29 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           </div>
         )}
       </Card>
+
+      {/* Guia Rápido - Acesso Direto */}
+      {onOpenQuickGuide && (
+        <Card className="flex items-center justify-between p-4 sm:p-5 border-border bg-surface shadow-subtle">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary border border-primary/20 flex items-center justify-center shadow-subtle shrink-0">
+              <HelpCircle className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-text-primary">Guia Rápido</h4>
+              <p className="text-xs text-text-secondary">Veja em poucos passos como aproveitar melhor sua Geladeira Inteligente</p>
+            </div>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onOpenQuickGuide}
+            className="text-xs font-bold"
+          >
+            Abrir Guia
+          </Button>
+        </Card>
+      )}
 
       {/* Admin Panel Entry - apenas para administradores */}
       {user?.isAdmin && onNavigateTab && (
