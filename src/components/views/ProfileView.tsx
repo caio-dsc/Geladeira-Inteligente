@@ -18,6 +18,7 @@ import {
   Edit3,
   Calendar,
   Scale,
+  Ruler,
   ShieldCheck,
   X
 } from 'lucide-react';
@@ -77,6 +78,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   const [name, setName] = useState(user.name);
   const [age, setAge] = useState<string>(user.age !== undefined && user.age !== null ? String(user.age) : '');
   const [weightKg, setWeightKg] = useState<string>(user.weightKg !== undefined && user.weightKg !== null ? String(user.weightKg) : '');
+  const [heightCm, setHeightCm] = useState<string>(user.heightCm !== undefined && user.heightCm !== null ? String(user.heightCm) : '');
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
@@ -133,6 +135,15 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
 
       const parsedAge = age.trim() !== '' ? Math.max(0, parseInt(age, 10)) : null;
       const parsedWeight = weightKg.trim() !== '' ? Math.max(0, parseFloat(weightKg.replace(',', '.'))) : null;
+      const parsedHeight = heightCm.trim() !== '' ? Math.max(0, parseInt(heightCm, 10)) : null;
+
+      if (heightCm.trim() !== '') {
+        const hVal = Number(heightCm);
+        if (isNaN(hVal) || hVal < 30 || hVal > 280) {
+          setProfileError('Por favor informe uma altura válida entre 30 cm e 280 cm.');
+          return;
+        }
+      }
 
       const updated = await withTimeout(
         authService.updateUser({
@@ -140,6 +151,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           avatarUrl: newAvatarUrl,
           age: parsedAge,
           weightKg: parsedWeight,
+          heightCm: parsedHeight,
         }),
         8000,
         'Salvar perfil demorou demais. Verifique sua conexão e tente novamente.'
@@ -163,6 +175,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
     setName(user.name);
     setAge(user.age !== undefined && user.age !== null ? String(user.age) : '');
     setWeightKg(user.weightKg !== undefined && user.weightKg !== null ? String(user.weightKg) : '');
+    setHeightCm(user.heightCm !== undefined && user.heightCm !== null ? String(user.heightCm) : '');
     setAvatarFile(null);
     setAvatarPreview(null);
     setProfileError(null);
@@ -285,6 +298,12 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                     {user.weightKg} kg
                   </span>
                 )}
+                {user.heightCm !== undefined && user.heightCm !== null && (
+                  <span className="text-[11px] font-bold bg-surface-muted text-text-primary px-2.5 py-0.5 rounded-lg border border-border flex items-center gap-1">
+                    <Ruler className="w-3 h-3 text-primary" />
+                    {user.heightCm} cm
+                  </span>
+                )}
                 <span className="text-[11px] font-bold bg-primary/10 text-primary px-2.5 py-0.5 rounded-lg border border-primary/25">
                   Nível {user.preferences.cookingLevel}
                 </span>
@@ -299,6 +318,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                   setName(user.name);
                   setAge(user.age !== undefined && user.age !== null ? String(user.age) : '');
                   setWeightKg(user.weightKg !== undefined && user.weightKg !== null ? String(user.weightKg) : '');
+                  setHeightCm(user.heightCm !== undefined && user.heightCm !== null ? String(user.heightCm) : '');
                   setIsEditingProfile(true);
                 }}
                 leftIcon={<Edit3 className="w-3.5 h-3.5 text-primary" />}
@@ -373,7 +393,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                   required
                 />
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <Input
                     label="Idade (anos)"
                     type="number"
@@ -393,6 +413,16 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                     onChange={(e) => setWeightKg(e.target.value)}
                     min={1}
                     max={300}
+                  />
+
+                  <Input
+                    label="Altura (cm)"
+                    type="number"
+                    placeholder="Ex: 170"
+                    value={heightCm}
+                    onChange={(e) => setHeightCm(e.target.value)}
+                    min={30}
+                    max={280}
                   />
                 </div>
               </div>

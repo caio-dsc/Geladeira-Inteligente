@@ -12,7 +12,7 @@ export const Card: React.FC<CardProps> = ({
   className = '',
   ...props
 }) => {
-  const baseStyles = 'rounded-2xl transition-all duration-200 text-left';
+  const baseStyles = 'rounded-2xl transition-all duration-200 text-left motion-reduce:transform-none motion-reduce:transition-none';
 
   const paddingStyles = {
     none: 'p-0',
@@ -24,7 +24,7 @@ export const Card: React.FC<CardProps> = ({
   const variantStyles = {
     default: 'bg-surface border border-border text-text-primary shadow-subtle',
     flat: 'bg-surface-muted/70 border border-border text-text-primary',
-    interactive: 'bg-surface border border-border hover:border-primary/40 hover:shadow-soft cursor-pointer text-text-primary active:scale-[0.995]',
+    interactive: 'bg-surface border border-border hover:border-primary/40 hover:shadow-soft hover:-translate-y-0.5 active:translate-y-0 cursor-pointer text-text-primary active:scale-[0.995]',
     accent: 'bg-linear-to-br from-surface via-surface to-surface-muted text-text-primary border border-primary/30 shadow-soft',
     glow: 'bg-surface border border-primary/30 text-text-primary shadow-[0_4px_20px_-2px_rgba(22,160,133,0.15)]',
   };

@@ -21,6 +21,7 @@
         },
         "age": { "type": "number" },
         "weightKg": { "type": "number" },
+        "heightCm": { "type": "number" },
         "createdAt": { "type": "string" },
         "updatedAt": { "type": "string" }
       },

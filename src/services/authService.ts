@@ -83,6 +83,7 @@ class FirebaseAuthService implements IAuthService {
         avatarUrl: existing.avatarUrl || firebaseUser.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
         age: existing.age ?? null,
         weightKg: existing.weightKg ?? null,
+        heightCm: existing.heightCm ?? null,
         isAdmin,
       };
       await firestoreService.updateUserFields(firebaseUser.uid, {
@@ -91,6 +92,7 @@ class FirebaseAuthService implements IAuthService {
         avatarUrl: updated.avatarUrl,
         age: updated.age,
         weightKg: updated.weightKg,
+        heightCm: updated.heightCm,
       });
       return updated;
     }
@@ -106,6 +108,7 @@ class FirebaseAuthService implements IAuthService {
       createdAt: new Date().toISOString(),
       age: null,
       weightKg: null,
+      heightCm: null,
       isAdmin,
     };
 

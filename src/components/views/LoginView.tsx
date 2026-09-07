@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'motion/react';
 import { 
   Sparkles, 
   ShieldCheck, 
@@ -91,47 +92,59 @@ export const LoginView: React.FC<LoginViewProps> = ({
       {/* HERO SECTION (SPATIAL UI 2D)                                          */}
       {/* ===================================================================== */}
       <section className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 pt-10 sm:pt-16 pb-12 sm:pb-20 text-center flex flex-col items-center">
-        {/* Eyebrow badge */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-surface border border-border text-primary text-xs font-bold mb-5 shadow-subtle">
-          <Sparkles className="w-3.5 h-3.5 text-primary" />
-          <span>Inteligência Artificial & Gestão Gastronômica</span>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, ease: 'easeOut' }}
+          className="flex flex-col items-center"
+        >
+          {/* Eyebrow badge */}
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-surface border border-border text-primary text-xs font-bold mb-5 shadow-subtle hover:border-primary/40 transition-colors">
+            <Sparkles className="w-3.5 h-3.5 text-primary" />
+            <span>Inteligência Artificial & Gestão Gastronômica</span>
+          </div>
 
-        {/* Headline */}
-        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-text-primary tracking-tight max-w-3xl leading-[1.15]">
-          Descubra o que cozinhar com o que você <span className="text-primary">já tem</span> na geladeira.
-        </h1>
+          {/* Headline */}
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-text-primary tracking-tight max-w-3xl leading-[1.15]">
+            Descubra o que cozinhar com o que você <span className="text-primary">já tem</span> na geladeira.
+          </h1>
 
-        {/* Subtitle / Value Proposition */}
-        <p className="mt-4 sm:mt-6 text-sm sm:text-base text-text-secondary max-w-2xl leading-relaxed">
-          Fotografe suas prateleiras para catalogar ingredientes automaticamente, monitorar prazos de validade e desbloquear receitas práticas sem desperdício de alimentos.
-        </p>
+          {/* Subtitle / Value Proposition */}
+          <p className="mt-4 sm:mt-6 text-sm sm:text-base text-text-secondary max-w-2xl leading-relaxed">
+            Fotografe suas prateleiras para catalogar ingredientes automaticamente, monitorar prazos de validade e desbloquear receitas práticas sem desperdício de alimentos.
+          </p>
 
-        {/* Hero CTAs */}
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-3.5">
-          <Button
-            variant="primary"
-            size="lg"
-            onClick={scrollToAuth}
-            className="font-bold text-sm sm:text-base px-8 py-3.5 shadow-soft hover:scale-[1.02] active:scale-[0.98]"
-            leftIcon={<ArrowDown className="w-4 h-4" />}
-          >
-            Entrar agora
-          </Button>
+          {/* Hero CTAs */}
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3.5">
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={scrollToAuth}
+              className="font-bold text-sm sm:text-base px-8 py-3.5 shadow-soft hover:shadow-elevated hover:scale-[1.02] active:scale-[0.98] motion-reduce:transform-none"
+              leftIcon={<ArrowDown className="w-4 h-4" />}
+            >
+              Entrar agora
+            </Button>
 
-          <Button
-            variant="outline"
-            size="lg"
-            onClick={scrollToFeatures}
-            className="text-xs sm:text-sm font-semibold py-3.5 px-6"
-          >
-            Conhecer recursos
-          </Button>
-        </div>
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={scrollToFeatures}
+              className="text-xs sm:text-sm font-semibold py-3.5 px-6 hover:border-primary/40 transition-colors"
+            >
+              Conhecer recursos
+            </Button>
+          </div>
+        </motion.div>
 
         {/* SPATIAL UI 2D VISUAL PREVIEW: Layered interactive card mockup */}
-        <div className="mt-12 sm:mt-16 w-full max-w-4xl relative">
-          <div className="p-4 sm:p-6 rounded-3xl bg-surface border border-border shadow-elevated text-left relative overflow-hidden">
+        <motion.div
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, delay: 0.1, ease: 'easeOut' }}
+          className="mt-12 sm:mt-16 w-full max-w-4xl relative"
+        >
+          <div className="p-4 sm:p-6 rounded-3xl bg-surface border border-border shadow-elevated text-left relative overflow-hidden transition-all duration-200">
             {/* Header of mockup */}
             <div className="flex items-center justify-between pb-4 mb-4 border-b border-border">
               <div className="flex items-center gap-2.5">
@@ -140,7 +153,8 @@ export const LoginView: React.FC<LoginViewProps> = ({
                 <div className="w-3 h-3 rounded-full bg-emerald-400" />
                 <span className="text-xs font-bold text-text-secondary ml-2">Visão Geral da Geladeira</span>
               </div>
-              <span className="text-xs font-bold text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
+              <span className="text-xs font-bold text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
                 100% Sincronizado
               </span>
             </div>
@@ -154,19 +168,19 @@ export const LoginView: React.FC<LoginViewProps> = ({
                     <UtensilsCrossed className="w-4 h-4 text-primary" />
                     Estoque Identificado (Exemplo)
                   </span>
-                  <span className="text-primary">4 itens frescos</span>
+                  <span className="text-primary font-bold">4 itens frescos</span>
                 </div>
 
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-surface border border-border text-xs shadow-subtle">
+                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-surface border border-border text-xs shadow-subtle hover:-translate-y-0.5 hover:border-primary/30 transition-all duration-150 motion-reduce:transform-none">
                     <span className="font-semibold text-text-primary">🍅 Tomates Maduros</span>
                     <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-md">Fresco • 4 un</span>
                   </div>
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-surface border border-border text-xs shadow-subtle">
+                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-surface border border-border text-xs shadow-subtle hover:-translate-y-0.5 hover:border-primary/30 transition-all duration-150 motion-reduce:transform-none">
                     <span className="font-semibold text-text-primary">🥚 Ovos Caipiras</span>
                     <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-md">Fresco • 6 un</span>
                   </div>
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-surface border border-border text-xs shadow-subtle">
+                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-surface border border-border text-xs shadow-subtle hover:-translate-y-0.5 hover:border-primary/30 transition-all duration-150 motion-reduce:transform-none">
                     <span className="font-semibold text-text-primary">🧀 Queijo Mussarela</span>
                     <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-md">Fresco • 200g</span>
                   </div>
@@ -174,7 +188,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
               </div>
 
               {/* Right: Recipe match result card (Surface Z2 elevated) */}
-              <div className="md:col-span-6 p-4.5 rounded-2xl bg-gradient-to-br from-primary-dark via-[#0B3D35] to-[#082821] text-white shadow-floating border border-primary/30 space-y-3 relative overflow-hidden">
+              <div className="md:col-span-6 p-4.5 rounded-2xl bg-gradient-to-br from-primary-dark via-[#0B3D35] to-[#082821] text-white shadow-floating border border-primary/30 space-y-3 relative overflow-hidden hover:-translate-y-0.5 hover:shadow-elevated transition-all duration-200 motion-reduce:transform-none">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold bg-white/20 text-white px-2.5 py-0.5 rounded-full backdrop-blur-md">
                     100% Compatível
@@ -205,7 +219,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* ===================================================================== */}
@@ -252,14 +266,14 @@ export const LoginView: React.FC<LoginViewProps> = ({
           </div>
 
           <div className="md:col-span-5 flex flex-col gap-3">
-            <div className="p-4 rounded-2xl bg-surface-muted/60 border border-border">
+            <div className="p-4 rounded-2xl bg-surface-muted/60 border border-border hover:border-primary/30 hover:-translate-y-0.5 transition-all duration-200 motion-reduce:transform-none">
               <span className="text-2xl font-black text-primary block">30%</span>
               <p className="text-xs text-text-secondary mt-1">
                 dos alimentos comprados em média acabam no lixo por falta de planejamento.
               </p>
             </div>
 
-            <div className="p-4 rounded-2xl bg-surface-muted/60 border border-border">
+            <div className="p-4 rounded-2xl bg-surface-muted/60 border border-border hover:border-primary/30 hover:-translate-y-0.5 transition-all duration-200 motion-reduce:transform-none">
               <span className="text-2xl font-black text-primary block">Instantâneo</span>
               <p className="text-xs text-text-secondary mt-1">
                 Basta tirar uma foto da geladeira para atualizar o estoque de uma só vez.
@@ -288,11 +302,11 @@ export const LoginView: React.FC<LoginViewProps> = ({
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Card 1: Scanner */}
-          <Card variant="default" padding="md" className="space-y-3 border-border shadow-subtle hover:shadow-soft transition-shadow">
-            <div className="w-11 h-11 rounded-2xl bg-primary/10 text-primary border border-primary/20 flex items-center justify-center shadow-subtle">
+          <Card variant="default" padding="md" className="space-y-3 border-border shadow-subtle hover:shadow-elevated hover:border-primary/40 hover:-translate-y-0.5 transition-all duration-200 group motion-reduce:transform-none cursor-default">
+            <div className="w-11 h-11 rounded-2xl bg-primary/10 text-primary border border-primary/20 flex items-center justify-center shadow-subtle group-hover:scale-105 transition-transform duration-200 motion-reduce:transform-none">
               <Camera className="w-5 h-5" />
             </div>
-            <h3 className="text-base font-bold text-text-primary">
+            <h3 className="text-base font-bold text-text-primary group-hover:text-primary transition-colors">
               Scanner com Visão IA
             </h3>
             <p className="text-xs text-text-secondary leading-relaxed">
@@ -301,11 +315,11 @@ export const LoginView: React.FC<LoginViewProps> = ({
           </Card>
 
           {/* Card 2: Inventário */}
-          <Card variant="default" padding="md" className="space-y-3 border-border shadow-subtle hover:shadow-soft transition-shadow">
-            <div className="w-11 h-11 rounded-2xl bg-primary/10 text-primary border border-primary/20 flex items-center justify-center shadow-subtle">
+          <Card variant="default" padding="md" className="space-y-3 border-border shadow-subtle hover:shadow-elevated hover:border-primary/40 hover:-translate-y-0.5 transition-all duration-200 group motion-reduce:transform-none cursor-default">
+            <div className="w-11 h-11 rounded-2xl bg-primary/10 text-primary border border-primary/20 flex items-center justify-center shadow-subtle group-hover:scale-105 transition-transform duration-200 motion-reduce:transform-none">
               <UtensilsCrossed className="w-5 h-5" />
             </div>
-            <h3 className="text-base font-bold text-text-primary">
+            <h3 className="text-base font-bold text-text-primary group-hover:text-primary transition-colors">
               Inventário Inteligente
             </h3>
             <p className="text-xs text-text-secondary leading-relaxed">
@@ -314,11 +328,11 @@ export const LoginView: React.FC<LoginViewProps> = ({
           </Card>
 
           {/* Card 3: Matching */}
-          <Card variant="default" padding="md" className="space-y-3 border-border shadow-subtle hover:shadow-soft transition-shadow">
-            <div className="w-11 h-11 rounded-2xl bg-primary/10 text-primary border border-primary/20 flex items-center justify-center shadow-subtle">
+          <Card variant="default" padding="md" className="space-y-3 border-border shadow-subtle hover:shadow-elevated hover:border-primary/40 hover:-translate-y-0.5 transition-all duration-200 group motion-reduce:transform-none cursor-default">
+            <div className="w-11 h-11 rounded-2xl bg-primary/10 text-primary border border-primary/20 flex items-center justify-center shadow-subtle group-hover:scale-105 transition-transform duration-200 motion-reduce:transform-none">
               <ChefHat className="w-5 h-5" />
             </div>
-            <h3 className="text-base font-bold text-text-primary">
+            <h3 className="text-base font-bold text-text-primary group-hover:text-primary transition-colors">
               Matching de Receitas
             </h3>
             <p className="text-xs text-text-secondary leading-relaxed">
@@ -327,11 +341,11 @@ export const LoginView: React.FC<LoginViewProps> = ({
           </Card>
 
           {/* Card 4: Filtros & Dietas */}
-          <Card variant="default" padding="md" className="space-y-3 border-border shadow-subtle hover:shadow-soft transition-shadow">
-            <div className="w-11 h-11 rounded-2xl bg-primary/10 text-primary border border-primary/20 flex items-center justify-center shadow-subtle">
+          <Card variant="default" padding="md" className="space-y-3 border-border shadow-subtle hover:shadow-elevated hover:border-primary/40 hover:-translate-y-0.5 transition-all duration-200 group motion-reduce:transform-none cursor-default">
+            <div className="w-11 h-11 rounded-2xl bg-primary/10 text-primary border border-primary/20 flex items-center justify-center shadow-subtle group-hover:scale-105 transition-transform duration-200 motion-reduce:transform-none">
               <SlidersHorizontal className="w-5 h-5" />
             </div>
-            <h3 className="text-base font-bold text-text-primary">
+            <h3 className="text-base font-bold text-text-primary group-hover:text-primary transition-colors">
               Filtros & Dietas
             </h3>
             <p className="text-xs text-text-secondary leading-relaxed">
@@ -360,7 +374,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="p-4 rounded-2xl bg-surface-muted/50 border border-border">
+            <div className="p-4 rounded-2xl bg-surface-muted/50 border border-border hover:border-primary/30 hover:bg-surface-muted hover:-translate-y-0.5 transition-all duration-200 motion-reduce:transform-none">
               <span className="w-8 h-8 rounded-xl bg-primary text-white font-black text-sm flex items-center justify-center mb-3 shadow-subtle">
                 1
               </span>
@@ -370,7 +384,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
               </p>
             </div>
 
-            <div className="p-4 rounded-2xl bg-surface-muted/50 border border-border">
+            <div className="p-4 rounded-2xl bg-surface-muted/50 border border-border hover:border-primary/30 hover:bg-surface-muted hover:-translate-y-0.5 transition-all duration-200 motion-reduce:transform-none">
               <span className="w-8 h-8 rounded-xl bg-primary text-white font-black text-sm flex items-center justify-center mb-3 shadow-subtle">
                 2
               </span>
@@ -380,7 +394,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
               </p>
             </div>
 
-            <div className="p-4 rounded-2xl bg-surface-muted/50 border border-border">
+            <div className="p-4 rounded-2xl bg-surface-muted/50 border border-border hover:border-primary/30 hover:bg-surface-muted hover:-translate-y-0.5 transition-all duration-200 motion-reduce:transform-none">
               <span className="w-8 h-8 rounded-xl bg-primary text-white font-black text-sm flex items-center justify-center mb-3 shadow-subtle">
                 3
               </span>
@@ -390,7 +404,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
               </p>
             </div>
 
-            <div className="p-4 rounded-2xl bg-surface-muted/50 border border-border">
+            <div className="p-4 rounded-2xl bg-surface-muted/50 border border-border hover:border-primary/30 hover:bg-surface-muted hover:-translate-y-0.5 transition-all duration-200 motion-reduce:transform-none">
               <span className="w-8 h-8 rounded-xl bg-primary text-white font-black text-sm flex items-center justify-center mb-3 shadow-subtle">
                 4
               </span>

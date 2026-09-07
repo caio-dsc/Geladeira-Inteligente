@@ -28,7 +28,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
         {/* Início */}
         <button
           onClick={() => onTabChange('dashboard')}
-          className={`min-w-[56px] min-h-[48px] flex flex-col items-center justify-center py-1 px-2.5 rounded-xl transition-all duration-150 cursor-pointer active:scale-95 select-none ${
+          className={`min-w-[56px] min-h-[48px] flex flex-col items-center justify-center py-1 px-2.5 rounded-xl transition-all duration-150 cursor-pointer active:scale-95 motion-reduce:transform-none select-none ${
             activeTab === 'dashboard'
               ? 'text-primary font-bold'
               : 'text-text-secondary hover:text-text-primary'
@@ -45,7 +45,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
         {/* Minha geladeira */}
         <button
           onClick={() => onTabChange('inventory')}
-          className={`relative min-w-[56px] min-h-[48px] flex flex-col items-center justify-center py-1 px-2.5 rounded-xl transition-all duration-150 cursor-pointer active:scale-95 select-none ${
+          className={`relative min-w-[56px] min-h-[48px] flex flex-col items-center justify-center py-1 px-2.5 rounded-xl transition-all duration-150 cursor-pointer active:scale-95 motion-reduce:transform-none select-none ${
             activeTab === 'inventory'
               ? 'text-primary font-bold'
               : 'text-text-secondary hover:text-text-primary'
@@ -70,7 +70,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
           className="relative -top-3.5 flex flex-col items-center justify-center group focus-visible:outline-hidden cursor-pointer select-none"
           aria-label="Escanear geladeira"
         >
-          <div className={`w-13 h-13 rounded-2xl flex items-center justify-center transition-all duration-150 active:scale-95 shadow-soft border ${
+          <div className={`w-13 h-13 rounded-2xl flex items-center justify-center transition-all duration-150 active:scale-95 motion-reduce:transform-none shadow-soft border ${
             activeTab === 'scanner'
               ? 'bg-primary text-white shadow-elevated border-primary-dark/20 scale-105 ring-3 ring-primary/20'
               : 'bg-primary hover:bg-[#138a72] text-white border-primary-dark/15 hover:scale-105'
@@ -87,7 +87,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
         {/* Receitas */}
         <button
           onClick={() => onTabChange('recipes')}
-          className={`min-w-[56px] min-h-[48px] flex flex-col items-center justify-center py-1 px-2.5 rounded-xl transition-all duration-150 cursor-pointer active:scale-95 select-none ${
+          className={`min-w-[56px] min-h-[48px] flex flex-col items-center justify-center py-1 px-2.5 rounded-xl transition-all duration-150 cursor-pointer active:scale-95 motion-reduce:transform-none select-none ${
             activeTab === 'recipes'
               ? 'text-primary font-bold'
               : 'text-text-secondary hover:text-text-primary'
@@ -104,7 +104,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
         {/* Perfil */}
         <button
           onClick={() => onTabChange('profile')}
-          className={`min-w-[56px] min-h-[48px] flex flex-col items-center justify-center py-1 px-2.5 rounded-xl transition-all duration-150 cursor-pointer active:scale-95 select-none ${
+          className={`min-w-[56px] min-h-[48px] flex flex-col items-center justify-center py-1 px-2.5 rounded-xl transition-all duration-150 cursor-pointer active:scale-95 motion-reduce:transform-none select-none ${
             activeTab === 'profile'
               ? 'text-primary font-bold'
               : 'text-text-secondary hover:text-text-primary'

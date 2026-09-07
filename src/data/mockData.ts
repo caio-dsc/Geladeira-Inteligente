@@ -15,6 +15,7 @@ export const INITIAL_USER: User = {
   createdAt: '2025-01-15T10:00:00Z',
   age: 28,
   weightKg: 64,
+  heightCm: 168,
 };
 
 export const INITIAL_FOOD_ITEMS: FoodItem[] = [
