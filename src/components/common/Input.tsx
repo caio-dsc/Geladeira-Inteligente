@@ -6,6 +6,7 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   helperText?: string;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
+  rightElement?: React.ReactNode;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
@@ -14,11 +15,13 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
   helperText,
   leftIcon,
   rightIcon,
+  rightElement,
   className = '',
   id,
   ...props
 }, ref) => {
   const generatedId = id || `input-${Math.random().toString(36).substring(2, 7)}`;
+  const trailingContent = rightElement ?? rightIcon;
 
   return (
     <div className="w-full space-y-1.5 text-left">
@@ -40,7 +43,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
           id={generatedId}
           className={`w-full rounded-xl border bg-surface px-3.5 py-2.5 min-h-[40px] text-sm text-text-primary placeholder:text-text-secondary/50 transition-all duration-150 focus:outline-hidden focus:ring-3 ${
             leftIcon ? 'pl-10' : ''
-          } ${rightIcon ? 'pr-10' : ''} ${
+          } ${trailingContent ? 'pr-10' : ''} ${
             error
               ? 'border-danger focus:border-danger focus:ring-danger/15'
               : 'border-border hover:border-primary/40 focus:border-primary focus:ring-primary/15 shadow-subtle'
@@ -48,9 +51,9 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
           {...props}
         />
 
-        {rightIcon && (
+        {trailingContent && (
           <div className="absolute right-3.5 flex items-center text-text-secondary/70">
-            {rightIcon}
+            {trailingContent}
           </div>
         )}
       </div>

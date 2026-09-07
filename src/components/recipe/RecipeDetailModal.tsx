@@ -25,6 +25,14 @@ export const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
   isOpen,
   onClose,
 }) => {
+  const [isCooking, setIsCooking] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!isOpen) {
+      setIsCooking(false);
+    }
+  }, [isOpen]);
+
   if (!recipe) return null;
 
   const isFullMatch = recipe.matchPercentage === 100;
@@ -73,20 +81,33 @@ export const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
               Fechar
             </Button>
             <Button
-              variant="primary"
+              variant={isCooking ? "secondary" : "primary"}
               leftIcon={<CookingPot className="w-4 h-4" />}
               onClick={() => {
-                alert(`Iniciando o preparo de "${recipe.title}"! Bom apetite!`);
-                onClose();
+                setIsCooking(true);
               }}
             >
-              Começar a Cozinhar
+              {isCooking ? 'Modo de Preparo Ativo' : 'Começar a Cozinhar'}
             </Button>
           </div>
         </div>
       }
     >
       <div className="space-y-6 text-left">
+        {isCooking && (
+          <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-900 flex items-center justify-between gap-2 text-xs font-semibold shadow-subtle animate-in fade-in duration-200">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
+              <span>Modo de preparo ativado para "{recipe.title}". Siga o passo a passo abaixo. Bom apetite!</span>
+            </div>
+            <button
+              onClick={() => setIsCooking(false)}
+              className="text-text-secondary hover:text-text-primary text-xs underline cursor-pointer shrink-0"
+            >
+              Concluir
+            </button>
+          </div>
+        )}
         {/* Banner with image and key stats */}
         <div className="relative rounded-2xl overflow-hidden aspect-16/9 bg-surface-muted shadow-soft border border-border">
           <img

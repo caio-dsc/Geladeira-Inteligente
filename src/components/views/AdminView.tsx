@@ -126,13 +126,13 @@ export const AdminView: React.FC<AdminViewProps> = ({
       <svg xmlns="http://www.w3.org/2000/svg" width="800" height="500">
         <defs>
           <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
-            <stop offset="0" stop-color="#052014"/>
-            <stop offset="1" stop-color="#0b2b1b"/>
+            <stop offset="0" stop-color="#E8EFEA"/>
+            <stop offset="1" stop-color="#DFEAE4"/>
           </linearGradient>
         </defs>
         <rect width="100%" height="100%" fill="url(#g)"/>
         <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle"
-          fill="#7ef0b5" font-family="Arial" font-size="28" font-weight="700">
+          fill="#16A085" font-family="Arial" font-size="28" font-weight="700">
           Sem foto
         </text>
       </svg>

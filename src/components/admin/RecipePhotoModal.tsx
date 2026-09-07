@@ -35,6 +35,7 @@ export const RecipePhotoModal: React.FC<RecipePhotoModalProps> = ({
   const [uploadStep, setUploadStep] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [isConfirmingRemove, setIsConfirmingRemove] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Limpa estados ao fechar ou trocar de receita
@@ -50,6 +51,7 @@ export const RecipePhotoModal: React.FC<RecipePhotoModalProps> = ({
       setUploadProgress(0);
       setUploadStep('');
       setIsDragging(false);
+      setIsConfirmingRemove(false);
     }
   }, [isOpen]);
 
@@ -61,13 +63,13 @@ export const RecipePhotoModal: React.FC<RecipePhotoModalProps> = ({
       <svg xmlns="http://www.w3.org/2000/svg" width="800" height="500">
         <defs>
           <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
-            <stop offset="0" stop-color="#052014"/>
-            <stop offset="1" stop-color="#0b2b1b"/>
+            <stop offset="0" stop-color="#E8EFEA"/>
+            <stop offset="1" stop-color="#DFEAE4"/>
           </linearGradient>
         </defs>
         <rect width="100%" height="100%" fill="url(#g)"/>
         <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle"
-          fill="#7ef0b5" font-family="Arial" font-size="28" font-weight="700">
+          fill="#16A085" font-family="Arial" font-size="28" font-weight="700">
           Sem foto
         </text>
       </svg>
@@ -191,8 +193,6 @@ export const RecipePhotoModal: React.FC<RecipePhotoModalProps> = ({
 
   const handleRemovePhoto = async () => {
     if (!recipe || !recipe.imageUrl) return;
-    const confirm = window.confirm(`Deseja remover a foto personalizada da receita "${recipe.title}"?`);
-    if (!confirm) return;
 
     try {
       setIsUploading(true);
@@ -201,6 +201,7 @@ export const RecipePhotoModal: React.FC<RecipePhotoModalProps> = ({
 
       await firestoreService.updateRecipeImage(recipe.id, '');
       onSuccess(recipe.id, '');
+      setIsConfirmingRemove(false);
       onClose();
     } catch (err: any) {
       console.error('Erro ao remover foto da receita:', err);
@@ -222,16 +223,38 @@ export const RecipePhotoModal: React.FC<RecipePhotoModalProps> = ({
         <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 w-full">
           <div className="w-full sm:w-auto">
             {recipe.imageUrl?.trim() && !previewUrl && (
-              <Button
-                variant="danger"
-                size="sm"
-                onClick={handleRemovePhoto}
-                disabled={isUploading}
-                leftIcon={<Trash2 className="w-4 h-4" />}
-                className="w-full sm:w-auto justify-center"
-              >
-                Remover Foto
-              </Button>
+              isConfirmingRemove ? (
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    onClick={handleRemovePhoto}
+                    disabled={isUploading}
+                    leftIcon={<Trash2 className="w-4 h-4" />}
+                  >
+                    Confirmar Remoção
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsConfirmingRemove(false)}
+                    disabled={isUploading}
+                  >
+                    Cancelar
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  variant="danger"
+                  size="sm"
+                  onClick={() => setIsConfirmingRemove(true)}
+                  disabled={isUploading}
+                  leftIcon={<Trash2 className="w-4 h-4" />}
+                  className="w-full sm:w-auto justify-center"
+                >
+                  Remover Foto
+                </Button>
+              )
             )}
             {previewUrl && (
               <Button
