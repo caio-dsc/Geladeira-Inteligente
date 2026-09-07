@@ -31,30 +31,30 @@ export const CreditsModal: React.FC<CreditsModalProps> = ({
     >
       <div className="space-y-5 text-center">
         {/* Balance Display */}
-        <div className="p-6 bg-gradient-to-b from-[#0e2c1c] to-[#081f13] rounded-3xl border border-emerald-500/30 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 text-stone-950 flex items-center justify-center mx-auto mb-3 shadow-[0_0_20px_rgba(52,211,153,0.4)]">
+        <div className="p-6 bg-gradient-to-b from-primary/10 via-surface to-surface-muted rounded-2xl sm:rounded-3xl border border-primary/20 shadow-soft">
+          <div className="w-14 h-14 rounded-2xl bg-primary text-white flex items-center justify-center mx-auto mb-3 shadow-subtle">
             <Sparkles className="w-7 h-7" />
           </div>
-          <div className="text-4xl font-black text-white tracking-tight">{credits}</div>
-          <p className="text-xs font-bold text-emerald-400 uppercase tracking-widest mt-1">
+          <div className="text-4xl font-black text-text-primary tracking-tight">{credits}</div>
+          <p className="text-xs font-bold text-primary uppercase tracking-wider mt-1">
             {credits === 1 ? 'Crédito Disponível' : 'Créditos Disponíveis'}
           </p>
-          <p className="text-xs text-emerald-300/60 mt-2 max-w-xs mx-auto">
+          <p className="text-xs text-text-secondary mt-2 max-w-xs mx-auto">
             Cada foto analisada consome 1 crédito do seu saldo para rodar o modelo de visão.
           </p>
         </div>
 
         {/* Demo Packages */}
         <div className="space-y-3 text-left">
-          <h4 className="text-xs font-bold text-emerald-300/80 uppercase tracking-wider">
+          <h4 className="text-xs font-bold text-text-secondary uppercase tracking-wider">
             Recarga Rápida (Ambiente Demonstração)
           </h4>
 
           <div className="grid grid-cols-2 gap-3">
-            <div className="p-4 rounded-2xl border border-emerald-500/20 hover:border-emerald-400/60 bg-[#0a2316]/80 hover:bg-[#0d2d1d] transition-all flex flex-col justify-between">
+            <div className="p-4 rounded-xl sm:rounded-2xl border border-border hover:border-primary/50 bg-surface hover:bg-surface-muted/60 shadow-subtle transition-all flex flex-col justify-between">
               <div>
-                <span className="text-sm font-bold text-white">+5 Créditos</span>
-                <p className="text-[11px] text-emerald-300/60 mt-0.5">Para testar novas fotos</p>
+                <span className="text-sm font-bold text-text-primary">+5 Créditos</span>
+                <p className="text-[11px] text-text-secondary mt-0.5">Para testar novas fotos</p>
               </div>
               <Button
                 variant="secondary"
@@ -68,10 +68,10 @@ export const CreditsModal: React.FC<CreditsModalProps> = ({
               </Button>
             </div>
 
-            <div className="p-4 rounded-2xl border border-emerald-500/20 hover:border-emerald-400/60 bg-[#0a2316]/80 hover:bg-[#0d2d1d] transition-all flex flex-col justify-between">
+            <div className="p-4 rounded-xl sm:rounded-2xl border border-border hover:border-primary/50 bg-surface hover:bg-surface-muted/60 shadow-subtle transition-all flex flex-col justify-between">
               <div>
-                <span className="text-sm font-bold text-white">+15 Créditos</span>
-                <p className="text-[11px] text-emerald-300/60 mt-0.5">Pacote completo</p>
+                <span className="text-sm font-bold text-text-primary">+15 Créditos</span>
+                <p className="text-[11px] text-text-secondary mt-0.5">Pacote completo</p>
               </div>
               <Button
                 variant="primary"

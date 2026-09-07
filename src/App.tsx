@@ -220,10 +220,10 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#05130b] text-emerald-100 flex flex-col selection:bg-emerald-500 selection:text-stone-950 font-sans antialiased relative overflow-x-hidden">
+    <div className="min-h-screen bg-surface-muted text-text-primary flex flex-col selection:bg-primary/20 selection:text-primary font-sans antialiased relative overflow-x-hidden">
       {/* Background ambient lighting */}
-      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-emerald-500/10 rounded-full blur-[140px] pointer-events-none z-0" />
-      <div className="fixed bottom-0 right-0 w-[500px] h-[300px] bg-emerald-600/5 rounded-full blur-[120px] pointer-events-none z-0" />
+      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-primary/5 rounded-full blur-[140px] pointer-events-none z-0" />
+      <div className="fixed bottom-0 right-0 w-[500px] h-[300px] bg-primary/5 rounded-full blur-[120px] pointer-events-none z-0" />
 
       {/* Top Navigation Header */}
       <Header
@@ -351,12 +351,12 @@ export default function App() {
 
       {/* Global Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-50 flex items-center gap-2.5 bg-[#0b281b] text-white px-4 py-3 rounded-2xl shadow-[0_0_30px_rgba(16,185,129,0.35)] border border-emerald-400/40 text-xs sm:text-sm animate-in fade-in slide-in-from-bottom-3 duration-200">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+        <div className="fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-50 flex items-center gap-2.5 bg-surface text-text-primary px-4 py-3 rounded-2xl shadow-elevated border border-border text-xs sm:text-sm animate-in fade-in slide-in-from-bottom-3 duration-200">
+          <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
           <span className="font-semibold">{toastMessage}</span>
           <button
             onClick={() => setToastMessage(null)}
-            className="ml-2 p-1 text-emerald-300 hover:text-white"
+            className="ml-2 p-1 text-text-secondary hover:text-text-primary cursor-pointer"
           >
             <X className="w-3.5 h-3.5" />
           </button>

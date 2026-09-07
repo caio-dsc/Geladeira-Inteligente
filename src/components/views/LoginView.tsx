@@ -31,18 +31,18 @@ export const LoginView: React.FC<LoginViewProps> = ({
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#05130b] text-emerald-100 flex flex-col justify-between selection:bg-emerald-500 selection:text-stone-950 relative overflow-hidden">
+    <div className="min-h-screen bg-surface-muted text-text-primary flex flex-col justify-between selection:bg-primary/20 selection:text-primary relative overflow-hidden">
       {/* Ambient background glows */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-emerald-500/15 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-10 left-10 w-96 h-96 bg-emerald-600/10 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute top-10 right-10 w-80 h-80 bg-emerald-400/10 rounded-full blur-[90px] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-10 left-10 w-96 h-96 bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-10 right-10 w-80 h-80 bg-primary/5 rounded-full blur-[90px] pointer-events-none" />
 
       {/* Top micro banner */}
       <header className="p-4 sm:p-6 flex items-center justify-between max-w-6xl mx-auto w-full relative z-10">
         <AppLogo size="md" />
 
-        <div className="hidden sm:flex items-center gap-2 text-xs font-bold text-emerald-300 bg-emerald-950/60 px-3.5 py-1.5 rounded-full border border-emerald-500/30 backdrop-blur-md shadow-[0_0_15px_rgba(16,185,129,0.15)]">
-          <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+        <div className="hidden sm:flex items-center gap-2 text-xs font-bold text-primary bg-surface px-3.5 py-1.5 rounded-full border border-border shadow-subtle">
+          <Sparkles className="w-3.5 h-3.5 text-primary" />
           <span>Visão Computacional & Culinária</span>
         </div>
       </header>
@@ -51,36 +51,36 @@ export const LoginView: React.FC<LoginViewProps> = ({
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-10 flex-1 flex flex-col items-center justify-center text-center relative z-10">
         {/* Large Concentric Glowing Hero Icon Container */}
         <div className="relative mb-6 flex items-center justify-center">
-          <div className="absolute w-36 h-36 rounded-full bg-emerald-500/20 animate-pulse blur-xl" />
-          <div className="absolute w-28 h-28 rounded-full border border-emerald-400/30 animate-spin-slow" />
-          <div className="w-24 h-24 rounded-full bg-gradient-to-b from-[#0e3320] to-[#081e13] border-2 border-emerald-400/50 flex items-center justify-center p-3 shadow-[0_0_35px_rgba(34,197,94,0.45)] backdrop-blur-md">
+          <div className="absolute w-36 h-36 rounded-full bg-primary/10 animate-pulse blur-xl" />
+          <div className="absolute w-28 h-28 rounded-full border border-primary/25" />
+          <div className="w-24 h-24 rounded-full bg-surface border-2 border-primary/30 flex items-center justify-center p-3 shadow-soft">
             <AppLogo size="lg" showText={false} />
           </div>
         </div>
 
         {/* Hero badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-950/80 border border-emerald-400/30 text-emerald-300 text-xs font-bold mb-3 backdrop-blur-md shadow-[0_0_20px_rgba(16,185,129,0.2)]">
-          <Sparkles className="w-4 h-4 text-emerald-400" />
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface border border-border text-primary text-xs font-bold mb-3 shadow-subtle">
+          <Sparkles className="w-4 h-4 text-primary" />
           <span>Gestão Inteligente de Alimentos & Receitas</span>
         </div>
 
         {/* Title & description */}
-        <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight max-w-2xl leading-[1.2]">
-          Descubra o que cozinhar com o que você <span className="text-emerald-400 drop-shadow-[0_0_15px_rgba(52,211,153,0.5)]">já tem</span> em casa.
+        <h1 className="text-2xl sm:text-4xl font-black text-text-primary tracking-tight max-w-2xl leading-[1.2]">
+          Descubra o que cozinhar com o que você <span className="text-primary">já tem</span> em casa.
         </h1>
 
-        <p className="mt-3 text-xs sm:text-sm text-emerald-200/80 max-w-xl leading-relaxed">
+        <p className="mt-3 text-xs sm:text-sm text-text-secondary max-w-xl leading-relaxed">
           Fotografe as prateleiras da sua geladeira para catalogar ingredientes automaticamente, monitorar validades e desbloquear receitas práticas.
         </p>
 
         {/* Action card */}
-        <div className="mt-6 w-full max-w-md bg-[#0a2316]/90 rounded-3xl p-6 sm:p-7 border border-emerald-500/25 shadow-[0_10px_40px_rgba(0,0,0,0.6)] backdrop-blur-2xl text-left">
+        <div className="mt-6 w-full max-w-md bg-surface rounded-3xl p-6 sm:p-7 border border-border shadow-elevated text-left">
           {/* Google Sign In Button */}
           <Button
             type="button"
             variant="primary"
             size="lg"
-            className="w-full justify-center text-sm sm:text-base py-3.5"
+            className="w-full justify-center text-sm sm:text-base py-3.5 font-bold shadow-subtle"
             onClick={async () => {
               setErrorMessage('');
               setInfoMessage('');
@@ -121,9 +121,9 @@ export const LoginView: React.FC<LoginViewProps> = ({
 
           {/* Divider */}
           <div className="my-5 flex items-center gap-3">
-            <div className="h-px flex-1 bg-emerald-500/15" />
-            <span className="text-[11px] font-bold text-emerald-300/60">ou</span>
-            <div className="h-px flex-1 bg-emerald-500/15" />
+            <div className="h-px flex-1 bg-border" />
+            <span className="text-[11px] font-bold text-text-secondary">ou</span>
+            <div className="h-px flex-1 bg-border" />
           </div>
 
           {/* Email/Password Form */}
@@ -188,7 +188,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowPassword((s) => !s)}
-                  className="p-1 rounded-md hover:bg-emerald-900/40 text-sm"
+                  className="p-1 rounded-md hover:bg-surface-muted text-sm cursor-pointer"
                   title={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
                 >
                   {showPassword ? '🙈' : '👁️'}
@@ -197,13 +197,13 @@ export const LoginView: React.FC<LoginViewProps> = ({
             />
 
             {errorMessage && (
-              <div className="text-xs font-semibold text-rose-300 bg-rose-950/30 border border-rose-500/25 rounded-2xl p-3">
+              <div className="text-xs font-semibold text-rose-700 bg-rose-500/10 border border-rose-500/25 rounded-2xl p-3">
                 {errorMessage}
               </div>
             )}
 
             {infoMessage && (
-              <div className="text-xs font-semibold text-emerald-200 bg-emerald-950/40 border border-emerald-500/25 rounded-2xl p-3">
+              <div className="text-xs font-semibold text-primary bg-primary/10 border border-primary/25 rounded-2xl p-3">
                 {infoMessage}
               </div>
             )}
@@ -212,7 +212,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
               type="submit"
               variant="secondary"
               size="lg"
-              className="w-full justify-center text-sm sm:text-base py-3.5"
+              className="w-full justify-center text-sm sm:text-base py-3.5 font-bold"
               isLoading={isLoading}
             >
               {mode === 'signup' ? 'Criar conta' : 'Entrar com Email'}
@@ -223,7 +223,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="text-xs"
+                className="text-xs font-semibold text-text-secondary hover:text-text-primary"
                 onClick={() => {
                   setMode((m) => (m === 'signin' ? 'signup' : 'signin'));
                   setErrorMessage('');
@@ -238,7 +238,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="text-xs"
+                className="text-xs text-text-secondary hover:text-text-primary"
                 onClick={async () => {
                   setErrorMessage('');
                   setInfoMessage('');
@@ -264,34 +264,34 @@ export const LoginView: React.FC<LoginViewProps> = ({
           </form>
 
           {/* Feature points */}
-          <div className="mt-5 pt-4 border-t border-emerald-500/15 space-y-2 text-[11px] text-emerald-200/70">
+          <div className="mt-5 pt-4 border-t border-border space-y-2 text-[11px] text-text-secondary">
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+              <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0" />
               <span>Controle visual de estoque e frescor</span>
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+              <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0" />
               <span>Calculadora dinâmica de receitas compatíveis</span>
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+              <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0" />
               <span>Scanner de geladeira com reconhecimento por foto</span>
             </div>
           </div>
         </div>
 
         {/* Cloud Architecture Note */}
-        <div className="mt-6 p-3.5 rounded-2xl bg-[#081e13]/80 border border-emerald-500/20 max-w-md text-xs text-emerald-300/80 flex items-start gap-3 text-left backdrop-blur-md shadow-[0_0_20px_rgba(0,0,0,0.3)]">
-          <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+        <div className="mt-6 p-3.5 rounded-2xl bg-surface border border-border max-w-md text-xs text-text-secondary flex items-start gap-3 text-left shadow-subtle">
+          <ShieldCheck className="w-4 h-4 text-primary shrink-0 mt-0.5" />
           <div>
-            <span className="font-bold text-white block">Arquitetura de Nuvem Segura</span>
+            <span className="font-bold text-text-primary block">Arquitetura de Nuvem Segura</span>
             Integrado com Firebase Authentication e Cloud Firestore. Todos os dados permanecem protegidos e sincronizados.
           </div>
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="py-4 text-center text-xs text-emerald-400/60 relative z-10">
+      <footer className="py-4 text-center text-xs text-text-secondary relative z-10">
         Geladeira Inteligente © 2026 • Alimentação Sustentável e Prática
       </footer>
     </div>

@@ -24,12 +24,12 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
   const isRetryDisabled = retryDisabled !== undefined ? retryDisabled : disabled;
 
   return (
-    <div className="flex flex-col items-center justify-center p-6 sm:p-10 text-center rounded-3xl border border-rose-500/30 bg-[#1c0a0f]/80 backdrop-blur-md shadow-[0_0_30px_rgba(244,63,94,0.15)]">
-      <div className="w-14 h-14 rounded-2xl bg-rose-950 text-rose-400 flex items-center justify-center mb-3.5 border border-rose-500/40 shadow-[0_0_15px_rgba(244,63,94,0.3)]">
+    <div className="flex flex-col items-center justify-center p-6 sm:p-10 text-center rounded-2xl sm:rounded-3xl border border-danger/30 bg-red-50/40 shadow-subtle">
+      <div className="w-14 h-14 rounded-2xl bg-red-100 text-danger flex items-center justify-center mb-3.5 border border-danger/20">
         <AlertCircle className="w-7 h-7" />
       </div>
-      <h4 className="text-base font-bold text-white mb-1">{title}</h4>
-      <p className="text-xs sm:text-sm text-rose-200/70 max-w-sm mb-4 leading-relaxed">{message}</p>
+      <h4 className="text-base font-bold text-text-primary mb-1">{title}</h4>
+      <p className="text-xs sm:text-sm text-text-secondary max-w-sm mb-4 leading-relaxed">{message}</p>
       {onRetry && (
         <div className="flex flex-col items-center gap-2">
           <Button
@@ -42,7 +42,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
             {retryLabel}
           </Button>
           {retryHint && (
-            <span className="text-xs text-rose-300/60 font-medium">
+            <span className="text-xs text-text-secondary/70 font-medium">
               {retryHint}
             </span>
           )}

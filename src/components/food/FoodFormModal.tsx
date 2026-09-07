@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FoodItem, CategoryType, FreshnessState, StorageLocation } from '../../types';
 import { Modal } from '../common/Modal';
 import { Input } from '../common/Input';
+import { Select } from '../common/Select';
 import { Button } from '../common/Button';
 import { Plus, Save, AlertCircle } from 'lucide-react';
 
@@ -138,8 +139,8 @@ export const FoodFormModal: React.FC<FoodFormModalProps> = ({
     >
       <form onSubmit={handleSubmit} className="space-y-4 text-left">
         {error && (
-          <div className="p-3 rounded-2xl bg-rose-950/80 border border-rose-500/40 text-rose-200 text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+          <div className="p-3 rounded-xl bg-red-50/80 border border-danger/30 text-danger text-xs flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-danger shrink-0" />
             <span>{error}</span>
           </div>
         )}
@@ -155,43 +156,33 @@ export const FoodFormModal: React.FC<FoodFormModalProps> = ({
 
         {/* Category & Location */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-          <div>
-            <label className="block text-xs font-semibold text-emerald-200/90 mb-1.5">
-              Categoria
-            </label>
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value as CategoryType)}
-              className="w-full rounded-2xl border border-emerald-500/30 bg-[#081e13] px-3.5 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-400/30"
-            >
-              <option value="vegetables">Legumes & Verduras</option>
-              <option value="fruits">Frutas</option>
-              <option value="dairy">Laticínios</option>
-              <option value="proteins">Proteínas & Ovos</option>
-              <option value="drinks">Bebidas</option>
-              <option value="pantry">Despensa</option>
-              <option value="condiments">Temperos & Molhos</option>
-              <option value="bakery">Pães & Massas</option>
-              <option value="other">Outros</option>
-            </select>
-          </div>
+          <Select
+            label="Categoria"
+            value={category}
+            onChange={(e) => setCategory(e.target.value as CategoryType)}
+          >
+            <option value="vegetables">Legumes & Verduras</option>
+            <option value="fruits">Frutas</option>
+            <option value="dairy">Laticínios</option>
+            <option value="proteins">Proteínas & Ovos</option>
+            <option value="drinks">Bebidas</option>
+            <option value="pantry">Despensa</option>
+            <option value="condiments">Temperos & Molhos</option>
+            <option value="bakery">Pães & Massas</option>
+            <option value="other">Outros</option>
+          </Select>
 
-          <div>
-            <label className="block text-xs font-semibold text-emerald-200/90 mb-1.5">
-              Compartimento / Local
-            </label>
-            <select
-              value={location}
-              onChange={(e) => setLocation(e.target.value as StorageLocation)}
-              className="w-full rounded-2xl border border-emerald-500/30 bg-[#081e13] px-3.5 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-400/30"
-            >
-              <option value="geladeira">Prateleira Principal</option>
-              <option value="gaveta_legumes">Gaveta de Hortifrúti</option>
-              <option value="porta">Porta da Geladeira</option>
-              <option value="freezer">Freezer / Congelador</option>
-              <option value="despensa">Despensa</option>
-            </select>
-          </div>
+          <Select
+            label="Compartimento / Local"
+            value={location}
+            onChange={(e) => setLocation(e.target.value as StorageLocation)}
+          >
+            <option value="geladeira">Prateleira Principal</option>
+            <option value="gaveta_legumes">Gaveta de Hortifrúti</option>
+            <option value="porta">Porta da Geladeira</option>
+            <option value="freezer">Freezer / Congelador</option>
+            <option value="despensa">Despensa</option>
+          </Select>
         </div>
 
         {/* Quantity & Unit */}
@@ -207,41 +198,31 @@ export const FoodFormModal: React.FC<FoodFormModalProps> = ({
             required
           />
 
-          <div>
-            <label className="block text-xs font-semibold text-emerald-200/90 mb-1.5">
-              Unidade
-            </label>
-            <select
-              value={unit}
-              onChange={(e) => setUnit(e.target.value as FoodItem['unit'])}
-              className="w-full rounded-2xl border border-emerald-500/30 bg-[#081e13] px-3.5 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-400/30"
-            >
-              <option value="un">un (unidades)</option>
-              <option value="g">g (gramas)</option>
-              <option value="kg">kg (quilos)</option>
-              <option value="ml">ml (mililitros)</option>
-              <option value="l">l (litros)</option>
-              <option value="fatias">fatias</option>
-              <option value="porções">porções</option>
-            </select>
-          </div>
+          <Select
+            label="Unidade"
+            value={unit}
+            onChange={(e) => setUnit(e.target.value as FoodItem['unit'])}
+          >
+            <option value="un">un (unidades)</option>
+            <option value="g">g (gramas)</option>
+            <option value="kg">kg (quilos)</option>
+            <option value="ml">ml (mililitros)</option>
+            <option value="l">l (litros)</option>
+            <option value="fatias">fatias</option>
+            <option value="porções">porções</option>
+          </Select>
         </div>
 
         {/* Freshness & Expiration */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-          <div>
-            <label className="block text-xs font-semibold text-emerald-200/90 mb-1.5">
-              Estado de Frescor
-            </label>
-            <select
-              value={state}
-              onChange={(e) => setState(e.target.value as FreshnessState)}
-              className="w-full rounded-2xl border border-emerald-500/30 bg-[#081e13] px-3.5 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-400/30"
-            >
-              <option value="fresh">Fresco</option>
-              <option value="frozen">Congelado</option>
-            </select>
-          </div>
+          <Select
+            label="Estado de Frescor"
+            value={state}
+            onChange={(e) => setState(e.target.value as FreshnessState)}
+          >
+            <option value="fresh">Fresco</option>
+            <option value="frozen">Congelado</option>
+          </Select>
 
           <Input
             label="Data de Validade (opcional)"

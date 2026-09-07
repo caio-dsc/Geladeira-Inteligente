@@ -149,5 +149,53 @@
   transform: translateY(-1px);
 }
 
+/* ==========================================================================
+   SPATIAL UI 2D ELEVATION LAYERS (Z0 - Z5)
+   ========================================================================== */
+.surface-z0 {
+  background-color: var(--background);
+}
+
+.surface-z1 {
+  background-color: var(--surface-muted);
+}
+
+.surface-z2 {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-subtle);
+}
+
+.surface-z3 {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-soft);
+}
+
+.surface-z4 {
+  background-color: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-floating);
+}
+
+.surface-z5 {
+  background-color: var(--surface);
+  box-shadow: var(--shadow-floating);
+  border: 1px solid rgba(221, 233, 228, 0.9);
+}
+
+/* Acessibilidade: prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+
 
 

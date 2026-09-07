@@ -22,18 +22,18 @@ export const CreditBadge: React.FC<CreditBadgeProps> = ({
     <button
       onClick={onClick}
       type="button"
-      className={`inline-flex items-center font-semibold rounded-full transition-all duration-200 backdrop-blur-md ${sizeClasses} ${
+      className={`inline-flex items-center font-medium rounded-full transition-all duration-200 ${sizeClasses} ${
         isLow 
-          ? 'bg-amber-950/60 text-amber-300 border border-amber-500/40 hover:bg-amber-900/60 hover:border-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.25)]' 
-          : 'bg-emerald-950/70 text-emerald-300 border border-emerald-500/35 hover:bg-emerald-900/80 hover:border-emerald-400/70 shadow-[0_0_15px_rgba(16,185,129,0.25)]'
-      } ${onClick ? 'cursor-pointer hover:scale-105 active:scale-95' : 'cursor-default'}`}
+          ? 'bg-amber-50 text-amber-900 border border-amber-200/80 hover:bg-amber-100/80 hover:border-amber-300 shadow-subtle' 
+          : 'bg-emerald-50/90 text-emerald-950 border border-emerald-200/80 hover:bg-emerald-100/80 hover:border-emerald-300 shadow-subtle'
+      } ${onClick ? 'cursor-pointer hover:-translate-y-0.5 active:translate-y-0' : 'cursor-default'}`}
       title="Créditos disponíveis para escaneamento"
     >
-      <div className="w-4 h-4 rounded-full bg-emerald-500/20 flex items-center justify-center">
-        <Sparkles className={`${size === 'sm' ? 'w-3 h-3' : 'w-3.5 h-3.5'} text-emerald-400 shrink-0`} />
+      <div className={`rounded-full flex items-center justify-center ${isLow ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-primary'}`}>
+        <Sparkles className={`${size === 'sm' ? 'w-3 h-3' : 'w-3.5 h-3.5'} shrink-0`} />
       </div>
-      <span className="font-extrabold text-white">{credits}</span>
-      <span className="text-emerald-300/80 hidden xs:inline">{credits === 1 ? 'crédito' : 'créditos'}</span>
+      <span className="font-bold text-text-primary">{credits}</span>
+      <span className="text-text-secondary hidden xs:inline">{credits === 1 ? 'crédito' : 'créditos'}</span>
     </button>
   );
 };

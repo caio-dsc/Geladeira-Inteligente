@@ -186,18 +186,18 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
   const almostReadyCount = recipes.filter((r) => !r.isReadyToCook && r.matchPercentage >= 60).length;
 
   return (
-    <div className="space-y-6 pb-24 md:pb-10 text-emerald-100 text-left">
+    <div className="space-y-6 pb-24 md:pb-10 text-text-primary text-left">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 bg-emerald-950/80 px-3 py-1 rounded-full border border-emerald-500/30 mb-1.5 backdrop-blur-md">
+          <div className="inline-flex items-center gap-1.5 text-xs font-bold text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20 mb-1.5">
             <BookOpen className="w-3.5 h-3.5" />
             <span>Sugestões Personalizadas</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-black text-text-primary tracking-tight">
             Receitas Compatíveis
           </h1>
-          <p className="text-xs sm:text-sm text-emerald-300/70">
+          <p className="text-xs sm:text-sm text-text-secondary">
             Receitas calculadas dinamicamente com base nos alimentos da sua geladeira.
           </p>
         </div>
@@ -206,8 +206,8 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
         <div className="flex flex-col items-start sm:items-end gap-1.5 self-start sm:self-auto">
           <div className="flex items-center gap-2">
             {/* Ready badge */}
-            <div className="flex items-center gap-2 bg-[#092617] p-2.5 px-4 rounded-2xl border border-emerald-500/30 text-xs text-emerald-200 font-bold shadow-[0_0_15px_rgba(16,185,129,0.2)]">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+            <div className="flex items-center gap-2 bg-emerald-50 p-2.5 px-4 rounded-xl border border-emerald-200 text-xs text-emerald-800 font-bold shadow-subtle">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
               <span>{readyCount} {readyCount === 1 ? 'receita pronta' : 'receitas prontas'} para cozinhar</span>
             </div>
 
@@ -215,24 +215,24 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
             <button
               onClick={onRefreshRecipes}
               disabled={!!isRefreshingRecipes}
-              className={`flex items-center gap-2 px-3 py-2.5 rounded-2xl border text-xs font-black transition
+              className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-xs font-bold transition shadow-subtle cursor-pointer
                 ${isRefreshingRecipes
-                  ? 'bg-white/5 border-white/10 text-white/40 cursor-not-allowed'
-                  : 'bg-emerald-500/15 border-emerald-500/30 text-emerald-200 hover:bg-emerald-500/25'}
+                  ? 'bg-surface-muted border-border text-text-secondary/40 cursor-not-allowed'
+                  : 'bg-surface border-border text-text-primary hover:bg-surface-muted hover:border-primary/40'}
               `}
               title="Recalcular receitas com base na geladeira"
             >
               {isRefreshingRecipes ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 className="w-4 h-4 animate-spin text-primary" />
               ) : (
-                <RefreshCcw className="w-4 h-4" />
+                <RefreshCcw className="w-4 h-4 text-primary" />
               )}
               Atualizar
             </button>
           </div>
 
           {recipesUpdatedAt && (
-            <div className="text-[11px] text-emerald-300/60 font-medium">
+            <div className="text-[11px] text-text-secondary font-medium">
               Última atualização: {new Date(recipesUpdatedAt).toLocaleString('pt-BR')}
             </div>
           )}
@@ -240,7 +240,7 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
       </div>
 
       {/* Search and Filters Bar */}
-      <div className="bg-[#081e13]/85 p-4 rounded-3xl border border-emerald-500/20 shadow-[0_4px_24px_rgba(0,0,0,0.4)] backdrop-blur-xl space-y-3">
+      <div className="bg-surface p-4 rounded-2xl sm:rounded-3xl border border-border shadow-soft space-y-3">
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="flex-1">
             <Input
@@ -252,33 +252,33 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
           </div>
 
           {/* Quick filter tabs */}
-          <div className="flex items-center gap-1 bg-[#05140c] p-1.5 rounded-2xl border border-emerald-500/20 shrink-0">
+          <div className="flex items-center gap-1 bg-surface-muted p-1 rounded-xl border border-border shrink-0">
             <button
               onClick={() => setFilterMatch('all')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                 filterMatch === 'all'
-                  ? 'bg-emerald-500 text-stone-950 shadow-[0_0_10px_rgba(16,185,129,0.4)]'
-                  : 'text-emerald-300/70 hover:text-white'
+                  ? 'bg-primary text-white shadow-subtle'
+                  : 'text-text-secondary hover:text-text-primary'
               }`}
             >
               Todas ({recipes.length})
             </button>
             <button
               onClick={() => setFilterMatch('ready')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                 filterMatch === 'ready'
-                  ? 'bg-emerald-500 text-stone-950 shadow-[0_0_10px_rgba(16,185,129,0.4)]'
-                  : 'text-emerald-300/70 hover:text-white'
+                  ? 'bg-primary text-white shadow-subtle'
+                  : 'text-text-secondary hover:text-text-primary'
               }`}
             >
               Prontas ({readyCount})
             </button>
             <button
               onClick={() => setFilterMatch('high')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                 filterMatch === 'high'
-                  ? 'bg-emerald-500 text-stone-950 shadow-[0_0_10px_rgba(16,185,129,0.4)]'
-                  : 'text-emerald-300/70 hover:text-white'
+                  ? 'bg-primary text-white shadow-subtle'
+                  : 'text-text-secondary hover:text-text-primary'
               }`}
             >
               Quase Prontas ({almostReadyCount})
@@ -292,10 +292,10 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
             <button
               key={cat.id}
               onClick={() => setSelectedCategory(cat.id)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                 selectedCategory === cat.id
-                  ? 'bg-emerald-500 text-stone-950 shadow-[0_0_15px_rgba(16,185,129,0.4)]'
-                  : 'bg-[#092416] text-emerald-300/80 hover:text-white hover:bg-[#0e3320] border border-emerald-500/15'
+                  ? 'bg-primary text-white shadow-subtle'
+                  : 'bg-surface-muted text-text-secondary hover:text-text-primary hover:bg-border/40 border border-border'
               }`}
             >
               {cat.label}
@@ -304,19 +304,19 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
         </div>
 
         {/* Dificuldade & Porções */}
-        <div className="pt-2 border-t border-emerald-500/10 flex flex-wrap items-center justify-between gap-3">
+        <div className="pt-2 border-t border-border flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-4">
             {/* Dificuldade */}
             <div className="flex items-center gap-2">
-              <span className="text-[11px] font-bold text-emerald-400/80 uppercase tracking-wider flex items-center gap-1">
-                <ChefHat className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="text-[11px] font-bold text-text-secondary uppercase tracking-wider flex items-center gap-1">
+                <ChefHat className="w-3.5 h-3.5 text-primary" />
                 Dificuldade:
               </span>
               <select
                 id="recipe-difficulty-select"
                 value={difficultyFilter}
                 onChange={(e) => setDifficultyFilter(e.target.value as DifficultyFilterValue)}
-                className="rounded-xl border border-emerald-500/30 bg-[#081d12] px-3 py-1.5 text-xs font-semibold text-white focus:outline-none focus:ring-2 focus:ring-emerald-400/30 cursor-pointer"
+                className="rounded-xl border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-text-primary focus:outline-hidden focus:ring-2 focus:ring-primary/20 cursor-pointer shadow-subtle"
               >
                 <option value="all">Todas</option>
                 <option value="Fácil">Fácil</option>
@@ -327,15 +327,15 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
 
             {/* Porções */}
             <div className="flex items-center gap-2">
-              <span className="text-[11px] font-bold text-emerald-400/80 uppercase tracking-wider flex items-center gap-1">
-                <Users className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="text-[11px] font-bold text-text-secondary uppercase tracking-wider flex items-center gap-1">
+                <Users className="w-3.5 h-3.5 text-primary" />
                 Porções:
               </span>
               <select
                 id="recipe-servings-select"
                 value={servingsFilter}
                 onChange={(e) => setServingsFilter(e.target.value as ServingsFilterValue)}
-                className="rounded-xl border border-emerald-500/30 bg-[#081d12] px-3 py-1.5 text-xs font-semibold text-white focus:outline-none focus:ring-2 focus:ring-emerald-400/30 cursor-pointer"
+                className="rounded-xl border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-text-primary focus:outline-hidden focus:ring-2 focus:ring-primary/20 cursor-pointer shadow-subtle"
               >
                 <option value="all">Todas</option>
                 <option value="1">1 porção</option>
@@ -354,7 +354,7 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
                 setDifficultyFilter('all');
                 setServingsFilter('all');
               }}
-              className="text-[11px] font-bold text-rose-300/80 hover:text-rose-200 transition cursor-pointer"
+              className="text-[11px] font-semibold text-danger hover:text-danger/80 transition cursor-pointer"
               title="Redefinir dificuldade e porções"
             >
               Limpar dificuldade & porções
@@ -363,9 +363,9 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
         </div>
 
         {/* Diet Chips */}
-        <div className="pt-2 border-t border-emerald-500/10">
+        <div className="pt-2 border-t border-border">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-bold text-emerald-400/80 uppercase tracking-wider">
+            <span className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">
               Filtros de Dieta:
             </span>
             {userDietaryRestrictions && userDietaryRestrictions.length > 0 && (
@@ -375,7 +375,7 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
                   setDietFilters(userDietaryRestrictions);
                   onDietaryRestrictionsChange?.(userDietaryRestrictions);
                 }}
-                className="text-[11px] font-bold text-emerald-400/90 hover:text-emerald-200 underline underline-offset-2 transition cursor-pointer"
+                className="text-[11px] font-bold text-primary hover:text-primary-dark underline underline-offset-2 transition cursor-pointer"
                 title="Restaurar restrições salvas no perfil"
               >
                 Usar do perfil
@@ -391,10 +391,10 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
                   key={label}
                   type="button"
                   onClick={() => toggleDiet(label)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-bold border transition cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition cursor-pointer ${
                     active
-                      ? 'bg-emerald-500/25 border-emerald-400/50 text-emerald-200 shadow-[0_0_12px_rgba(16,185,129,0.25)]'
-                      : 'bg-white/5 border-white/10 text-white/60 hover:border-emerald-500/30 hover:text-emerald-200'
+                      ? 'bg-primary/15 border-primary/40 text-primary font-bold shadow-subtle'
+                      : 'bg-surface-muted border-border text-text-secondary hover:border-primary/40 hover:text-primary'
                   }`}
                 >
                   {label}
@@ -409,7 +409,7 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
                   setDietFilters([]);
                   onDietaryRestrictionsChange?.([]);
                 }}
-                className="px-3 py-1.5 rounded-full text-xs font-bold text-rose-300/80 hover:text-rose-200 transition cursor-pointer"
+                className="px-3 py-1.5 rounded-full text-xs font-semibold text-danger hover:text-danger/80 transition cursor-pointer"
               >
                 Limpar dietas
               </button>
@@ -426,13 +426,13 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
               <div key={cat} className="space-y-3">
                 <div className="flex items-end justify-between">
                   <div>
-                    <h3 className="text-sm sm:text-base font-black text-white">{cat}</h3>
-                    <p className="text-xs text-emerald-300/60">{items.length} receita(s)</p>
+                    <h3 className="text-sm sm:text-base font-bold text-text-primary">{cat}</h3>
+                    <p className="text-xs text-text-secondary">{items.length} receita(s)</p>
                   </div>
 
                   <button
                     onClick={() => setSelectedCategory(cat)}
-                    className="text-xs font-black text-emerald-300 hover:text-white transition cursor-pointer"
+                    className="text-xs font-bold text-primary hover:text-primary-dark transition cursor-pointer"
                   >
                     Ver todas
                   </button>
@@ -455,9 +455,9 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
         )
       ) : (
         <EmptyState
-          icon={<Utensils className="w-8 h-8 text-emerald-400" />}
+          icon={<Utensils className="w-8 h-8 text-primary" />}
           title="Nenhuma receita encontrada"
-          message="Tente ajustar a busca, filtros ou adicione mais itens na geladeira."
+          description="Tente ajustar a busca, filtros ou adicione mais itens na geladeira."
           actionLabel="Ver Geladeira"
           onAction={onNavigateToInventory}
         />

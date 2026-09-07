@@ -57,21 +57,21 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   ];
 
   return (
-    <div className="space-y-6 sm:space-y-8 pb-24 md:pb-12 text-emerald-100">
+    <div className="space-y-6 sm:space-y-8 pb-24 md:pb-12 text-text-primary">
       {/* Top Greeting & Balance Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
+        <div className="text-left">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">
+            <span className="text-xs font-bold text-primary uppercase tracking-wider">
               Painel Principal
             </span>
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+            <span className="w-1.5 h-1.5 rounded-full bg-primary" />
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight mt-0.5">
+          <h1 className="text-2xl sm:text-3xl font-black text-text-primary tracking-tight mt-0.5">
             Olá, {user.name.split(' ')[0]} 👋
           </h1>
-          <p className="text-xs sm:text-sm text-emerald-300/70 mt-1">
-            Você tem <strong className="text-white font-bold">{inventory.length} itens</strong> catalogados na sua geladeira.
+          <p className="text-xs sm:text-sm text-text-secondary mt-1">
+            Você tem <strong className="text-text-primary font-bold">{inventory.length} itens</strong> catalogados na sua geladeira.
           </p>
         </div>
 
@@ -84,11 +84,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {/* Hero Scanner Card (Action Principal - Visual hierarchy with glow & camera icon) */}
       <div
         id="hero-scanner-section"
-        className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0e3a24] via-[#092316] to-[#05140c] text-white p-6 sm:p-8 shadow-[0_0_40px_rgba(16,185,129,0.25)] border border-emerald-400/40"
+        className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-primary-dark via-[#0B3D35] to-[#06241F] text-white p-6 sm:p-8 shadow-floating border border-primary/30 text-left"
       >
         <div className="relative z-10 max-w-xl">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/80 text-emerald-300 text-xs font-bold mb-3.5 border border-emerald-400/40 backdrop-blur-md shadow-[0_0_15px_rgba(52,211,153,0.3)]">
-            <Camera className="w-3.5 h-3.5 text-emerald-400" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-white text-xs font-semibold mb-3.5 border border-white/20 backdrop-blur-md">
+            <Camera className="w-3.5 h-3.5 text-white" />
             <span>Reconhecimento Visual Instantâneo</span>
           </div>
 
@@ -96,19 +96,19 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             Pronto para atualizar seu estoque?
           </h2>
 
-          <p className="mt-2 text-sm sm:text-base text-emerald-100/80 leading-relaxed font-normal">
+          <p className="mt-2 text-sm sm:text-base text-white/80 leading-relaxed font-normal">
             Fotografe as prateleiras para identificar alimentos automaticamente, acompanhar prazos de validade e desbloquear receitas.
           </p>
 
           <div className="mt-6 flex flex-wrap items-center gap-3.5">
-            {/* Primary Hero Button: Escanear minha geladeira with high contrast and camera icon */}
+            {/* Primary Hero Button: Escanear minha geladeira */}
             <Button
               id="hero-scan-fridge-btn"
               variant="primary"
               size="lg"
               onClick={() => onNavigate('scanner')}
-              className="font-black text-sm sm:text-base px-6 sm:px-8 py-3.5 shadow-[0_0_30px_rgba(34,197,94,0.6)] cursor-pointer hover:scale-105 active:scale-95"
-              leftIcon={<Camera className="w-5 h-5 text-stone-950 shrink-0" />}
+              className="font-bold text-sm sm:text-base px-6 sm:px-8 py-3.5 shadow-soft cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+              leftIcon={<Camera className="w-5 h-5 text-white shrink-0" />}
             >
               Escanear minha geladeira
             </Button>
@@ -118,8 +118,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               variant="secondary"
               size="md"
               onClick={onOpenFoodModal}
-              className="text-xs sm:text-sm font-semibold py-3 px-4.5"
-              leftIcon={<Plus className="w-4 h-4 text-emerald-400" />}
+              className="text-xs sm:text-sm font-semibold py-3 px-4.5 bg-white/15 hover:bg-white/25 text-white border-white/20"
+              leftIcon={<Plus className="w-4 h-4 text-white" />}
             >
               Adicionar Manualmente
             </Button>
@@ -127,9 +127,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* Decorative background visual elements */}
-        <div className="absolute -right-10 -bottom-10 w-72 h-72 rounded-full bg-emerald-500/20 blur-3xl pointer-events-none" />
-        <div className="hidden lg:block absolute right-8 top-1/2 -translate-y-1/2 opacity-20 pointer-events-none">
-          <Refrigerator className="w-52 h-52 text-emerald-300" />
+        <div className="absolute -right-10 -bottom-10 w-72 h-72 rounded-full bg-primary/20 blur-3xl pointer-events-none" />
+        <div className="hidden lg:block absolute right-8 top-1/2 -translate-y-1/2 opacity-15 pointer-events-none">
+          <Refrigerator className="w-52 h-52 text-white" />
         </div>
       </div>
 
@@ -138,61 +138,61 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         {/* Total in Fridge */}
         <Card variant="interactive" padding="sm" onClick={() => onNavigate('inventory')} className="text-left">
           <div className="flex items-center justify-between mb-2">
-            <div className="w-9 h-9 rounded-2xl bg-emerald-950/80 border border-emerald-500/30 text-emerald-400 flex items-center justify-center shadow-[0_0_10px_rgba(16,185,129,0.2)]">
+            <div className="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center shadow-subtle">
               <UtensilsCrossed className="w-4.5 h-4.5" />
             </div>
-            <span className="text-[11px] font-bold text-emerald-400/80">Estoque</span>
+            <span className="text-[11px] font-semibold text-text-secondary">Estoque</span>
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-white">{inventory.length}</div>
-          <p className="text-[11px] sm:text-xs text-emerald-300/60 mt-0.5">Alimentos no total</p>
+          <div className="text-2xl sm:text-3xl font-black text-text-primary">{inventory.length}</div>
+          <p className="text-[11px] sm:text-xs text-text-secondary mt-0.5">Alimentos no total</p>
         </Card>
 
         {/* Fresh Items */}
         <Card variant="interactive" padding="sm" onClick={() => onNavigate('inventory')} className="text-left">
           <div className="flex items-center justify-between mb-2">
-            <div className="w-9 h-9 rounded-2xl bg-emerald-950/80 border border-emerald-500/40 text-emerald-400 flex items-center justify-center shadow-[0_0_10px_rgba(16,185,129,0.2)]">
+            <div className="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center shadow-subtle">
               <Leaf className="w-4.5 h-4.5" />
             </div>
-            <span className="text-[11px] font-bold text-emerald-400">Frescos</span>
+            <span className="text-[11px] font-semibold text-emerald-700">Frescos</span>
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-white">{freshCount}</div>
-          <p className="text-[11px] sm:text-xs text-emerald-300/70 mt-0.5">Alimentos frescos</p>
+          <div className="text-2xl sm:text-3xl font-black text-text-primary">{freshCount}</div>
+          <p className="text-[11px] sm:text-xs text-text-secondary mt-0.5">Alimentos frescos</p>
         </Card>
 
         {/* Frozen Items */}
         <Card variant="interactive" padding="sm" onClick={() => onNavigate('inventory')} className="text-left">
           <div className="flex items-center justify-between mb-2">
-            <div className="w-9 h-9 rounded-2xl bg-sky-950/80 border border-sky-500/40 text-sky-400 flex items-center justify-center shadow-[0_0_10px_rgba(56,189,248,0.2)]">
+            <div className="w-9 h-9 rounded-xl bg-sky-50 border border-sky-200 text-sky-700 flex items-center justify-center shadow-subtle">
               <Snowflake className="w-4.5 h-4.5" />
             </div>
-            <span className="text-[11px] font-bold text-sky-400">Congelados</span>
+            <span className="text-[11px] font-semibold text-sky-700">Congelados</span>
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-white">{frozenCount}</div>
-          <p className="text-[11px] sm:text-xs text-sky-300/70 mt-0.5">No freezer / congelador</p>
+          <div className="text-2xl sm:text-3xl font-black text-text-primary">{frozenCount}</div>
+          <p className="text-[11px] sm:text-xs text-text-secondary mt-0.5">No freezer / congelador</p>
         </Card>
 
         {/* Ready Recipes */}
         <Card variant="interactive" padding="sm" onClick={() => onNavigate('recipes')} className="text-left">
           <div className="flex items-center justify-between mb-2">
-            <div className="w-9 h-9 rounded-2xl bg-emerald-950/80 border border-emerald-500/40 text-emerald-400 flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+            <div className="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center shadow-subtle">
               <ChefHat className="w-4.5 h-4.5" />
             </div>
-            <span className="text-[11px] font-bold text-emerald-400">Receitas</span>
+            <span className="text-[11px] font-semibold text-primary">Receitas</span>
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-white">{readyRecipes.length}</div>
-          <p className="text-[11px] sm:text-xs text-emerald-300/60 mt-0.5">Prontas para cozinhar</p>
+          <div className="text-2xl sm:text-3xl font-black text-text-primary">{readyRecipes.length}</div>
+          <p className="text-[11px] sm:text-xs text-text-secondary mt-0.5">Prontas para cozinhar</p>
         </Card>
       </div>
 
-      {/* Category Quick Grid (Inspired by the category icons in image.png) */}
+      {/* Category Quick Grid */}
       <div className="space-y-3 text-left">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-bold text-emerald-300/90 uppercase tracking-wider">
+          <h3 className="text-sm font-bold text-text-secondary uppercase tracking-wider">
             Categorias de Alimentos
           </h3>
           <button
             onClick={() => onNavigate('inventory')}
-            className="text-xs font-bold text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1 cursor-pointer"
+            className="text-xs font-bold text-primary hover:text-primary-dark transition-colors flex items-center gap-1 cursor-pointer"
           >
             <span>Ver todos</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -206,15 +206,15 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <button
                 key={cat.id}
                 onClick={() => onNavigate('inventory')}
-                className="p-3.5 rounded-2xl bg-[#081e13]/90 hover:bg-[#0d2d1d] border border-emerald-500/20 hover:border-emerald-400/50 transition-all flex flex-col items-center justify-center text-center group cursor-pointer shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
+                className="p-3.5 rounded-xl sm:rounded-2xl bg-surface hover:bg-surface-muted border border-border hover:border-primary/40 transition-all flex flex-col items-center justify-center text-center group cursor-pointer shadow-subtle hover:shadow-soft"
               >
-                <div className="w-10 h-10 rounded-xl bg-emerald-950/90 border border-emerald-500/30 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform shadow-[0_0_10px_rgba(16,185,129,0.25)]">
+                <div className="w-10 h-10 rounded-xl bg-surface-muted border border-border group-hover:border-primary/30 flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
                   {getCategoryIcon(cat.id)}
                 </div>
-                <span className="text-xs font-bold text-white group-hover:text-emerald-300 transition-colors">
+                <span className="text-xs font-bold text-text-primary group-hover:text-primary transition-colors">
                   {cat.label}
                 </span>
-                <span className="text-[10px] text-emerald-400/60 font-semibold mt-0.5">
+                <span className="text-[10px] text-text-secondary font-medium mt-0.5">
                   {count} {count === 1 ? 'item' : 'itens'}
                 </span>
               </button>
@@ -227,17 +227,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       <div className="space-y-4 text-left">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg sm:text-xl font-extrabold text-white tracking-tight">
+            <h3 className="text-lg sm:text-xl font-bold text-text-primary tracking-tight">
               Sugestões de Receitas Compatíveis
             </h3>
-            <p className="text-xs text-emerald-300/70">
+            <p className="text-xs text-text-secondary">
               Ideais para preparar com os ingredientes disponíveis no momento.
             </p>
           </div>
 
           <button
             onClick={() => onNavigate('recipes')}
-            className="text-xs font-bold text-emerald-400 hover:text-emerald-300 flex items-center gap-1 cursor-pointer"
+            className="text-xs font-bold text-primary hover:text-primary-dark flex items-center gap-1 cursor-pointer"
           >
             <span>Ver todas</span>
             <ArrowRight className="w-3.5 h-3.5" />

@@ -211,69 +211,69 @@ export const AdminView: React.FC<AdminViewProps> = ({
 
       {/* Cards de Métricas do Catálogo */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="p-4 rounded-xl bg-[#05130b] border border-emerald-500/15 flex items-center justify-between">
+        <div className="p-4 rounded-xl bg-surface border border-border shadow-subtle flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Database className="w-5 h-5 text-emerald-400" />
+            <Database className="w-5 h-5 text-primary" />
             <div>
-              <p className="text-xs text-emerald-300/60 font-medium">Total de Pratos</p>
-              <p className="text-xl font-extrabold text-white">
+              <p className="text-xs text-text-secondary font-medium">Total de Pratos</p>
+              <p className="text-xl font-extrabold text-text-primary">
                 {isLoading ? '—' : totalRecipes}
               </p>
             </div>
           </div>
-          <span className="text-xs text-emerald-400/80 font-medium bg-emerald-500/10 px-2 py-1 rounded-md border border-emerald-500/20">
+          <span className="text-xs text-primary font-medium bg-primary/10 px-2 py-1 rounded-md border border-primary/20">
             Catálogo completo
           </span>
         </div>
 
-        <div className="p-4 rounded-xl bg-[#05130b] border border-emerald-500/15 flex items-center justify-between">
+        <div className="p-4 rounded-xl bg-surface border border-border shadow-subtle flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <ImageIcon className="w-5 h-5 text-emerald-400" />
+            <ImageIcon className="w-5 h-5 text-primary" />
             <div>
-              <p className="text-xs text-emerald-300/60 font-medium">Com Foto Definida</p>
-              <p className="text-xl font-extrabold text-white">
+              <p className="text-xs text-text-secondary font-medium">Com Foto Definida</p>
+              <p className="text-xl font-extrabold text-text-primary">
                 {isLoading ? '—' : recipesWithImage}
               </p>
             </div>
           </div>
-          <span className="text-xs text-emerald-300 font-bold bg-emerald-500/20 px-2 py-1 rounded-md border border-emerald-500/30">
+          <span className="text-xs text-primary font-bold bg-primary/15 px-2 py-1 rounded-md border border-primary/25">
             {isLoading || !totalRecipes ? '—' : `${Math.round((recipesWithImage / totalRecipes) * 100)}%`}
           </span>
         </div>
 
-        <div className="p-4 rounded-xl bg-[#05130b] border border-amber-500/20 flex items-center justify-between">
+        <div className="p-4 rounded-xl bg-surface border border-amber-500/20 shadow-subtle flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Camera className="w-5 h-5 text-amber-400" />
+            <Camera className="w-5 h-5 text-amber-500" />
             <div>
-              <p className="text-xs text-amber-300/70 font-medium">Pendentes de Foto</p>
-              <p className="text-xl font-extrabold text-amber-300">
+              <p className="text-xs text-amber-700 font-medium">Pendentes de Foto</p>
+              <p className="text-xl font-extrabold text-amber-600">
                 {isLoading ? '—' : recipesWithoutImage}
               </p>
             </div>
           </div>
-          <span className="text-xs text-amber-300 font-bold bg-amber-500/15 px-2 py-1 rounded-md border border-amber-500/30">
+          <span className="text-xs text-amber-700 font-bold bg-amber-500/15 px-2 py-1 rounded-md border border-amber-500/30">
             {isLoading || !totalRecipes ? '—' : `${Math.round((recipesWithoutImage / totalRecipes) * 100)}%`}
           </span>
         </div>
       </div>
 
       {/* Barra de Filtros e Busca do Admin */}
-      <Card className="p-4 space-y-4">
+      <Card className="p-4 space-y-4 shadow-subtle">
         <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
           {/* Campo de Busca */}
           <div className="relative flex-1">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-400/60" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Buscar receita por título, categoria ou ingrediente..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#05130b] border border-emerald-500/30 text-white placeholder-emerald-400/40 text-sm focus:outline-hidden focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-surface-muted border border-border text-text-primary placeholder-text-secondary/60 text-sm focus:outline-hidden focus:border-primary focus:ring-1 focus:ring-primary"
             />
             {searchTerm && (
               <button
                 onClick={() => setSearchTerm('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-400/60 hover:text-emerald-300 text-xs px-1.5 py-0.5 rounded bg-emerald-950"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary text-xs px-1.5 py-0.5 rounded bg-surface border border-border"
               >
                 Limpar
               </button>
@@ -281,13 +281,13 @@ export const AdminView: React.FC<AdminViewProps> = ({
           </div>
 
           {/* Filtro por Status da Foto */}
-          <div className="flex items-center gap-1.5 bg-[#05130b] p-1 rounded-xl border border-emerald-500/20">
+          <div className="flex items-center gap-1.5 bg-surface-muted p-1 rounded-xl border border-border">
             <button
               onClick={() => setPhotoFilter('all')}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                 photoFilter === 'all'
-                  ? 'bg-emerald-500 text-stone-950 font-bold shadow-xs'
-                  : 'text-emerald-300/70 hover:text-white'
+                  ? 'bg-primary text-white font-bold shadow-subtle'
+                  : 'text-text-secondary hover:text-text-primary'
               }`}
             >
               Todas ({totalRecipes})
@@ -296,8 +296,8 @@ export const AdminView: React.FC<AdminViewProps> = ({
               onClick={() => setPhotoFilter('without_photo')}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                 photoFilter === 'without_photo'
-                  ? 'bg-amber-500 text-stone-950 font-bold shadow-xs'
-                  : 'text-amber-300/70 hover:text-amber-200'
+                  ? 'bg-amber-500 text-white font-bold shadow-subtle'
+                  : 'text-amber-700 hover:text-amber-800'
               }`}
             >
               Sem Foto ({recipesWithoutImage})
@@ -306,8 +306,8 @@ export const AdminView: React.FC<AdminViewProps> = ({
               onClick={() => setPhotoFilter('with_photo')}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                 photoFilter === 'with_photo'
-                  ? 'bg-emerald-500 text-stone-950 font-bold shadow-xs'
-                  : 'text-emerald-300/70 hover:text-white'
+                  ? 'bg-primary text-white font-bold shadow-subtle'
+                  : 'text-text-secondary hover:text-text-primary'
               }`}
             >
               Com Foto ({recipesWithImage})
@@ -318,7 +318,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
         {/* Filtro por Categoria */}
         {categories.length > 0 && (
           <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs no-scrollbar">
-            <span className="text-emerald-400/60 font-semibold flex items-center gap-1 shrink-0">
+            <span className="text-text-secondary font-semibold flex items-center gap-1 shrink-0">
               <Filter className="w-3.5 h-3.5" />
               Categoria:
             </span>
@@ -326,8 +326,8 @@ export const AdminView: React.FC<AdminViewProps> = ({
               onClick={() => setSelectedCategory('all')}
               className={`px-2.5 py-1 rounded-lg shrink-0 font-medium transition-colors cursor-pointer ${
                 selectedCategory === 'all'
-                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                  : 'bg-emerald-950/40 text-emerald-300/60 hover:text-white border border-transparent'
+                  ? 'bg-primary/15 text-primary border border-primary/30 font-semibold'
+                  : 'bg-surface-muted text-text-secondary hover:text-text-primary border border-border'
               }`}
             >
               Todas
@@ -338,8 +338,8 @@ export const AdminView: React.FC<AdminViewProps> = ({
                 onClick={() => setSelectedCategory(cat)}
                 className={`px-2.5 py-1 rounded-lg shrink-0 font-medium transition-colors cursor-pointer ${
                   selectedCategory === cat
-                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                    : 'bg-emerald-950/40 text-emerald-300/60 hover:text-white border border-transparent'
+                    ? 'bg-primary/15 text-primary border border-primary/30 font-semibold'
+                    : 'bg-surface-muted text-text-secondary hover:text-text-primary border border-border'
                 }`}
               >
                 {cat}
@@ -384,10 +384,10 @@ export const AdminView: React.FC<AdminViewProps> = ({
               return (
                 <div
                   key={recipe.id}
-                  className="rounded-2xl bg-[#081e13]/80 border border-emerald-500/20 hover:border-emerald-500/40 transition-all flex flex-col overflow-hidden group shadow-sm hover:shadow-[0_0_20px_rgba(16,185,129,0.15)]"
+                  className="rounded-2xl bg-surface border border-border hover:border-primary/40 transition-all flex flex-col overflow-hidden group shadow-subtle hover:shadow-soft"
                 >
                   {/* Thumbnail com Badge de Foto */}
-                  <div className="relative aspect-16/10 bg-[#05130b] overflow-hidden border-b border-emerald-500/15">
+                  <div className="relative aspect-16/10 bg-surface-muted overflow-hidden border-b border-border">
                     <img
                       src={imgSrc}
                       alt={recipe.title}
@@ -401,13 +401,13 @@ export const AdminView: React.FC<AdminViewProps> = ({
                     {/* Badge Indicador de Status */}
                     <div className="absolute top-2.5 right-2.5">
                       {hasPhoto ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-950/90 text-emerald-300 border border-emerald-500/40 text-[10px] font-bold backdrop-blur-xs">
-                          <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white/90 text-primary border border-border text-[10px] font-bold backdrop-blur-xs shadow-subtle">
+                          <CheckCircle2 className="w-3 h-3 text-primary" />
                           Com Foto
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-950/90 text-amber-300 border border-amber-500/40 text-[10px] font-bold backdrop-blur-xs">
-                          <Camera className="w-3 h-3 text-amber-400" />
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white/90 text-amber-600 border border-amber-200 text-[10px] font-bold backdrop-blur-xs shadow-subtle">
+                          <Camera className="w-3 h-3 text-amber-600" />
                           Sem Foto
                         </span>
                       )}
@@ -416,7 +416,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
                     {/* Categoria */}
                     {recipe.category && (
                       <div className="absolute bottom-2.5 left-2.5">
-                        <span className="px-2 py-0.5 rounded-md bg-black/75 text-emerald-200 text-[10px] font-medium backdrop-blur-xs border border-white/10">
+                        <span className="px-2 py-0.5 rounded-md bg-stone-900/80 text-white text-[10px] font-medium backdrop-blur-xs border border-white/10">
                           {recipe.category}
                         </span>
                       </div>
@@ -426,21 +426,21 @@ export const AdminView: React.FC<AdminViewProps> = ({
                   {/* Conteúdo do Card */}
                   <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
                     <div>
-                      <h3 className="text-sm font-bold text-white line-clamp-1 group-hover:text-emerald-300 transition-colors">
+                      <h3 className="text-sm font-bold text-text-primary line-clamp-1 group-hover:text-primary transition-colors">
                         {recipe.title}
                       </h3>
 
-                      <div className="flex items-center gap-3 mt-1.5 text-xs text-emerald-300/70">
+                      <div className="flex items-center gap-3 mt-1.5 text-xs text-text-secondary">
                         {recipe.prepTimeMinutes ? (
                           <span className="flex items-center gap-1">
-                            <Clock className="w-3.5 h-3.5 text-emerald-400" />
+                            <Clock className="w-3.5 h-3.5 text-primary" />
                             {recipe.prepTimeMinutes} min
                           </span>
                         ) : null}
 
                         {recipe.difficulty && (
                           <span className="flex items-center gap-1">
-                            <ChefHat className="w-3.5 h-3.5 text-emerald-400" />
+                            <ChefHat className="w-3.5 h-3.5 text-primary" />
                             {recipe.difficulty}
                           </span>
                         )}
@@ -448,8 +448,8 @@ export const AdminView: React.FC<AdminViewProps> = ({
                     </div>
 
                     {/* Botão de Ação para Foto */}
-                    <div className="pt-2 border-t border-emerald-500/10 flex items-center justify-between gap-2">
-                      <span className="text-[11px] text-emerald-400/60 font-mono truncate">
+                    <div className="pt-2 border-t border-border flex items-center justify-between gap-2">
+                      <span className="text-[11px] text-text-secondary font-mono truncate">
                         ID: {recipe.id}
                       </span>
 
