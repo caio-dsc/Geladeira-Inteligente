@@ -426,6 +426,15 @@ class HuggingFaceScannerService implements IScannerService {
       throw new Error('Nenhuma imagem foi selecionada.');
     }
 
+    // Se a imagem for uma das amostras de teste rápido, retorna as detecções correspondentes
+    const sample = SAMPLE_FRIDGE_IMAGES.find((s) => s.url === imageUrl);
+    if (sample && sample.mockDetections && sample.mockDetections.length > 0) {
+      onProgress?.('Carregando alimentos da foto de teste...');
+      await new Promise((r) => setTimeout(r, 700));
+      onProgress?.('Processando itens detectados...');
+      return sample.mockDetections.map((item) => ({ ...item }));
+    }
+
     onProgress?.('Enviando imagem para análise...');
 
     const response = await fetch('/api/scan', {

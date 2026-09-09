@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 360" fill="none">
+  <!-- Embedded Poppins font style -->
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@700;800;900&amp;display=swap');
+      .brand-title {
+        font-family: 'Poppins', 'Century Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-weight: 900;
+        font-size: 116px;
+        letter-spacing: -0.035em;
+      }
+      .brand-sub {
+        font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-weight: 700;
+        font-size: 20.5px;
+        letter-spacing: 0.28em;
+      }
+    </style>
+  </defs>
+
+  <!-- Refrigerator Tech Icon -->
+  <g id="fridge-icon">
+    <!-- Circuit lines in Emerald / Teal (#0E9F82) -->
+    <g stroke="#0E9F82" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <!-- Trace 1 (Top) -->
+      <path d="M 125 74 L 142 74 L 142 102 L 168 102" />
+      <!-- Trace 2 (Upper-mid) -->
+      <path d="M 98 118 L 122 118 L 122 146 L 168 146" />
+      <!-- Trace 3 (Middle / Apex - longest) -->
+      <path d="M 56 192 L 168 192" />
+      <!-- Trace 4 (Lower-mid) -->
+      <path d="M 74 238 L 112 238 L 112 260 L 168 260" />
+      <!-- Trace 5 (Bottom) -->
+      <path d="M 108 272 L 134 272 L 134 300 L 168 300" />
+    </g>
+
+    <!-- Circuit node dots (5 circles) -->
+    <circle cx="125" cy="74" r="8" fill="#0E9F82" />
+    <circle cx="98" cy="118" r="8" fill="#0E9F82" />
+    <circle cx="56" cy="192" r="8" fill="#0E9F82" />
+    <circle cx="74" cy="238" r="8" fill="#0E9F82" />
+    <circle cx="108" cy="272" r="8" fill="#0E9F82" />
+
+    <!-- 3D Refrigerator Silhouette in Pure Black (#000000) -->
+    <!-- Freezer Door (Top) with rounded corners and subtle bevel -->
+    <path
+      d="M 168 76 C 168 56 178 48 206 48 L 268 48 C 284 48 292 56 292 72 L 292 124 C 292 128 288 132 284 132 L 176 132 C 172 132 168 128 168 124 Z"
+      fill="#000000"
+    />
+
+    <!-- Fridge Door (Bottom) with rounded base -->
+    <path
+      d="M 168 140 L 284 140 C 288 140 292 144 292 148 L 292 278 C 292 296 282 304 262 304 L 198 304 C 178 304 168 296 168 278 Z"
+      fill="#000000"
+    />
+
+    <!-- Feet -->
+    <rect x="178" y="304" width="14" height="6" rx="2" fill="#000000" />
+    <rect x="266" y="304" width="14" height="6" rx="2" fill="#000000" />
+
+    <!-- White door handles (capsules on left side of doors) -->
+    <rect x="178" y="72" width="7" height="30" rx="3.5" fill="#FFFFFF" />
+    <rect x="178" y="152" width="7" height="48" rx="3.5" fill="#FFFFFF" />
+  </g>
+
+  <!-- Typography -->
+  <!-- Line 1: geladeira (Black) -->
+  <text x="315" y="165" class="brand-title" fill="#000000">geladeira</text>
+
+  <!-- Line 2: inteligente (Emerald / Teal #0E9F82, indented under 'e') -->
+  <text x="388" y="246" class="brand-title" fill="#0E9F82">&#305;ntel&#305;gente</text>
+
+  <!-- Line 3: ALIMENTAÇÃO & RECEITAS (Gray #707070, letter-spaced) -->
+  <text x="392" y="292" class="brand-sub" fill="#707070">ALIMENTAÇÃO &amp; RECEITAS</text>
+</svg>

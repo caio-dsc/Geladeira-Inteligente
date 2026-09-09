@@ -20,6 +20,7 @@ import {
 import { Button } from '../common/Button';
 import { Input } from '../common/Input';
 import { AppLogo } from '../common/AppLogo';
+import { LoginBadge } from '../common/LoginBadge';
 import { Card } from '../common/Card';
 
 export interface LoginViewProps {
@@ -69,7 +70,9 @@ export const LoginView: React.FC<LoginViewProps> = ({
       {/* ===================================================================== */}
       <header className="sticky top-0 z-40 bg-surface/90 backdrop-blur-md border-b border-border shadow-subtle">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
-          <AppLogo size="md" />
+          <div className="flex items-center select-none" title="Geladeira Inteligente">
+            <AppLogo size="md" />
+          </div>
 
           <nav className="hidden md:flex items-center gap-6 text-xs font-semibold text-text-secondary">
             <a href="#proposta" className="hover:text-primary transition-colors">O que é</a>
@@ -426,8 +429,8 @@ export const LoginView: React.FC<LoginViewProps> = ({
           {/* Ambient subtle glow */}
           <div className="absolute -top-12 -right-12 w-48 h-48 bg-primary/10 rounded-full blur-2xl pointer-events-none" />
           
-          <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center mb-4 shadow-subtle">
-            <Sparkles className="w-8 h-8" />
+          <div className="mb-4 flex justify-center">
+            <LoginBadge size="lg" showCircuits={true} />
           </div>
 
           <h2 className="text-2xl sm:text-4xl font-black text-text-primary tracking-tight">
@@ -495,30 +498,28 @@ export const LoginView: React.FC<LoginViewProps> = ({
               transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
               className="relative w-full max-w-md max-h-[calc(100dvh-1.5rem)] sm:max-h-[90vh] flex flex-col bg-surface rounded-2xl sm:rounded-3xl shadow-floating border border-border overflow-hidden z-10 text-text-primary text-left motion-reduce:transform-none"
             >
-              {/* Header Fixo */}
-              <div className="flex items-center justify-between p-4 sm:p-5 border-b border-border bg-surface-muted/60 shrink-0">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary border border-primary/20 flex items-center justify-center shrink-0">
-                    <AppLogo size="sm" showText={false} />
-                  </div>
-                  <div>
-                    <h3 id="auth-modal-title" className="text-base sm:text-lg font-bold text-text-primary tracking-tight">
-                      Acesse sua Geladeira Inteligente
-                    </h3>
-                    <p className="text-xs text-text-secondary">
-                      {mode === 'signin' ? 'Entre com sua conta' : 'Crie sua nova conta'}
-                    </p>
-                  </div>
-                </div>
-
+              {/* Header Fixo da Parte de Login */}
+              <div className="flex flex-col items-center justify-center p-5 pt-6 pb-4 border-b border-border bg-gradient-to-b from-surface-muted/90 via-surface-muted/50 to-surface shrink-0 relative text-center">
                 <button
                   onClick={() => setIsAuthModalOpen(false)}
-                  className="rounded-xl p-2 text-text-secondary hover:text-text-primary hover:bg-surface-muted transition-colors cursor-pointer"
+                  className="absolute top-3.5 right-3.5 rounded-xl p-2 text-text-secondary hover:text-text-primary hover:bg-surface-muted transition-colors cursor-pointer"
                   title="Fechar"
                   aria-label="Fechar"
                 >
                   <X className="w-5 h-5" />
                 </button>
+
+                {/* Ícone com efeito em volta do ícone da geladeira apenas na parte de login */}
+                <div className="mb-2 flex justify-center">
+                  <LoginBadge size="md" showCircuits={true} />
+                </div>
+
+                <h3 id="auth-modal-title" className="text-base sm:text-lg font-bold text-text-primary tracking-tight">
+                  Acesse sua Geladeira Inteligente
+                </h3>
+                <p className="text-xs text-text-secondary mt-0.5">
+                  {mode === 'signin' ? 'Entre com sua conta para gerenciar seus alimentos' : 'Crie sua nova conta gratuita'}
+                </p>
               </div>
 
               {/* Form Content */}

@@ -1,4 +1,6 @@
 import { FoodItem, Recipe, User } from '../types';
+import geladeiraOrganizadaImg from '../assets/images/geladeira_organizada.jpg';
+import gavetaHortifrutiImg from '../assets/images/gaveta_hortifruti.jpg';
 
 export const INITIAL_USER: User = {
   id: 'usr_demo_01',
@@ -326,28 +328,29 @@ export const MOCK_RECIPES: Recipe[] = [
 export const SAMPLE_FRIDGE_IMAGES = [
   {
     id: 'fridge_sample_1',
-    name: 'Geladeira Organizada (Prateleiras & Gaveta)',
-    url: 'https://images.unsplash.com/photo-1584992236310-6edddc08acff?w=800&auto=format&fit=crop&q=80',
-    description: 'Foto clara mostrando ovos, laticínios, garrafas e vegetais frescos.',
+    name: 'Geladeira Organizada',
+    url: geladeiraOrganizadaImg,
+    description: 'Geladeira organizada com potes herméticos, frios, água mineral e legumes.',
     mockDetections: [
-      { id: 'det_1', name: 'Ovos Caipiras', category: 'proteins' as const, quantity: 12, unit: 'un' as const, state: 'fresh' as const, location: 'porta' as const, confidence: 0.98, selected: true },
-      { id: 'det_2', name: 'Leite Integral', category: 'dairy' as const, quantity: 2, unit: 'L' as const, state: 'fresh' as const, location: 'porta' as const, confidence: 0.95, selected: true },
-      { id: 'det_3', name: 'Queijo Prato', category: 'dairy' as const, quantity: 300, unit: 'g' as const, state: 'fresh' as const, location: 'geladeira' as const, confidence: 0.92, selected: true },
-      { id: 'det_4', name: 'Tomates', category: 'vegetables' as const, quantity: 5, unit: 'un' as const, state: 'fresh' as const, location: 'gaveta_legumes' as const, confidence: 0.89, selected: true },
-      { id: 'det_5', name: 'Pimentão Verde', category: 'vegetables' as const, quantity: 2, unit: 'un' as const, state: 'fresh' as const, location: 'gaveta_legumes' as const, confidence: 0.86, selected: true },
-      { id: 'det_6', name: 'Manteiga', category: 'dairy' as const, quantity: 200, unit: 'g' as const, state: 'fresh' as const, location: 'porta' as const, confidence: 0.94, selected: true },
+      { id: 'det_1', name: 'Queijo Prato Fatiado', category: 'dairy' as const, quantity: 300, unit: 'g' as const, state: 'fresh' as const, location: 'geladeira' as const, confidence: 0.98, selected: true },
+      { id: 'det_2', name: 'Presunto Cozido', category: 'proteins' as const, quantity: 200, unit: 'g' as const, state: 'fresh' as const, location: 'geladeira' as const, confidence: 0.96, selected: true },
+      { id: 'det_3', name: 'Tomates Cereja', category: 'vegetables' as const, quantity: 12, unit: 'un' as const, state: 'fresh' as const, location: 'geladeira' as const, confidence: 0.94, selected: true },
+      { id: 'det_4', name: 'Milho Verde em Grãos', category: 'vegetables' as const, quantity: 2, unit: 'un' as const, state: 'fresh' as const, location: 'geladeira' as const, confidence: 0.93, selected: true },
+      { id: 'det_5', name: 'Ervilhas Frescas', category: 'vegetables' as const, quantity: 1, unit: 'pct' as const, state: 'fresh' as const, location: 'geladeira' as const, confidence: 0.91, selected: true },
+      { id: 'det_6', name: 'Mix de Folhas Verdes', category: 'vegetables' as const, quantity: 1, unit: 'un' as const, state: 'fresh' as const, location: 'geladeira' as const, confidence: 0.90, selected: true },
     ]
   },
   {
     id: 'fridge_sample_2',
-    name: 'Gaveta de Hortifrúti e Laticínios',
-    url: 'https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?w=800&auto=format&fit=crop&q=80',
-    description: 'Visão aproximada com verduras, iogurtes e frutas.',
+    name: 'Gaveta Hortifrúti',
+    url: gavetaHortifrutiImg,
+    description: 'Organizadores transparentes com morangos frescos, laranjas, maçãs e legumes.',
     mockDetections: [
-      { id: 'det_7', name: 'Iogurte Grego', category: 'dairy' as const, quantity: 3, unit: 'un' as const, state: 'fresh' as const, location: 'geladeira' as const, confidence: 0.96, selected: true },
-      { id: 'det_8', name: 'Maçãs Vermelhas', category: 'fruits' as const, quantity: 4, unit: 'un' as const, state: 'fresh' as const, location: 'gaveta_legumes' as const, confidence: 0.91, selected: true },
-      { id: 'det_9', name: 'Cenouras Baby', category: 'vegetables' as const, quantity: 1, unit: 'pct' as const, state: 'fresh' as const, location: 'gaveta_legumes' as const, confidence: 0.88, selected: true },
-      { id: 'det_10', name: 'Suco de Laranja Integral', category: 'drinks' as const, quantity: 1, unit: 'L' as const, state: 'fresh' as const, location: 'porta' as const, confidence: 0.93, selected: true },
+      { id: 'det_7', name: 'Morangos Frescos', category: 'fruits' as const, quantity: 1, unit: 'cx' as const, state: 'fresh' as const, location: 'gaveta_legumes' as const, confidence: 0.99, selected: true },
+      { id: 'det_8', name: 'Laranjas', category: 'fruits' as const, quantity: 6, unit: 'un' as const, state: 'fresh' as const, location: 'gaveta_legumes' as const, confidence: 0.96, selected: true },
+      { id: 'det_9', name: 'Maçãs Verdes', category: 'fruits' as const, quantity: 5, unit: 'un' as const, state: 'fresh' as const, location: 'gaveta_legumes' as const, confidence: 0.94, selected: true },
+      { id: 'det_10', name: 'Pimentão Vermelho', category: 'vegetables' as const, quantity: 3, unit: 'un' as const, state: 'fresh' as const, location: 'gaveta_legumes' as const, confidence: 0.92, selected: true },
+      { id: 'det_11', name: 'Pepinos', category: 'vegetables' as const, quantity: 2, unit: 'un' as const, state: 'fresh' as const, location: 'gaveta_legumes' as const, confidence: 0.89, selected: true },
     ]
   }
 ];

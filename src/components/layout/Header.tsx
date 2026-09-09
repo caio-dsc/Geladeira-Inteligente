@@ -45,10 +45,7 @@ export const Header: React.FC<HeaderProps> = ({
           onClick={() => onTabChange('dashboard')}
           className="cursor-pointer select-none group focus-visible:outline-hidden"
         >
-          <AppLogo 
-            size="md" 
-            className="[&_.text-white]:!text-text-primary [&_.text-emerald-400]:!text-primary [&_.text-emerald-400\/80]:!text-text-secondary" 
-          />
+          <AppLogo size="md" />
         </div>
 
         {/* Desktop navigation tabs */}
