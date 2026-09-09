@@ -1516,24 +1516,6 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
         </motion.div>
       )}
 
-      {/* SIMULAÇÃO DE ERRO */}
-      <div className="p-3.5 rounded-2xl bg-surface border border-border text-xs text-text-secondary flex items-center justify-between shadow-subtle">
-        <span className="flex items-center gap-1.5 font-medium">
-          <Sparkles className="w-3.5 h-3.5 text-primary" />
-          Simular falha de captura de foto
-        </span>
-
-        <label className="relative inline-flex items-center cursor-pointer">
-          <input
-            type="checkbox"
-            checked={simulatedErrorToggle}
-            onChange={(e) => setSimulatedErrorToggle(e.target.checked)}
-            className="sr-only peer"
-          />
-          <div className="w-9 h-5 bg-border peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-rose-500" />
-        </label>
-      </div>
-
       {/* MODAL DE EDIÇÃO DO ITEM DETECTADO */}
       <Modal
         isOpen={!!editingItem}

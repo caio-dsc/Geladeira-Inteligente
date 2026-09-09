@@ -73,7 +73,7 @@ export const HowItWorksGuide: React.FC<HowItWorksGuideProps> = ({
               <h4 className="text-xs sm:text-sm font-bold text-text-primary">
                 Guia Rápido da Geladeira Inteligente
               </h4>
-              <p className="text-[11px] sm:text-xs text-text-secondary line-clamp-1">
+              <p className="text-[11px] sm:text-xs text-text-secondary leading-snug">
                 Veja em poucos passos como aproveitar melhor sua Geladeira Inteligente.
               </p>
             </div>

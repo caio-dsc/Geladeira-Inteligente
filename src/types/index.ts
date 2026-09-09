@@ -26,6 +26,7 @@ export interface FoodItem {
   location: StorageLocation;
   addedAt: string;
   expiryDate?: string;
+  expirationDate?: string;
   notes?: string;
 }
 

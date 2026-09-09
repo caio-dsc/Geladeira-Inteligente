@@ -4,7 +4,8 @@ import { Modal } from '../common/Modal';
 import { Input } from '../common/Input';
 import { Select } from '../common/Select';
 import { Button } from '../common/Button';
-import { Plus, Save, AlertCircle } from 'lucide-react';
+import { Plus, Save, AlertCircle, Clock } from 'lucide-react';
+import { getExpirationInfo } from '../../utils/expirationHelper';
 
 export interface FoodFormModalProps {
   isOpen: boolean;
@@ -224,12 +225,26 @@ export const FoodFormModal: React.FC<FoodFormModalProps> = ({
             <option value="frozen">Congelado</option>
           </Select>
 
-          <Input
-            label="Data de Validade (opcional)"
-            type="date"
-            value={expirationDate}
-            onChange={(e) => setExpirationDate(e.target.value)}
-          />
+          <div>
+            <Input
+              label="Data de Validade (opcional)"
+              type="date"
+              value={expirationDate}
+              onChange={(e) => setExpirationDate(e.target.value)}
+            />
+            {expirationDate && (() => {
+              const info = getExpirationInfo(expirationDate);
+              if (!info) return null;
+              return (
+                <div className="mt-1.5 flex items-center">
+                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold ${info.badgeClass}`}>
+                    <Clock className="w-3.5 h-3.5 shrink-0" />
+                    <span>{info.label}</span>
+                  </span>
+                </div>
+              );
+            })()}
+          </div>
         </div>
 
         {/* Notes */}

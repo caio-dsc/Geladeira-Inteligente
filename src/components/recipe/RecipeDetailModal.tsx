@@ -18,20 +18,26 @@ export interface RecipeDetailModalProps {
   recipe: RecipeMatch | null;
   isOpen: boolean;
   onClose: () => void;
+  onStartCookingTimer?: (recipe: RecipeMatch) => void;
+  activeCookingRecipeId?: string | null;
 }
 
 export const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
   recipe,
   isOpen,
   onClose,
+  onStartCookingTimer,
+  activeCookingRecipeId,
 }) => {
   const [isCooking, setIsCooking] = React.useState(false);
 
   React.useEffect(() => {
-    if (!isOpen) {
+    if (recipe && activeCookingRecipeId === recipe.id) {
+      setIsCooking(true);
+    } else if (!isOpen) {
       setIsCooking(false);
     }
-  }, [isOpen]);
+  }, [isOpen, recipe, activeCookingRecipeId]);
 
   if (!recipe) return null;
 
@@ -85,6 +91,9 @@ export const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
               leftIcon={<CookingPot className="w-4 h-4" />}
               onClick={() => {
                 setIsCooking(true);
+                if (onStartCookingTimer) {
+                  onStartCookingTimer(recipe);
+                }
               }}
             >
               {isCooking ? 'Modo de Preparo Ativo' : 'Começar a Cozinhar'}

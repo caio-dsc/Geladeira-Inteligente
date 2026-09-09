@@ -13,9 +13,11 @@ import {
   Pencil, 
   Trash2, 
   Calendar,
-  MapPin
+  MapPin,
+  Clock
 } from 'lucide-react';
 import { Card } from '../common/Card';
+import { getExpirationInfo } from '../../utils/expirationHelper';
 
 export interface FoodCardProps {
   item: FoodItem;
@@ -82,6 +84,8 @@ export const getLocationLabel = (loc: string): string => {
 
 export const FoodCard: React.FC<FoodCardProps> = ({ item, onEdit, onDelete }) => {
   const freshness = getFreshnessBadge(item.state);
+  const expirationDate = item.expirationDate || item.expiryDate;
+  const expirationInfo = getExpirationInfo(expirationDate);
 
   return (
     <Card variant="interactive" padding="sm" className="relative group flex flex-col justify-between">
@@ -110,6 +114,14 @@ export const FoodCard: React.FC<FoodCardProps> = ({ item, onEdit, onDelete }) =>
             </span>
             <span className="text-xs text-text-secondary font-medium">{item.unit}</span>
           </div>
+
+          {/* Expiration Dynamic Status */}
+          {expirationInfo && (
+            <div className={`inline-flex items-center gap-1.5 mt-2 px-2.5 py-1 rounded-lg text-xs ${expirationInfo.badgeClass}`}>
+              <Clock className="w-3.5 h-3.5 shrink-0" />
+              <span>{expirationInfo.label}</span>
+            </div>
+          )}
         </div>
 
         {/* Location & Expiration info */}
@@ -119,10 +131,12 @@ export const FoodCard: React.FC<FoodCardProps> = ({ item, onEdit, onDelete }) =>
             <span className="truncate">{getLocationLabel(item.location)}</span>
           </div>
 
-          {item.expirationDate && (
+          {expirationDate && (
             <div className="flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5 text-primary shrink-0" />
-              <span>Validade: {new Date(item.expirationDate).toLocaleDateString('pt-BR')}</span>
+              <span>
+                Validade: {new Date(expirationDate.includes('T') ? expirationDate : `${expirationDate}T00:00:00`).toLocaleDateString('pt-BR')}
+              </span>
             </div>
           )}
 

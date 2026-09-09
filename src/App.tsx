@@ -26,6 +26,7 @@ import { AdminView } from './components/views/AdminView';
 import { FoodFormModal } from './components/food/FoodFormModal';
 import { RecipeDetailModal } from './components/recipe/RecipeDetailModal';
 import { QuickGuideModal } from './components/common/QuickGuideModal';
+import { FloatingCookingTimer } from './components/recipe/FloatingCookingTimer';
 import { CheckCircle2, X } from 'lucide-react';
 
 export default function App() {
@@ -41,6 +42,16 @@ export default function App() {
   const [selectedRecipe, setSelectedRecipe] = useState<RecipeMatch | null>(null);
   const [isCreditsModalOpen, setIsCreditsModalOpen] = useState(false);
   const [isQuickGuideOpen, setIsQuickGuideOpen] = useState(false);
+
+  // Cooking timer session state
+  const [activeCookingSession, setActiveCookingSession] = useState<{
+    recipeId: string;
+    recipeTitle: string;
+    totalSeconds: number;
+    remainingSeconds: number;
+    isRunning: boolean;
+    isCompleted: boolean;
+  } | null>(null);
 
   // Exibe o Guia Rápido automaticamente na primeira vez que o usuário entra na conta após o login
   useEffect(() => {
@@ -95,6 +106,87 @@ export default function App() {
       setToastMessage(null);
     }, 3500);
   };
+
+  // Contagem regressiva do temporizador de receita em preparo
+  useEffect(() => {
+    if (!activeCookingSession || !activeCookingSession.isRunning || activeCookingSession.remainingSeconds <= 0) {
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setActiveCookingSession((prev) => {
+        if (!prev || !prev.isRunning) return prev;
+        if (prev.remainingSeconds <= 1) {
+          showToast(`Tempo de preparo concluído para "${prev.recipeTitle}"!`);
+          return {
+            ...prev,
+            remainingSeconds: 0,
+            isRunning: false,
+            isCompleted: true,
+          };
+        }
+        return {
+          ...prev,
+          remainingSeconds: prev.remainingSeconds - 1,
+        };
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [activeCookingSession?.isRunning, activeCookingSession?.recipeId]);
+
+  const handleStartCookingTimer = useCallback((recipe: RecipeMatch) => {
+    const minutes = Number(recipe.prepTimeMinutes);
+    if (!Number.isFinite(minutes) || minutes <= 0) {
+      // Se ausente ou inválido, mantém comportamento atual sem quebrar
+      return;
+    }
+
+    const totalSeconds = Math.round(minutes * 60);
+    setActiveCookingSession({
+      recipeId: recipe.id,
+      recipeTitle: recipe.title,
+      totalSeconds,
+      remainingSeconds: totalSeconds,
+      isRunning: true,
+      isCompleted: false,
+    });
+    showToast(`Temporizador iniciado: ${minutes} min para "${recipe.title}".`);
+  }, []);
+
+  const handleTogglePauseCookingTimer = useCallback(() => {
+    setActiveCookingSession((prev) => {
+      if (!prev) return null;
+      return {
+        ...prev,
+        isRunning: !prev.isRunning,
+      };
+    });
+  }, []);
+
+  const handleCancelCookingTimer = useCallback(() => {
+    setActiveCookingSession(null);
+  }, []);
+
+  const handleRestartCookingTimer = useCallback(() => {
+    setActiveCookingSession((prev) => {
+      if (!prev) return null;
+      return {
+        ...prev,
+        remainingSeconds: prev.totalSeconds,
+        isRunning: true,
+        isCompleted: false,
+      };
+    });
+  }, []);
+
+  const handleReopenCookingRecipe = useCallback(() => {
+    if (!activeCookingSession) return;
+    const rec = recipes.find((r) => r.id === activeCookingSession.recipeId);
+    if (rec) {
+      setSelectedRecipe(rec);
+    }
+  }, [activeCookingSession, recipes]);
 
   // Re-calculate recipes match when inventory or preferences change
   const updateRecipeMatches = useCallback(async (currentInventory: FoodItem[], preferences?: UserPreferences) => {
@@ -369,7 +461,24 @@ export default function App() {
         recipe={selectedRecipe}
         isOpen={Boolean(selectedRecipe)}
         onClose={() => setSelectedRecipe(null)}
+        onStartCookingTimer={handleStartCookingTimer}
+        activeCookingRecipeId={activeCookingSession?.recipeId}
       />
+
+      {/* Floating Cooking Timer */}
+      {activeCookingSession && (
+        <FloatingCookingTimer
+          recipeTitle={activeCookingSession.recipeTitle}
+          remainingSeconds={activeCookingSession.remainingSeconds}
+          totalSeconds={activeCookingSession.totalSeconds}
+          isRunning={activeCookingSession.isRunning}
+          isCompleted={activeCookingSession.isCompleted}
+          onTogglePause={handleTogglePauseCookingTimer}
+          onCancel={handleCancelCookingTimer}
+          onRestart={handleRestartCookingTimer}
+          onClickRecipe={handleReopenCookingRecipe}
+        />
+      )}
 
       <CreditsModal
         isOpen={isCreditsModalOpen}
