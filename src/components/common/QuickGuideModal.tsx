@@ -23,7 +23,8 @@ import {
   Croissant,
   HelpCircle,
   Lightbulb,
-  Sun
+  Sun,
+  Clock
 } from 'lucide-react';
 import { Button } from './Button';
 
@@ -237,6 +238,36 @@ export const QuickGuideModal: React.FC<QuickGuideModalProps> = ({
                     </p>
                   </div>
                 </div>
+
+                {/* Acompanhe a validade */}
+                <div className="p-3.5 rounded-2xl bg-surface-muted/70 border border-border space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-primary shrink-0" />
+                    <h5 className="text-xs font-bold text-text-primary">
+                      Acompanhe a validade
+                    </h5>
+                  </div>
+                  <p className="text-xs text-text-secondary leading-relaxed">
+                    Ao cadastrar um alimento, informe a data de vencimento. O sistema mostra automaticamente quanto tempo falta para o alimento vencer e alerta quando estiver próximo da validade ou vencido:
+                  </p>
+                  <div className="flex flex-wrap gap-1.5 pt-0.5">
+                    <span className="px-2 py-0.5 rounded-md text-[11px] bg-red-600 text-white font-bold border border-red-700 shadow-xs">
+                      Vencido
+                    </span>
+                    <span className="px-2 py-0.5 rounded-md text-[11px] bg-red-600 text-white font-bold border border-red-700 shadow-xs">
+                      Vence hoje
+                    </span>
+                    <span className="px-2 py-0.5 rounded-md text-[11px] bg-orange-600 text-white font-bold border border-orange-700 shadow-xs">
+                      Falta 1 dia para vencer
+                    </span>
+                    <span className="px-2 py-0.5 rounded-md text-[11px] bg-amber-300 text-amber-950 font-bold border border-amber-400 shadow-xs">
+                      Falta 2 dias para vencer
+                    </span>
+                    <span className="px-2 py-0.5 rounded-md text-[11px] bg-surface-muted text-text-primary font-medium border border-border">
+                      Vence em X dias
+                    </span>
+                  </div>
+                </div>
               </div>
             )}
 
@@ -431,9 +462,16 @@ export const QuickGuideModal: React.FC<QuickGuideModalProps> = ({
                     <span className="text-text-primary font-medium">Itens em vermelho: ingredientes faltantes opcionais</span>
                   </div>
 
-                  <p className="pt-1">
-                    Além disso, você pode ativar o botão <strong>Começar a Cozinhar</strong> para ligar o temporizador oficial da receita!
-                  </p>
+                  {/* Controle o tempo de preparo */}
+                  <div className="p-3 rounded-xl bg-surface border border-border space-y-1.5 mt-1">
+                    <div className="flex items-center gap-1.5">
+                      <Clock className="w-4 h-4 text-primary shrink-0" />
+                      <span className="font-bold text-text-primary text-xs">Controle o tempo de preparo</span>
+                    </div>
+                    <p className="text-xs text-text-secondary leading-relaxed">
+                      Ao tocar em <strong>"Começar a Cozinhar"</strong>, o temporizador acompanha o tempo de preparo da receita. Você pode pausar, continuar ou cancelar e o contador continua corretamente mesmo se a página for recarregada.
+                    </p>
+                  </div>
                 </div>
               </div>
             )}

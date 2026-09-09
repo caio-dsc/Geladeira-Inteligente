@@ -950,8 +950,8 @@
     },
     {
       "id": "themealdb_53482",
-      "title": "Black bean & meat stew - feijoada",
-      "description": "Beef • Almoço & Jantar",
+      "title": "Feijoada — ensopado de feijão-preto com carne",
+      "description": "Carne • Almoço & Jantar",
       "prepTimeMinutes": 35,
       "difficulty": "Médio",
       "servings": 2,
@@ -961,77 +961,73 @@
       "ingredients": [
         {
           "name": "Feijão preto",
-          "nameOriginal": "Black Beans",
+          "nameOriginal": "Feijão-preto",
           "quantity": "250g",
           "required": true
         },
         {
           "name": "Bacon",
-          "nameOriginal": "Bacon",
+          "nameOriginal": "Bacon em cubos",
           "quantity": "100g",
           "required": true
         },
         {
           "name": "Carne de porco",
-          "nameOriginal": "Pork Back Ribs",
+          "nameOriginal": "Costelinha de porco",
           "quantity": "500g",
           "required": true
         },
         {
           "name": "Linguiça calabresa",
-          "nameOriginal": "Chorizo",
-          "quantity": "3",
+          "nameOriginal": "Linguiça calabresa / chouriço",
+          "quantity": "3 unidades",
           "required": true
         },
         {
           "name": "Carne de porco",
-          "nameOriginal": "Pork Shoulder",
+          "nameOriginal": "Paleta de porco",
           "quantity": "500g",
           "required": true
         },
         {
           "name": "Cebola",
-          "nameOriginal": "Onion",
-          "quantity": "3 chopped",
+          "nameOriginal": "Cebola picada",
+          "quantity": "3 unidades picadas",
           "required": true
         },
         {
           "name": "Alho",
-          "nameOriginal": "Garlic",
-          "quantity": "4 Cloves Chopped",
+          "nameOriginal": "Dentes de alho picados",
+          "quantity": "4 dentes picados",
           "required": true
         },
         {
           "name": "Pimenta",
-          "nameOriginal": "Chilli Flakes",
-          "quantity": "Pinch",
+          "nameOriginal": "Pimenta em flocos",
+          "quantity": "1 pitada",
           "required": true
         },
         {
           "name": "Óleo",
-          "nameOriginal": "Oil",
-          "quantity": "Drizzle",
+          "nameOriginal": "Fio de óleo ou azeite",
+          "quantity": "1 fio",
           "required": true
         },
         {
           "name": "Folha de louro",
-          "nameOriginal": "Bay Leaf",
-          "quantity": "2",
+          "nameOriginal": "Folhas de louro",
+          "quantity": "2 unidades",
           "required": true
         }
       ],
       "steps": [
-        "step 1",
-        "Heat a large heavy-based saucepan with a fitted lid, add the bacon and fry until crisp. Remove and keep the oil in the pan. In batches sear the ribs, sausages and pork shoulder. Season each batch with salt and pepper.",
-        "step 2",
-        "Remove the meat and set aside. Add the onion, garlic and chilli to the pan. Pour in a little olive oil if it needs more. Season with salt and pepper and fry for 8 mins or until soft.",
-        "step 3",
-        "Add the meat, bay leaves, white wine vinegar and drained beans. Cover with just enough water to cover, about 650ml. Bring to a boil and reduce the heat to a low simmer. Cover and cook for 2 hrs, or until the beans are soft and the meat is tender. If there is too much liquid in the pot take the lid off in the last hr. You can also use a slow cooker on the short method (4 hr) or make a quick version using a pressure cooker in batches for 30 mins each. Another method is to cook it in the oven for 3-4 hrs at 160C/140C fan/gas 3.",
-        "step 4",
-        "Serve with rice, a sprinkle of parsley or coriander, hot pepper sauce and orange slices."
+        "Aqueça uma panela grande e de fundo grosso com tampa, adicione o bacon e frite até dourar e ficar crocante. Retire o bacon e mantenha a gordura na panela. Em porções, sele a costelinha, as linguiças e a paleta de porco, temperando com sal e pimenta.",
+        "Retire as carnes e reserve. Adicione a cebola picada, o alho e a pimenta à panela com um fio de óleo ou azeite, refogando por cerca de 8 minutos até amaciar.",
+        "Adicione as carnes seladas, as folhas de louro, um toque de vinagre de vinho branco e o feijão-preto escorrido. Cubra com água suficiente (cerca de 650ml). Deixe ferver e abaixe o fogo para cozimento brando. Tampe e cozinhe em fogo baixo até o feijão e as carnes ficarem macios e suculentos. Destampe ao final para apurar o caldo se necessário.",
+        "Sirva a feijoada bem quente acompanhada de arroz branco, folhas de salsa ou coentro picadas, molho de pimenta e rodelas de laranja fresca."
       ],
       "tags": [
-        "Beef",
+        "Carne",
         "Sem Glúten",
         "Sem Lactose",
         "Sem Frituras",
@@ -1040,6 +1036,8 @@
       "caloriesPerServing": 380,
       "canonicalKey": "black-bean-meat-stew-feijoada",
       "aliases": [
+        "Feijoada — ensopado de feijão-preto com carne",
+        "Feijoada",
         "Black bean & meat stew - feijoada"
       ],
       "originArea": "Brazilian",

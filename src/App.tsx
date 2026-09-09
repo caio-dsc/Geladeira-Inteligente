@@ -27,6 +27,13 @@ import { FoodFormModal } from './components/food/FoodFormModal';
 import { RecipeDetailModal } from './components/recipe/RecipeDetailModal';
 import { QuickGuideModal } from './components/common/QuickGuideModal';
 import { FloatingCookingTimer } from './components/recipe/FloatingCookingTimer';
+import { 
+  StoredCookingSession, 
+  getStoredCookingSession, 
+  saveStoredCookingSession, 
+  clearStoredCookingSession, 
+  restoreCookingSession 
+} from './services/cookingTimerStorage';
 import { CheckCircle2, X } from 'lucide-react';
 
 export default function App() {
@@ -43,15 +50,21 @@ export default function App() {
   const [isCreditsModalOpen, setIsCreditsModalOpen] = useState(false);
   const [isQuickGuideOpen, setIsQuickGuideOpen] = useState(false);
 
-  // Cooking timer session state
-  const [activeCookingSession, setActiveCookingSession] = useState<{
-    recipeId: string;
-    recipeTitle: string;
-    totalSeconds: number;
-    remainingSeconds: number;
-    isRunning: boolean;
-    isCompleted: boolean;
-  } | null>(null);
+  // Cooking timer session state com persistência
+  const [activeCookingSession, setActiveCookingSession] = useState<StoredCookingSession | null>(null);
+
+  // Restaura temporizador persistido no localStorage (com base em timestamps absolutos)
+  useEffect(() => {
+    const stored = getStoredCookingSession(user?.id);
+    if (stored) {
+      const restored = restoreCookingSession(stored);
+      setActiveCookingSession(restored);
+      // Se tiver concluído enquanto o usuário estava ausente, atualiza o status no storage
+      if (restored.isCompleted && !stored.isCompleted) {
+        saveStoredCookingSession(restored, user?.id);
+      }
+    }
+  }, [user?.id]);
 
   // Exibe o Guia Rápido automaticamente na primeira vez que o usuário entra na conta após o login
   useEffect(() => {
@@ -107,7 +120,7 @@ export default function App() {
     }, 3500);
   };
 
-  // Contagem regressiva do temporizador de receita em preparo
+  // Contagem regressiva do temporizador de receita em preparo baseada em timestamps absolutos
   useEffect(() => {
     if (!activeCookingSession || !activeCookingSession.isRunning || activeCookingSession.remainingSeconds <= 0) {
       return;
@@ -116,24 +129,32 @@ export default function App() {
     const interval = setInterval(() => {
       setActiveCookingSession((prev) => {
         if (!prev || !prev.isRunning) return prev;
-        if (prev.remainingSeconds <= 1) {
+        const now = Date.now();
+        const remainingMs = prev.endAt - now;
+        const remainingSeconds = Math.max(0, Math.ceil(remainingMs / 1000));
+
+        if (remainingSeconds <= 0) {
           showToast(`Tempo de preparo concluído para "${prev.recipeTitle}"!`);
-          return {
+          const completed: StoredCookingSession = {
             ...prev,
             remainingSeconds: 0,
             isRunning: false,
             isCompleted: true,
           };
+          saveStoredCookingSession(completed, user?.id);
+          return completed;
         }
+
+        // Atualização em memória a cada segundo para fluidez do relógio (sem escrita I/O contínua)
         return {
           ...prev,
-          remainingSeconds: prev.remainingSeconds - 1,
+          remainingSeconds,
         };
       });
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [activeCookingSession?.isRunning, activeCookingSession?.recipeId]);
+  }, [activeCookingSession?.isRunning, activeCookingSession?.recipeId, activeCookingSession?.endAt, user?.id]);
 
   const handleStartCookingTimer = useCallback((recipe: RecipeMatch) => {
     const minutes = Number(recipe.prepTimeMinutes);
@@ -143,42 +164,73 @@ export default function App() {
     }
 
     const totalSeconds = Math.round(minutes * 60);
-    setActiveCookingSession({
+    const now = Date.now();
+    const endAt = now + totalSeconds * 1000;
+    const session: StoredCookingSession = {
       recipeId: recipe.id,
       recipeTitle: recipe.title,
       totalSeconds,
       remainingSeconds: totalSeconds,
       isRunning: true,
       isCompleted: false,
-    });
+      startedAt: now,
+      endAt,
+    };
+    saveStoredCookingSession(session, user?.id);
+    setActiveCookingSession(session);
     showToast(`Temporizador iniciado: ${minutes} min para "${recipe.title}".`);
-  }, []);
+  }, [user?.id]);
 
   const handleTogglePauseCookingTimer = useCallback(() => {
     setActiveCookingSession((prev) => {
       if (!prev) return null;
-      return {
-        ...prev,
-        isRunning: !prev.isRunning,
-      };
+      const now = Date.now();
+      let updated: StoredCookingSession;
+      if (prev.isRunning) {
+        // Pausando: calcula e congela os segundos restantes exatos
+        const remainingSeconds = Math.max(0, Math.ceil((prev.endAt - now) / 1000));
+        updated = {
+          ...prev,
+          remainingSeconds,
+          isRunning: false,
+        };
+      } else {
+        // Retomando: recalcula endAt a partir de agora com o tempo restante
+        const endAt = now + prev.remainingSeconds * 1000;
+        updated = {
+          ...prev,
+          isRunning: true,
+          startedAt: now,
+          endAt,
+        };
+      }
+      saveStoredCookingSession(updated, user?.id);
+      return updated;
     });
-  }, []);
+  }, [user?.id]);
 
   const handleCancelCookingTimer = useCallback(() => {
+    clearStoredCookingSession(user?.id);
     setActiveCookingSession(null);
-  }, []);
+  }, [user?.id]);
 
   const handleRestartCookingTimer = useCallback(() => {
     setActiveCookingSession((prev) => {
       if (!prev) return null;
-      return {
+      const now = Date.now();
+      const endAt = now + prev.totalSeconds * 1000;
+      const updated: StoredCookingSession = {
         ...prev,
         remainingSeconds: prev.totalSeconds,
         isRunning: true,
         isCompleted: false,
+        startedAt: now,
+        endAt,
       };
+      saveStoredCookingSession(updated, user?.id);
+      return updated;
     });
-  }, []);
+  }, [user?.id]);
 
   const handleReopenCookingRecipe = useCallback(() => {
     if (!activeCookingSession) return;
