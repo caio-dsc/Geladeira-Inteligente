@@ -3,6 +3,7 @@ import { RecipeMatch } from '../../types';
 import { Modal } from '../common/Modal';
 import { Button } from '../common/Button';
 import { getRecipeDietBadges } from '../../services/recipeService';
+import { formatTime } from './FloatingCookingTimer';
 import { 
   Clock, 
   ChefHat, 
@@ -19,6 +20,14 @@ export interface RecipeDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   onStartCookingTimer?: (recipe: RecipeMatch) => void;
+  activeCookingSession?: {
+    recipeId: string;
+    recipeTitle: string;
+    totalSeconds: number;
+    remainingSeconds: number;
+    isRunning: boolean;
+    isCompleted: boolean;
+  } | null;
   activeCookingRecipeId?: string | null;
 }
 
@@ -27,17 +36,22 @@ export const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
   isOpen,
   onClose,
   onStartCookingTimer,
+  activeCookingSession,
   activeCookingRecipeId,
 }) => {
   const [isCooking, setIsCooking] = React.useState(false);
 
+  const isTimerActiveForThisRecipe = Boolean(
+    activeCookingSession && recipe && activeCookingSession.recipeId === recipe.id
+  );
+
   React.useEffect(() => {
-    if (recipe && activeCookingRecipeId === recipe.id) {
+    if (recipe && (activeCookingRecipeId === recipe.id || activeCookingSession?.recipeId === recipe.id)) {
       setIsCooking(true);
     } else if (!isOpen) {
       setIsCooking(false);
     }
-  }, [isOpen, recipe, activeCookingRecipeId]);
+  }, [isOpen, recipe, activeCookingRecipeId, activeCookingSession?.recipeId]);
 
   if (!recipe) return null;
 
@@ -167,10 +181,39 @@ export const RecipeDetailModal: React.FC<RecipeDetailModalProps> = ({
 
         {/* Quick metrics bar */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="p-3 bg-surface-muted/70 rounded-xl sm:rounded-2xl border border-border text-center shadow-subtle">
-            <Clock className="w-4 h-4 text-primary mx-auto mb-1" />
-            <div className="text-xs text-text-secondary">Tempo</div>
-            <div className="text-sm font-bold text-text-primary">{recipe.prepTimeMinutes} min</div>
+          <div className={`p-3 rounded-xl sm:rounded-2xl border text-center shadow-subtle transition-all duration-200 ${
+            isTimerActiveForThisRecipe
+              ? activeCookingSession?.isCompleted
+                ? 'bg-emerald-500/10 border-emerald-500/30'
+                : 'bg-primary/5 border-primary/25'
+              : 'bg-surface-muted/70 border-border'
+          }`}>
+            <div className="flex items-center justify-center gap-1.5 mb-1">
+              <Clock className={`w-4 h-4 ${
+                isTimerActiveForThisRecipe && activeCookingSession?.isCompleted ? 'text-emerald-700' : 'text-primary'
+              }`} />
+              {isTimerActiveForThisRecipe && !activeCookingSession?.isCompleted && activeCookingSession?.isRunning && (
+                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse motion-reduce:animate-none" title="Temporizador em andamento" />
+              )}
+            </div>
+            <div className="text-xs text-text-secondary">
+              {isTimerActiveForThisRecipe && !activeCookingSession?.isCompleted && !activeCookingSession?.isRunning
+                ? 'Tempo (pausado)'
+                : 'Tempo'}
+            </div>
+            <div className={`text-sm font-bold ${
+              isTimerActiveForThisRecipe
+                ? (activeCookingSession?.isCompleted
+                    ? 'text-emerald-700 font-extrabold'
+                    : 'text-text-primary font-mono tracking-tight')
+                : 'text-text-primary'
+            }`}>
+              {isTimerActiveForThisRecipe
+                ? (activeCookingSession?.isCompleted
+                    ? 'Tempo concluído!'
+                    : formatTime(activeCookingSession!.remainingSeconds))
+                : `${recipe.prepTimeMinutes} min`}
+            </div>
           </div>
 
           <div className="p-3 bg-surface-muted/70 rounded-xl sm:rounded-2xl border border-border text-center shadow-subtle">

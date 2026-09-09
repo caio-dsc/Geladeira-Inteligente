@@ -70,13 +70,13 @@ export function getExpirationInfo(rawDate?: string | null, referenceDate = new D
   const MS_PER_DAY = 1000 * 60 * 60 * 24;
   const diffDays = Math.round((targetCalendar - todayCalendar) / MS_PER_DAY);
 
-  // Estados visuais alinhados ao Spatial UI 2D
+  // Estados visuais alinhados ao Spatial UI 2D com alto contraste e visibilidade
   if (diffDays > 3) {
     return {
       diffDays,
       label: `Faltam ${diffDays} dias para vencer`,
       status: 'normal',
-      badgeClass: 'bg-surface-muted text-text-secondary border border-border',
+      badgeClass: 'bg-surface-muted text-text-primary font-medium border border-border',
     };
   }
 
@@ -85,16 +85,16 @@ export function getExpirationInfo(rawDate?: string | null, referenceDate = new D
       diffDays,
       label: 'Faltam 3 dias para vencer',
       status: 'notice',
-      badgeClass: 'bg-amber-500/10 text-amber-800 dark:text-amber-300 border border-amber-500/25 font-semibold',
+      badgeClass: 'bg-amber-100 text-amber-950 font-semibold border border-amber-300',
     };
   }
 
   if (diffDays === 2) {
     return {
       diffDays,
-      label: 'Faltam 2 dias para vencer',
+      label: 'Falta 2 dias para vencer',
       status: 'warning',
-      badgeClass: 'bg-amber-500/15 text-amber-900 dark:text-amber-200 border border-amber-500/35 font-bold',
+      badgeClass: 'bg-amber-300 text-amber-950 font-bold border border-amber-400 shadow-xs',
     };
   }
 
@@ -103,7 +103,7 @@ export function getExpirationInfo(rawDate?: string | null, referenceDate = new D
       diffDays,
       label: 'Falta 1 dia para vencer',
       status: 'alert',
-      badgeClass: 'bg-orange-500/15 text-orange-900 dark:text-orange-200 border border-orange-500/35 font-bold',
+      badgeClass: 'bg-orange-600 text-white font-bold border border-orange-700 shadow-xs',
     };
   }
 
@@ -112,7 +112,7 @@ export function getExpirationInfo(rawDate?: string | null, referenceDate = new D
       diffDays,
       label: 'Vence hoje',
       status: 'alert',
-      badgeClass: 'bg-rose-500/15 text-rose-800 dark:text-rose-200 border border-rose-500/35 font-bold',
+      badgeClass: 'bg-red-600 text-white font-bold border border-red-700 shadow-xs',
     };
   }
 
@@ -123,6 +123,6 @@ export function getExpirationInfo(rawDate?: string | null, referenceDate = new D
     diffDays,
     label,
     status: 'expired',
-    badgeClass: 'bg-rose-500/20 text-rose-900 dark:text-rose-100 border border-rose-500/40 font-bold',
+    badgeClass: 'bg-red-600 text-white font-bold border border-red-700 shadow-xs',
   };
 }

@@ -462,6 +462,7 @@ export default function App() {
         isOpen={Boolean(selectedRecipe)}
         onClose={() => setSelectedRecipe(null)}
         onStartCookingTimer={handleStartCookingTimer}
+        activeCookingSession={activeCookingSession}
         activeCookingRecipeId={activeCookingSession?.recipeId}
       />
 
