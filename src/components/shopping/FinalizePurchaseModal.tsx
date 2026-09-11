@@ -48,7 +48,31 @@ export const FinalizePurchaseModal: React.FC<FinalizePurchaseModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       title="Finalizar Compra"
-      maxWidth="max-w-lg"
+      maxWidth="md"
+      footer={
+        <div className="flex items-center justify-end gap-2.5 w-full">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={onClose}
+            disabled={isSubmitting}
+          >
+            Cancelar
+          </Button>
+          <Button
+            type="button"
+            variant="primary"
+            size="sm"
+            onClick={handleConfirm}
+            isLoading={isSubmitting}
+            disabled={targetItems.length === 0}
+            leftIcon={<UtensilsCrossed className="w-4 h-4" />}
+          >
+            Transferir para Geladeira
+          </Button>
+        </div>
+      }
     >
       <div className="space-y-4 text-left">
         {error && (
@@ -131,7 +155,7 @@ export const FinalizePurchaseModal: React.FC<FinalizePurchaseModalProps> = ({
           <span className="text-xs font-semibold text-text-secondary">
             Prévia dos alimentos ({targetItems.length}):
           </span>
-          <div className="mt-2 max-h-44 overflow-y-auto space-y-1.5 pr-1">
+          <div className="mt-2 max-h-40 overflow-y-auto space-y-1.5 pr-1">
             {targetItems.length > 0 ? (
               targetItems.map((item) => (
                 <div
@@ -155,29 +179,6 @@ export const FinalizePurchaseModal: React.FC<FinalizePurchaseModalProps> = ({
               </div>
             )}
           </div>
-        </div>
-
-        <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-border">
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={onClose}
-            disabled={isSubmitting}
-          >
-            Cancelar
-          </Button>
-          <Button
-            type="button"
-            variant="primary"
-            size="sm"
-            onClick={handleConfirm}
-            isLoading={isSubmitting}
-            disabled={targetItems.length === 0}
-            leftIcon={<UtensilsCrossed className="w-4 h-4" />}
-          >
-            Transferir para Geladeira
-          </Button>
         </div>
       </div>
     </Modal>

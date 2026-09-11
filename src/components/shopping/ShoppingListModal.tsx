@@ -3,7 +3,7 @@ import { ShoppingList } from '../../types';
 import { Modal } from '../common/Modal';
 import { Input } from '../common/Input';
 import { Button } from '../common/Button';
-import { Calendar, Clock, ShoppingCart, AlertCircle } from 'lucide-react';
+import { ShoppingCart, AlertCircle } from 'lucide-react';
 
 export interface ShoppingListModalProps {
   isOpen: boolean;
@@ -67,7 +67,7 @@ export const ShoppingListModal: React.FC<ShoppingListModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       title={initialData ? 'Editar Lista de Mercado' : 'Nova Lista de Mercado'}
-      maxWidth="max-w-md"
+      maxWidth="md"
     >
       <form onSubmit={handleSubmit} className="space-y-4 text-left">
         {error && (
@@ -99,7 +99,6 @@ export const ShoppingListModal: React.FC<ShoppingListModalProps> = ({
               type="date"
               value={shoppingDate}
               onChange={(e) => setShoppingDate(e.target.value)}
-              leftIcon={<Calendar className="w-4 h-4" />}
             />
           </div>
 
@@ -111,7 +110,6 @@ export const ShoppingListModal: React.FC<ShoppingListModalProps> = ({
               type="time"
               value={shoppingTime}
               onChange={(e) => setShoppingTime(e.target.value)}
-              leftIcon={<Clock className="w-4 h-4" />}
             />
           </div>
         </div>

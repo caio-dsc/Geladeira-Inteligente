@@ -45,7 +45,7 @@ export const Modal: React.FC<ModalProps> = ({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 md:p-6 overflow-hidden sm:overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 pb-20 sm:p-4 md:p-6 sm:pb-4 overflow-hidden sm:overflow-y-auto">
           {/* Backdrop com desfoque moderado e tom neutro */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -61,7 +61,7 @@ export const Modal: React.FC<ModalProps> = ({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.97, y: 10 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className={`relative w-full ${maxWidthStyles[maxWidth]} max-h-[calc(100dvh-1.25rem)] sm:max-h-[88vh] flex flex-col bg-surface rounded-2xl sm:rounded-3xl shadow-floating border border-border overflow-hidden z-10 text-text-primary text-left`}
+            className={`relative w-full ${maxWidthStyles[maxWidth] || maxWidthStyles.md} max-h-[calc(100dvh-5.5rem)] sm:max-h-[88vh] flex flex-col bg-surface rounded-2xl sm:rounded-3xl shadow-floating border border-border overflow-hidden z-10 text-text-primary text-left`}
             role="dialog"
             aria-modal="true"
           >
