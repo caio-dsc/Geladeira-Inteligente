@@ -12,7 +12,8 @@ import {
   RotateCcw, 
   UtensilsCrossed, 
   Sparkles,
-  Camera
+  Camera,
+  ShoppingCart
 } from 'lucide-react';
 
 export interface InventoryViewProps {
@@ -22,6 +23,7 @@ export interface InventoryViewProps {
   onDeleteItem: (id: string) => void;
   onResetDefault: () => void;
   onNavigateToScanner: () => void;
+  onNavigateToShoppingList?: () => void;
 }
 
 export const InventoryView: React.FC<InventoryViewProps> = ({
@@ -31,6 +33,7 @@ export const InventoryView: React.FC<InventoryViewProps> = ({
   onDeleteItem,
   onResetDefault,
   onNavigateToScanner,
+  onNavigateToShoppingList,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -74,6 +77,19 @@ export const InventoryView: React.FC<InventoryViewProps> = ({
         </div>
 
         <div className="flex items-center gap-2.5 self-start sm:self-auto">
+          {onNavigateToShoppingList && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onNavigateToShoppingList}
+              leftIcon={<ShoppingCart className="w-4 h-4 text-primary" />}
+              className="text-xs"
+              title="Abrir Lista de Mercado"
+            >
+              Lista de Mercado
+            </Button>
+          )}
+
           <Button
             variant="outline"
             size="sm"

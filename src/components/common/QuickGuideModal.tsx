@@ -24,7 +24,8 @@ import {
   HelpCircle,
   Lightbulb,
   Sun,
-  Clock
+  Clock,
+  ShoppingCart
 } from 'lucide-react';
 import { Button } from './Button';
 
@@ -39,7 +40,7 @@ export const QuickGuideModal: React.FC<QuickGuideModalProps> = ({
 }) => {
   const [currentStep, setCurrentStep] = useState(0);
 
-  const TOTAL_STEPS = 7;
+  const TOTAL_STEPS = 8;
 
   const handleNext = () => {
     if (currentStep < TOTAL_STEPS - 1) {
@@ -513,6 +514,53 @@ export const QuickGuideModal: React.FC<QuickGuideModalProps> = ({
                     <li className="flex items-center gap-2">
                       <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
                       <span>Restrições alimentares permanentes</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            )}
+
+            {/* ETAPA 8: Lista de Mercado Inteligente */}
+            {currentStep === 7 && (
+              <div className="space-y-4 animate-in fade-in duration-200">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary border border-primary/20 flex items-center justify-center shrink-0">
+                    <ShoppingCart className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-base font-bold text-text-primary">
+                      8. Lista de Mercado Inteligente
+                    </h4>
+                    <p className="text-xs text-text-secondary mt-0.5">
+                      Planeje suas compras com controle financeiro e envie os itens diretamente para a geladeira.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-surface-muted/60 border border-border space-y-2.5 text-xs text-text-secondary">
+                  <p className="text-text-primary font-semibold">
+                    Recursos da sua Lista de Mercado:
+                  </p>
+                  <ul className="space-y-2 pl-1">
+                    <li className="flex items-start gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0 mt-1" />
+                      <span><strong>Criação & Agendamento:</strong> Crie listas independentes com título, data e horário opcionais para planejar suas idas às compras.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0 mt-1" />
+                      <span><strong>Adição de Produtos:</strong> Adicione itens com facilidade, definindo quantidade, unidade e preço unitário estimado.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0 mt-1" />
+                      <span><strong>Checklist & Total da Compra:</strong> Marque itens comprados no carrinho com cálculo do total em tempo real (R$) e progresso visual.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0 mt-1" />
+                      <span><strong>Copiar Lista:</strong> Copie o texto organizado com emojis e totais para compartilhar no WhatsApp ou bloco de notas.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0 mt-1" />
+                      <span><strong>Finalizar Compra → Geladeira:</strong> Transfira automaticamente os itens adquiridos direto para o estoque da sua geladeira!</span>
                     </li>
                   </ul>
                 </div>

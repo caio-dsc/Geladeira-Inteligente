@@ -19,6 +19,7 @@ import { LoginView } from './components/views/LoginView';
 import { DashboardView } from './components/views/DashboardView';
 import { ScannerView } from './components/views/ScannerView';
 import { InventoryView } from './components/views/InventoryView';
+import { ShoppingListView } from './components/views/ShoppingListView';
 import { RecipesView } from './components/views/RecipesView';
 import { ProfileView } from './components/views/ProfileView';
 import { AdminView } from './components/views/AdminView';
@@ -456,6 +457,14 @@ export default function App() {
             onDeleteItem={handleDeleteFood}
             onResetDefault={handleResetDefaultInventory}
             onNavigateToScanner={() => setActiveTab('scanner')}
+            onNavigateToShoppingList={() => setActiveTab('shoppingList')}
+          />
+        )}
+
+        {activeTab === 'shoppingList' && (
+          <ShoppingListView
+            userId={user.id}
+            onNavigateToInventory={() => setActiveTab('inventory')}
           />
         )}
 

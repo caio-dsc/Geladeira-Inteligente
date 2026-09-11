@@ -19,7 +19,6 @@ import {
 } from 'lucide-react';
 import { Button } from '../common/Button';
 import { Input } from '../common/Input';
-import { AppLogo } from '../common/AppLogo';
 import { LoginBadge } from '../common/LoginBadge';
 import { Card } from '../common/Card';
 
@@ -71,7 +70,11 @@ export const LoginView: React.FC<LoginViewProps> = ({
       <header className="sticky top-0 z-40 bg-surface/90 backdrop-blur-md border-b border-border shadow-subtle">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
           <div className="flex items-center select-none" title="Geladeira Inteligente">
-            <AppLogo size="md" />
+            <img
+              src="/Logo_GI.png"
+              alt="Geladeira Inteligente - Alimentação & Receitas"
+              className="h-[54px] sm:h-16 w-auto object-contain select-none pointer-events-none drop-shadow-xs"
+            />
           </div>
 
           <nav className="hidden md:flex items-center gap-6 text-xs font-semibold text-text-secondary">

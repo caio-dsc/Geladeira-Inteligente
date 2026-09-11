@@ -89,6 +89,42 @@
       "properties": {
         "createdAt": { "type": "string" }
       }
+    },
+    "ShoppingListItem": {
+      "title": "ShoppingListItem",
+      "description": "Item individual pertencente a uma lista de mercado",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "quantity": { "type": "number" },
+        "unit": { "type": "string" },
+        "price": { "type": "number" },
+        "completed": { "type": "boolean" },
+        "category": { "type": "string" }
+      },
+      "required": ["id", "name", "quantity", "price", "completed", "category"]
+    },
+    "ShoppingList": {
+      "title": "ShoppingList",
+      "description": "Lista de compras criada pelo usuário autenticado",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "shoppingDate": { "type": "string" },
+        "shoppingTime": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "completed": { "type": "boolean" },
+        "total": { "type": "number" },
+        "items": {
+          "type": "array",
+          "items": { "type": "object" }
+        }
+      },
+      "required": ["id", "title", "createdAt", "updatedAt", "completed", "total", "items"]
     }
   },
   "firestore": {
@@ -103,6 +139,10 @@
     "users/{userId}/inventory/{itemId}": {
       "schema": "InventoryItem",
       "description": "Itens estocados na geladeira do usuário"
+    },
+    "users/{userId}/shoppingLists/{listId}": {
+      "schema": "ShoppingList",
+      "description": "Listas de compras e mercado do usuário"
     },
     "users/{userId}/scans/{scanId}": {
       "schema": "ScanRecord",

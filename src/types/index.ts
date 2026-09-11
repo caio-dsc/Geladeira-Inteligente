@@ -169,4 +169,27 @@ export interface ScanSession {
   errorMessage?: string;
 }
 
-export type NavigationTab = 'dashboard' | 'scanner' | 'inventory' | 'recipes' | 'profile' | 'admin';
+export interface ShoppingListItem {
+  id: string;
+  name: string;
+  quantity: number;
+  unit: 'un' | 'kg' | 'g' | 'L' | 'ml' | 'pct' | 'fatias';
+  price: number; // Preço unitário em BRL
+  completed: boolean;
+  category: CategoryType;
+}
+
+export interface ShoppingList {
+  id: string;
+  userId?: string;
+  title: string;
+  shoppingDate?: string; // Formato YYYY-MM-DD
+  shoppingTime?: string; // Formato HH:mm
+  createdAt: string;
+  updatedAt: string;
+  completed: boolean;
+  total: number;
+  items: ShoppingListItem[];
+}
+
+export type NavigationTab = 'dashboard' | 'scanner' | 'inventory' | 'shoppingList' | 'recipes' | 'profile' | 'admin';

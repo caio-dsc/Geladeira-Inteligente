@@ -23,6 +23,7 @@ import {
   ChefHat, 
   SlidersHorizontal,
   User as UserIcon,
+  ShoppingCart,
   HelpCircle,
   Clock,
   Sparkles
@@ -391,7 +392,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </h3>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
           {/* Shortcut 1: Inventory */}
           <Card 
             variant="interactive" 
@@ -408,7 +409,23 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
           </Card>
 
-          {/* Shortcut 2: Recipes with filters */}
+          {/* Shortcut 2: Shopping List */}
+          <Card 
+            variant="interactive" 
+            padding="sm" 
+            onClick={() => onNavigate('shoppingList')}
+            className="flex items-center gap-3"
+          >
+            <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary border border-primary/20 flex items-center justify-center shrink-0">
+              <ShoppingCart className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="text-xs sm:text-sm font-bold text-text-primary">Lista de Mercado</h4>
+              <p className="text-[11px] text-text-secondary">Planejar compras & gastos</p>
+            </div>
+          </Card>
+
+          {/* Shortcut 3: Recipes with filters */}
           <Card 
             variant="interactive" 
             padding="sm" 
@@ -424,7 +441,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
           </Card>
 
-          {/* Shortcut 3: Preferences & Profile */}
+          {/* Shortcut 4: Preferences & Profile */}
           <Card 
             variant="interactive" 
             padding="sm" 

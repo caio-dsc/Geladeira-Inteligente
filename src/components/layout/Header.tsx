@@ -6,6 +6,7 @@ import {
   Home, 
   Camera, 
   UtensilsCrossed, 
+  ShoppingCart,
   BookOpen, 
   User as UserIcon,
   ShieldCheck,
@@ -32,6 +33,7 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'dashboard' as NavigationTab, label: 'Início', icon: Home },
     { id: 'scanner' as NavigationTab, label: 'Scanner', icon: Camera },
     { id: 'inventory' as NavigationTab, label: 'Minha Geladeira', icon: UtensilsCrossed },
+    { id: 'shoppingList' as NavigationTab, label: 'Lista de Mercado', icon: ShoppingCart },
     { id: 'recipes' as NavigationTab, label: 'Receitas', icon: BookOpen },
     { id: 'profile' as NavigationTab, label: 'Perfil', icon: UserIcon },
     ...(user?.isAdmin ? [{ id: 'admin' as NavigationTab, label: 'Admin', icon: ShieldCheck }] : []),
@@ -79,6 +81,20 @@ export const Header: React.FC<HeaderProps> = ({
                 onClick={onOpenCreditsModal}
                 size="sm"
               />
+
+              {/* Mobile Shopping List button */}
+              <button
+                onClick={() => onTabChange('shoppingList')}
+                className={`md:hidden p-1.5 rounded-xl border transition-all cursor-pointer ${
+                  activeTab === 'shoppingList'
+                    ? 'border-primary/50 bg-primary/10 text-primary shadow-subtle'
+                    : 'border-border bg-surface hover:bg-surface-muted text-text-secondary hover:text-text-primary'
+                }`}
+                title="Lista de Mercado"
+                aria-label="Abrir Lista de Mercado"
+              >
+                <ShoppingCart className="w-4 h-4" />
+              </button>
 
               {/* User avatar / profile button */}
               <button
