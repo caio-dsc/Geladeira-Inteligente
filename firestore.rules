@@ -19,7 +19,8 @@ service cloud.firestore {
 
     // Coleção de teste para validação de conectividade
     match /test/{testId} {
-      allow read: if true;
+      allow read: if isAuthenticated();
+      allow write: if false;
     }
 
     // Coleção de Administradores (apenas leitura para checagem, escrita bloqueada para clientes)
@@ -30,7 +31,18 @@ service cloud.firestore {
 
     // Documento principal do Usuário (apenas o próprio usuário autenticado pode ler ou gravar)
     match /users/{userId} {
-      allow read, create, update: if isOwner(userId);
+      allow read: if isOwner(userId);
+
+      // Criação inicial do perfil: não pode se autopromover a admin, créditos iniciais limitados a no máximo 5
+      allow create: if isOwner(userId)
+        && (!('isAdmin' in request.resource.data) || request.resource.data.isAdmin == false)
+        && (!('credits' in request.resource.data) || request.resource.data.credits <= 5);
+
+      // Atualização de perfil: o usuário comum NUNCA pode alterar credits, isAdmin, id ou createdAt
+      // Utiliza diff().affectedKeys() conforme diretrizes de segurança
+      allow update: if isOwner(userId)
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['credits', 'isAdmin', 'id', 'createdAt']);
+
       allow delete: if false;
 
       // Subcoleção: Itens do Inventário / Geladeira

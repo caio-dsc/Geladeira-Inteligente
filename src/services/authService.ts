@@ -26,6 +26,7 @@ export interface IAuthService {
   updateUser(userId: string, data: Partial<User>): Promise<User>;
   deductCredit(amount?: number): Promise<number>;
   addCredits(amount: number): Promise<number>;
+  syncRemainingCredits(amount: number): void;
   subscribe(callback: (user: User | null) => void): () => void;
 }
 
@@ -235,10 +236,12 @@ class FirebaseAuthService implements IAuthService {
 
     const effectiveUid = targetUserId || auth.currentUser?.uid;
     if (effectiveUid) {
-      if (this.currentUser) {
-        await firestoreService.setUser(effectiveUid, this.currentUser);
-      } else {
-        await firestoreService.updateUserFields(effectiveUid, safeUpdates);
+      // Isola apenas campos permitidos de perfil para escrita pelo usuário no Firestore
+      // NUNCA envia credits, isAdmin, id ou createdAt para respeitar as Firestore Security Rules
+      const { credits: _c, isAdmin: _a, id: _i, createdAt: _ca, ...allowedProfileFields } = safeUpdates as any;
+
+      if (Object.keys(allowedProfileFields).length > 0) {
+        await firestoreService.updateUserFields(effectiveUid, allowedProfileFields);
       }
 
       // Sincroniza metadados do Firebase Auth se alterados
@@ -294,6 +297,15 @@ class FirebaseAuthService implements IAuthService {
     }
 
     return newCredits;
+  }
+
+  public syncRemainingCredits(amount: number): void {
+    if (!this.currentUser) return;
+    this.currentUser = {
+      ...this.currentUser,
+      credits: Math.max(0, amount),
+    };
+    this.notify();
   }
 
   public subscribe(callback: (user: User | null) => void): () => void {

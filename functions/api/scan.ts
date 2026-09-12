@@ -1,10 +1,19 @@
 import { foodDetectionSchema } from "../_ai/foodSchema";
 import { foodDetectionPrompt } from "../_ai/foodPrompt";
+import {
+  validateFirebaseAuth,
+  validateAppCheck,
+  checkAndDeductCredit,
+  checkRateLimit,
+  FIREBASE_PROJECT_ID,
+  SecurityError,
+} from "../_ai/security";
 
 const MODEL = "google/gemma-3-4b-it:fastest";
 
 type Env = {
   HF_TOKEN: string;
+  ENFORCE_APP_CHECK?: string;
 };
 
 type EventContext<Env, P extends string, Data> = {
@@ -26,9 +35,60 @@ export type PagesFunction<
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   const { request, env } = context;
 
+  // 1. Validação Criptográfica do Firebase Auth ID Token (Bearer)
+  let user;
+  try {
+    user = await validateFirebaseAuth(request, FIREBASE_PROJECT_ID);
+  } catch (authErr: any) {
+    const secErr = authErr as SecurityError;
+    return Response.json(
+      { success: false, error: secErr.message || "Autenticação inválida.", code: secErr.code },
+      { status: secErr.status || 401 }
+    );
+  }
+
+  // 2. Validação do Firebase App Check Token
+  try {
+    const enforceAppCheck = env.ENFORCE_APP_CHECK === "true";
+    await validateAppCheck(request, FIREBASE_PROJECT_ID, enforceAppCheck);
+  } catch (appCheckErr: any) {
+    const secErr = appCheckErr as SecurityError;
+    return Response.json(
+      { success: false, error: secErr.message || "App Check inválido.", code: secErr.code },
+      { status: secErr.status || 403 }
+    );
+  }
+
+  // 3. Proteção contra Abuso (Rate Limiting por UID)
+  try {
+    checkRateLimit(user.uid, 6, 60000);
+  } catch (rateErr: any) {
+    const secErr = rateErr as SecurityError;
+    return Response.json(
+      { success: false, error: secErr.message, code: secErr.code },
+      {
+        status: secErr.status || 429,
+        headers: { "Retry-After": String(secErr.retryAfterSeconds || 60) },
+      }
+    );
+  }
+
+  // 4. Verificação e Consumo Atômico de Créditos (Prevenção de Race Conditions)
+  let deduction;
+  try {
+    deduction = await checkAndDeductCredit(user.uid, 1);
+  } catch (creditErr: any) {
+    const secErr = creditErr as SecurityError;
+    return Response.json(
+      { success: false, error: secErr.message, code: secErr.code, remainingCredits: 0 },
+      { status: secErr.status || 402 }
+    );
+  }
+
+  // 5. Verificação da Chave de API de IA no Ambiente de Servidor (nunca exposta ao frontend)
   if (!env.HF_TOKEN) {
     return Response.json(
-      { error: "HF_TOKEN não configurado no Cloudflare Pages (Variables and Secrets)." },
+      { success: false, error: "HF_TOKEN não configurado no Cloudflare Pages (Variables and Secrets)." },
       { status: 500 }
     );
   }
@@ -38,16 +98,17 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     const image = body?.image;
 
     if (!image || typeof image !== "string") {
-      return Response.json({ error: "A propriedade 'image' é obrigatória." }, { status: 400 });
+      return Response.json({ success: false, error: "A propriedade 'image' é obrigatória." }, { status: 400 });
     }
 
-    if (!image.startsWith("data:image/")) {
+    if (!image.startsWith("data:image/") && !image.startsWith("https://")) {
       return Response.json(
-        { error: "Formato de imagem inválido. Esperado data:image/...;base64,..." },
+        { success: false, error: "Formato de imagem inválido. Esperado data:image/...;base64,... ou URL HTTPS." },
         { status: 400 }
       );
     }
 
+    // 6. Chamada segura ao Hugging Face
     const hfResp = await fetch("https://router.huggingface.co/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -85,7 +146,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
     if (!hfResp.ok) {
       return Response.json(
-        { error: "O Hugging Face recusou a solicitação.", details: data },
+        { success: false, error: "O Hugging Face recusou a solicitação.", details: data },
         { status: hfResp.status }
       );
     }
@@ -93,18 +154,24 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     const result = data?.choices?.[0]?.message?.content;
     if (!result) {
       return Response.json(
-        { error: "O Hugging Face não retornou uma resposta válida.", details: data },
+        { success: false, error: "O Hugging Face não retornou uma resposta válida.", details: data },
         { status: 502 }
       );
     }
 
     return Response.json(
-      { success: true, result, model: MODEL },
+      {
+        success: true,
+        result,
+        model: MODEL,
+        remainingCredits: deduction.remainingCredits,
+      },
       { headers: { "Cache-Control": "no-store" } }
     );
   } catch (err) {
     return Response.json(
       {
+        success: false,
         error: "Erro ao analisar a imagem com o Hugging Face.",
         details: err instanceof Error ? err.message : String(err),
       },

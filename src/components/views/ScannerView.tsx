@@ -30,6 +30,7 @@ import { Input } from '../common/Input';
 import { FoodItem, DetectedFoodItem, CategoryType, FreshnessState, StorageLocation } from '../../types';
 import { foodService } from '../../services/foodService';
 import { scannerService, mergeDetectedItems } from '../../services/scannerService';
+import { SAMPLE_FRIDGE_IMAGES } from '../../data/mockData';
 import {
   getCategoryIcon,
   getCategoryLabel,
@@ -631,10 +632,14 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
       throw new Error('Nenhum alimento foi identificado com clareza. Tente uma foto mais próxima.');
     }
 
-    const deducted = await onDeductCredit(1);
-    if (!deducted) {
-      onOpenCreditsModal();
-      throw new Error('Sem créditos para concluir a análise.');
+    // Se for foto de amostra local de teste, deduz no cliente; para fotos reais, a dedução atômica já ocorreu no backend
+    const isSample = SAMPLE_FRIDGE_IMAGES.some((s) => s.url === imageToScan);
+    if (isSample) {
+      const deducted = await onDeductCredit(1);
+      if (!deducted) {
+        onOpenCreditsModal();
+        throw new Error('Sem créditos para concluir a análise.');
+      }
     }
 
     setDetectedItems(sanitized);
@@ -657,7 +662,9 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
 
       await runScan(selectedImage);
     } catch (err: any) {
-      if (err?.name === 'ScanServiceError' && err?.status === 503) {
+      if (err?.name === 'ScanServiceError' && (err?.status === 402 || err?.code === 'INSUFFICIENT_CREDITS')) {
+        onOpenCreditsModal();
+      } else if (err?.name === 'ScanServiceError' && err?.status === 503) {
         const waitSec = typeof err.retryAfterSeconds === 'number' ? err.retryAfterSeconds : 3;
         setRetryIn(waitSec);
       }

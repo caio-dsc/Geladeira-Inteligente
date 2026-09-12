@@ -1,18 +1,23 @@
 import { DetectedFoodItem } from '../types';
 import { SAMPLE_FRIDGE_IMAGES } from '../data/mockData';
 import { resolveFoodCategory } from '../utils/foodTaxonomy';
+import { auth, appCheck } from './firebaseConfig';
+import { getToken } from 'firebase/app-check';
+import { authService } from './authService';
 
 export class ScanServiceError extends Error {
   status?: number;
   retryAfterSeconds?: number;
   retriable?: boolean;
+  code?: string;
 
-  constructor(message: string, opts?: { status?: number; retryAfterSeconds?: number; retriable?: boolean }) {
+  constructor(message: string, opts?: { status?: number; retryAfterSeconds?: number; retriable?: boolean; code?: string }) {
     super(message);
     this.name = "ScanServiceError";
     this.status = opts?.status;
     this.retryAfterSeconds = opts?.retryAfterSeconds;
     this.retriable = opts?.retriable;
+    this.code = opts?.code;
   }
 }
 
@@ -30,6 +35,8 @@ interface HuggingFaceScanResponse {
   success: boolean;
   result?: string;
   error?: string;
+  code?: string;
+  remainingCredits?: number;
   retryAfterSeconds?: number;
   details?: any;
 }
@@ -435,15 +442,116 @@ class HuggingFaceScannerService implements IScannerService {
       return sample.mockDetections.map((item) => ({ ...item }));
     }
 
+    // 1. Obtém o ID Token do Firebase Authentication para validar identidade
+    const currentUser = auth.currentUser;
+    let idToken: string | null = null;
+    if (currentUser) {
+      try {
+        idToken = await currentUser.getIdToken();
+      } catch (tokenErr) {
+        console.warn('Aviso ao obter ID Token do Firebase:', tokenErr);
+      }
+    }
+
+    // 2. Obtém o token do Firebase App Check se inicializado
+    let appCheckToken: string | null = null;
+    if (appCheck) {
+      try {
+        const appCheckResult = await getToken(appCheck, false);
+        appCheckToken = appCheckResult.token;
+      } catch (acErr) {
+        console.warn('Aviso ao obter token do Firebase App Check:', acErr);
+      }
+    }
+
+    onProgress?.('Preparando imagem para análise...');
+
+    /**
+     * Reduz a imagem antes do envio.
+     *
+     * Isso evita enviar fotos enormes do celular como Base64.
+     * O Base64 aumenta o tamanho dos dados em aproximadamente 33%.
+     */
+    const compressImageForScan = async (
+      source: string,
+      maxWidth: number = 1600,
+      quality: number = 0.82
+    ): Promise<string> => {
+      // Se não for uma imagem Base64, mantém a URL original.
+      if (!source.startsWith('data:image/')) {
+        return source;
+      }
+
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+
+        img.onload = () => {
+          try {
+            let width = img.naturalWidth;
+            let height = img.naturalHeight;
+
+            // Redimensiona mantendo a proporção.
+            if (width > maxWidth) {
+              const scale = maxWidth / width;
+              width = Math.round(width * scale);
+              height = Math.round(height * scale);
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+
+            const ctx = canvas.getContext('2d');
+
+            if (!ctx) {
+              reject(new Error('Não foi possível preparar a imagem para análise.'));
+              return;
+            }
+
+            // Fundo branco para evitar problemas com imagens transparentes.
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, width, height);
+
+            ctx.drawImage(img, 0, 0, width, height);
+
+            // JPEG costuma reduzir bastante o tamanho da foto.
+            const compressed = canvas.toDataURL('image/jpeg', quality);
+
+            resolve(compressed);
+          } catch (error) {
+            reject(error);
+          }
+        };
+
+        img.onerror = () => {
+          reject(new Error('Não foi possível carregar a imagem selecionada.'));
+        };
+
+        img.src = source;
+      });
+    };
+
+    const optimizedImage = await compressImageForScan(imageUrl);
+
     onProgress?.('Enviando imagem para análise...');
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+
+    if (idToken) {
+      headers['Authorization'] = `Bearer ${idToken}`;
+    }
+
+    if (appCheckToken) {
+      headers['X-Firebase-AppCheck'] = appCheckToken;
+    }
 
     const response = await fetch('/api/scan', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify({
-        image: imageUrl,
+        image: optimizedImage,
       }),
     });
 
@@ -455,7 +563,7 @@ class HuggingFaceScannerService implements IScannerService {
     try {
       data = JSON.parse(raw);
     } catch (e) {
-      console.error("Resposta não-JSON do /api/scan:", response.status, raw);
+      console.error("Resposta não-JSON do /api/scan:", response.status);
       throw new Error(`Falha no Scan (HTTP ${response.status}). A API não retornou JSON.`);
     }
 
@@ -472,11 +580,26 @@ class HuggingFaceScannerService implements IScannerService {
       const retryAfterHeader = response.headers.get("Retry-After");
       const retryAfterSeconds = retryAfterHeader ? Number(retryAfterHeader) : data?.retryAfterSeconds;
 
+      // 402/403 = Erro de créditos ou autorização
+      if (response.status === 402 || data?.code === 'INSUFFICIENT_CREDITS') {
+        throw new ScanServiceError(
+          data?.error || "Créditos insuficientes para realizar a análise. Adquira mais créditos.",
+          { status: 402, retriable: false, code: 'INSUFFICIENT_CREDITS' }
+        );
+      }
+
+      if (response.status === 401) {
+        throw new ScanServiceError(
+          data?.error || "Você precisa estar conectado à sua conta para escanear alimentos.",
+          { status: 401, retriable: false, code: 'AUTH_REQUIRED' }
+        );
+      }
+
       // 503 = ocupado/temporário (retriable)
       if (response.status === 503 || isBusy) {
         throw new ScanServiceError(
           data?.error || "Servidor da IA está ocupado no momento. Tente novamente.",
-          { status: 503, retryAfterSeconds, retriable: true }
+          { status: 503, retryAfterSeconds, retriable: true, code: data?.code }
         );
       }
 
@@ -484,8 +607,14 @@ class HuggingFaceScannerService implements IScannerService {
       throw new ScanServiceError(data?.error || "Não foi possível analisar a imagem.", {
         status: response.status,
         retryAfterSeconds,
-        retriable: response.status === 429, // opcional
+        retriable: response.status === 429,
+        code: data?.code,
       });
+    }
+
+    // Sincroniza saldo restante authoritative retornado pelo backend
+    if (typeof data.remainingCredits === 'number') {
+      authService.syncRemainingCredits(data.remainingCredits);
     }
 
     if (!data.result) {
@@ -493,7 +622,6 @@ class HuggingFaceScannerService implements IScannerService {
     }
 
     onProgress?.('Processando alimentos identificados...');
-    console.log('RESULTADO BRUTO DA IA:', data.result);
 
     return this.parseStructuredResult(data.result);
   }

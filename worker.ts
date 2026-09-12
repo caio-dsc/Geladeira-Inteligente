@@ -1,8 +1,17 @@
 import { foodDetectionSchema } from "./functions/_ai/foodSchema";
 import { foodDetectionPrompt } from "./functions/_ai/foodPrompt";
+import {
+  validateFirebaseAuth,
+  validateAppCheck,
+  checkAndDeductCredit,
+  checkRateLimit,
+  FIREBASE_PROJECT_ID,
+  SecurityError,
+} from "./functions/_ai/security";
 
 type Env = {
   HF_TOKEN: string;
+  ENFORCE_APP_CHECK?: string;
   ASSETS: { fetch: (request: Request) => Promise<Response> };
 };
 
@@ -70,7 +79,7 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
 
-    // --- API ---
+    // --- API /api/scan ---
     if (url.pathname === "/api/scan") {
       if (request.method !== "POST") {
         return json(
@@ -79,6 +88,57 @@ export default {
         );
       }
 
+      // 1. Validação Criptográfica do Firebase Auth ID Token (Bearer)
+      let user;
+      try {
+        user = await validateFirebaseAuth(request, FIREBASE_PROJECT_ID);
+      } catch (authErr: any) {
+        const secErr = authErr as SecurityError;
+        return json(
+          { success: false, error: secErr.message || "Autenticação necessária.", code: secErr.code },
+          { status: secErr.status || 401 }
+        );
+      }
+
+      // 2. Validação do Firebase App Check Token
+      try {
+        const enforceAppCheck = env.ENFORCE_APP_CHECK === "true";
+        await validateAppCheck(request, FIREBASE_PROJECT_ID, enforceAppCheck);
+      } catch (appCheckErr: any) {
+        const secErr = appCheckErr as SecurityError;
+        return json(
+          { success: false, error: secErr.message || "App Check inválido.", code: secErr.code },
+          { status: secErr.status || 403 }
+        );
+      }
+
+      // 3. Proteção contra Abuso (Rate Limiting por UID)
+      try {
+        checkRateLimit(user.uid, 6, 60000);
+      } catch (rateErr: any) {
+        const secErr = rateErr as SecurityError;
+        return json(
+          { success: false, error: secErr.message, code: secErr.code },
+          {
+            status: secErr.status || 429,
+            headers: { "Retry-After": String(secErr.retryAfterSeconds || 60) },
+          }
+        );
+      }
+
+      // 4. Verificação e Consumo Atômico de Créditos (Prevenção de Race Conditions)
+      let deduction;
+      try {
+        deduction = await checkAndDeductCredit(user.uid, 1);
+      } catch (creditErr: any) {
+        const secErr = creditErr as SecurityError;
+        return json(
+          { success: false, error: secErr.message, code: secErr.code, remainingCredits: 0 },
+          { status: secErr.status || 402 }
+        );
+      }
+
+      // 5. Verificação da Chave de Servidor do Hugging Face
       if (!env.HF_TOKEN) {
         return json(
           { success: false, error: "HF_TOKEN não configurado no Worker." },
@@ -130,7 +190,7 @@ export default {
         if (!hf || hf.status < 200 || hf.status >= 300) {
           const busy = isBusyError(hf?.data);
           if (busy) {
-            const retryAfterSeconds = 3; // ajuste como quiser (2–5 costuma ser bom)
+            const retryAfterSeconds = 3;
             return json(
               {
                 success: false,
@@ -160,7 +220,15 @@ export default {
           return json({ success: false, error: "Resposta inválida do Hugging Face.", details: hf.data }, { status: 502 });
         }
 
-        return json({ success: true, result, model: MODEL }, { status: 200 });
+        return json(
+          {
+            success: true,
+            result,
+            model: MODEL,
+            remainingCredits: deduction.remainingCredits,
+          },
+          { status: 200 }
+        );
       } catch (err) {
         return json(
           { success: false, error: "Erro ao analisar a imagem.", details: err instanceof Error ? err.message : String(err) },
@@ -170,7 +238,6 @@ export default {
     }
 
     // --- SPA fallback / Assets ---
-    // deixa o Cloudflare servir os arquivos do Vite (dist)
     return env.ASSETS.fetch(request);
   },
 };

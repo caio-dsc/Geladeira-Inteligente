@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
-    "test": "npm run test:diet && npm run test:filter && tsx src/utils/foodTaxonomy.test.ts && tsx src/services/imageUploadService.test.ts && tsx src/services/cookingTimerStorage.test.ts && tsx src/services/shoppingListService.test.ts",
+    "test": "npm run test:diet && npm run test:filter && npm run test:security && tsx src/utils/foodTaxonomy.test.ts && tsx src/services/imageUploadService.test.ts && tsx src/services/cookingTimerStorage.test.ts && tsx src/services/shoppingListService.test.ts",
+    "test:security": "tsx src/services/security.test.ts",
     "test:diet": "tsx scripts/catalog/dietHeuristics.test.ts",
     "test:filter": "tsx src/services/recipeDietFilters.test.ts",
     "generate": "tsx scripts/recipes/generateCatalog.ts",
@@ -40,5 +41,8 @@
     "tsx": "^4.23.13",
     "typescript": "~5.8.2",
     "vite": "^6.2.3"
+  },
+  "overrides": {
+    "qs": "^6.16.0"
   }
 }

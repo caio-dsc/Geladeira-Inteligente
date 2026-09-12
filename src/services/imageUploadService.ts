@@ -67,6 +67,22 @@ export class ImageUploadService implements IImageUploadService {
       throw new Error('Nenhum arquivo de imagem foi selecionado para upload.');
     }
 
+    // Validação de tipo MIME e formato permitido (JPEG, PNG, WebP)
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (fileOrBlob.type && !allowedMimeTypes.includes(fileOrBlob.type.toLowerCase())) {
+      throw new Error(
+        `Formato de imagem não suportado (${fileOrBlob.type}). Utilize fotos nos formatos JPG, PNG ou WebP.`
+      );
+    }
+
+    // Validação de tamanho máximo (limite de 10MB para uploads de receita)
+    const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
+    if (fileOrBlob.size && fileOrBlob.size > MAX_FILE_SIZE_BYTES) {
+      throw new Error(
+        `Tamanho da imagem excede o limite permitido de 10MB (arquivo atual: ${(fileOrBlob.size / (1024 * 1024)).toFixed(1)}MB).`
+      );
+    }
+
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       let isSettled = false;

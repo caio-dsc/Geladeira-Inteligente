@@ -19,21 +19,28 @@ service firebase.storage {
       );
     }
 
-    // Avatar do usuário (leitura pública, escrita apenas pelo dono)
+    // Validação estrita de formato e tamanho de imagem para uploads seguros
+    function isValidImage() {
+      return request.resource.contentType.matches('image/(jpeg|png|webp)')
+        && request.resource.size <= 10 * 1024 * 1024; // Máximo 10MB
+    }
+
+    // Avatar do usuário (leitura pública, escrita apenas pelo dono com arquivo de imagem válido)
     match /users/{userId}/avatar.jpg {
       allow read: if true;
-      allow write: if isOwner(userId);
+      allow write: if isOwner(userId) && isValidImage();
     }
 
     // Fotografias de escaneamento da geladeira do usuário
     match /users/{userId}/scans/{scanId} {
-      allow read, write: if isOwner(userId);
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId) && isValidImage();
     }
 
     // Fotografias oficiais do catálogo de receitas (leitura pública, upload/escrita restrita a administradores)
     match /recipes/{recipeId}/{allPaths=**} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isAdmin() && isValidImage();
     }
   }
 }
