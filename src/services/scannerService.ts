@@ -475,10 +475,9 @@ class HuggingFaceScannerService implements IScannerService {
     const compressImageForScan = async (
       source: string,
       maxWidth: number = 1024,
-      initialQuality: number = 0.70,
-      maxBytes: number = 1_500_000
+      quality: number = 0.65
     ): Promise<string> => {
-      // Se não for Base64 de imagem, mantém a URL original.
+      // URLs HTTPS não precisam ser recodificadas.
       if (!source.startsWith('data:image/')) {
         return source;
       }
@@ -488,97 +487,120 @@ class HuggingFaceScannerService implements IScannerService {
 
         img.onload = () => {
           try {
-            let width = img.naturalWidth;
-            let height = img.naturalHeight;
+            const originalWidth = img.naturalWidth;
+            const originalHeight = img.naturalHeight;
 
-            // Redimensiona mantendo proporção.
-            if (width > maxWidth) {
-              const scale = maxWidth / width;
-              width = Math.round(width * scale);
-              height = Math.round(height * scale);
-            }
-
-            const canvas = document.createElement('canvas');
-            canvas.width = width;
-            canvas.height = height;
-
-            const ctx = canvas.getContext('2d');
-
-            if (!ctx) {
-              reject(
-                new Error('Não foi possível preparar a imagem para análise.')
-              );
+            if (!originalWidth || !originalHeight) {
+              reject(new Error('Não foi possível determinar as dimensões da imagem.'));
               return;
             }
 
-            // Fundo branco para imagens transparentes.
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, width, height);
+            // Redimensiona mantendo a proporção.
+            const scale = Math.min(1, maxWidth / originalWidth);
 
-            ctx.drawImage(img, 0, 0, width, height);
+            let width = Math.max(1, Math.round(originalWidth * scale));
+            let height = Math.max(1, Math.round(originalHeight * scale));
 
-            /*
-             * Tenta várias qualidades até ficar abaixo do limite.
-             * Isso evita que uma foto de iPhone continue gerando
-             * um Base64 enorme mesmo depois do resize.
-             */
-            let quality = initialQuality;
-            let compressed = canvas.toDataURL('image/jpeg', quality);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
 
-            const getBase64Bytes = (dataUrl: string): number => {
-              const base64 = dataUrl.split(',')[1] || '';
-              return Math.floor((base64.length * 3) / 4);
-            };
-
-            while (
-              getBase64Bytes(compressed) > maxBytes &&
-              quality > 0.35
-            ) {
-              quality -= 0.05;
-
-              compressed = canvas.toDataURL(
-                'image/jpeg',
-                quality
-              );
+            if (!ctx) {
+              reject(new Error('Não foi possível preparar a imagem para análise.'));
+              return;
             }
 
-            /*
-             * Se mesmo com qualidade baixa ainda ficou grande,
-             * reduz a resolução progressivamente.
+            /**
+             * Tenta manter o payload abaixo de ~900 KB.
+             *
+             * O limite é propositalmente menor que 1 MB porque a imagem
+             * ainda será colocada dentro de JSON e o Base64 possui overhead.
              */
-            while (
-              getBase64Bytes(compressed) > maxBytes &&
-              width > 640
-            ) {
-              width = Math.round(width * 0.85);
-              height = Math.round(height * 0.85);
+            const MAX_BYTES = 900 * 1024;
 
+            const getBase64Bytes = (dataUrl: string): number => {
+              const commaIndex = dataUrl.indexOf(',');
+              if (commaIndex === -1) return dataUrl.length;
+
+              const base64 = dataUrl.substring(commaIndex + 1);
+
+              // Tamanho aproximado dos bytes reais representados pelo Base64.
+              const padding =
+                base64.endsWith('==') ? 2 :
+                base64.endsWith('=') ? 1 : 0;
+
+              return Math.floor((base64.length * 3) / 4) - padding;
+            };
+
+            /**
+             * Gera JPEG com as dimensões atuais.
+             */
+            const render = (q: number): string => {
               canvas.width = width;
               canvas.height = height;
 
+              // Fundo branco para preservar corretamente imagens transparentes.
               ctx.fillStyle = '#ffffff';
               ctx.fillRect(0, 0, width, height);
 
               ctx.drawImage(img, 0, 0, width, height);
 
-              quality = 0.60;
+              return canvas.toDataURL('image/jpeg', q);
+            };
 
-              compressed = canvas.toDataURL(
-                'image/jpeg',
-                quality
-              );
+            /**
+             * Primeira tentativa.
+             */
+            let currentQuality = quality;
+            let compressed = render(currentQuality);
+
+            /**
+             * Reduz progressivamente a qualidade.
+             */
+            while (
+              getBase64Bytes(compressed) > MAX_BYTES &&
+              currentQuality > 0.35
+            ) {
+              currentQuality = Math.max(0.35, currentQuality - 0.05);
+              compressed = render(currentQuality);
             }
+
+            /**
+             * Se ainda estiver grande, reduz a resolução.
+             *
+             * Isso é importante principalmente para fotos de iPhone,
+             * que podem ter resolução muito alta mesmo depois do JPEG.
+             */
+            while (
+              getBase64Bytes(compressed) > MAX_BYTES &&
+              width > 640
+            ) {
+              width = Math.max(640, Math.round(width * 0.80));
+              height = Math.max(1, Math.round(height * 0.80));
+
+              currentQuality = 0.50;
+              compressed = render(currentQuality);
+
+              while (
+                getBase64Bytes(compressed) > MAX_BYTES &&
+                currentQuality > 0.35
+              ) {
+                currentQuality = Math.max(0.35, currentQuality - 0.05);
+                compressed = render(currentQuality);
+              }
+            }
+
+            const finalBytes = getBase64Bytes(compressed);
 
             console.log(
               '[SCAN] Imagem otimizada:',
-              Math.round(getBase64Bytes(compressed) / 1024),
+              Math.round(finalBytes / 1024),
               'KB',
               'dimensões:',
               width,
               'x',
               height,
               'qualidade:',
-              quality
+              currentQuality
             );
 
             resolve(compressed);
@@ -588,11 +610,7 @@ class HuggingFaceScannerService implements IScannerService {
         };
 
         img.onerror = () => {
-          reject(
-            new Error(
-              'Não foi possível carregar a imagem selecionada.'
-            )
-          );
+          reject(new Error('Não foi possível carregar a imagem selecionada.'));
         };
 
         img.src = source;
