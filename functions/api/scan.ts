@@ -5,6 +5,7 @@ import {
   validateAppCheck,
   checkAndDeductCredit,
   checkRateLimit,
+  configureFirestoreServiceAccount,
   FIREBASE_PROJECT_ID,
   SecurityError,
 } from "../_ai/security";
@@ -13,6 +14,8 @@ const MODEL = "google/gemma-3-4b-it:fastest";
 
 type Env = {
   HF_TOKEN: string;
+  FIRESTORE_CLIENT_EMAIL?: string;
+  FIRESTORE_PRIVATE_KEY?: string;
   ENFORCE_APP_CHECK?: string;
 };
 
@@ -34,6 +37,13 @@ export type PagesFunction<
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   const { request, env } = context;
+
+  if (env.FIRESTORE_CLIENT_EMAIL && env.FIRESTORE_PRIVATE_KEY) {
+    configureFirestoreServiceAccount(
+      env.FIRESTORE_CLIENT_EMAIL,
+      env.FIRESTORE_PRIVATE_KEY
+    );
+  }
 
   // 1. Validação Criptográfica do Firebase Auth ID Token (Bearer)
   let user;

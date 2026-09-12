@@ -2,15 +2,52 @@
  * Módulo de Segurança e Autorização do Backend (/api/scan)
  *
  * Responsável por:
- * 1. Validação Criptográfica do Firebase ID Token (Bearer)
- * 2. Validação do Firebase App Check Token (X-Firebase-AppCheck)
- * 3. Validação de Acesso a Créditos do Usuário (Persistência no Firestore)
- * 4. Proteção contra Abuso (Rate Limiting)
- * 5. Sanitização de Logs e Ocultação de Tokens e Segredos
+ *
+ * 1. Validação criptográfica do Firebase Auth ID Token
+ * 2. Validação básica do Firebase App Check
+ * 3. Débito atômico de créditos no Cloud Firestore
+ *    usando Service Account + Google OAuth 2.0
+ * 4. Rate limiting por UID
+ * 5. Sanitização de erros e não exposição de segredos
+ *
+ * IMPORTANTE:
+ *
+ * O Worker NÃO usa o Firebase ID Token do usuário para escrever
+ * créditos no Firestore.
+ *
+ * O fluxo é:
+ *
+ * Browser
+ *   ↓
+ * Firebase ID Token
+ *   ↓
+ * Worker valida o token
+ *   ↓
+ * Worker identifica UID
+ *   ↓
+ * Worker autentica no Google usando Service Account
+ *   ↓
+ * Firestore REST API
+ *   ↓
+ * users/{uid}.credits
+ *
+ * Isso evita depender das Firestore Security Rules para a operação
+ * administrativa de débito de créditos.
  */
 
 export const FIREBASE_PROJECT_ID = "ai-studio-applet-webapp-1a826";
-export const FIRESTORE_DATABASE_ID = "ai-studio-geladeiraintelig-ebd28962-2ea8-42ef-98cc-767ea5f182c5";
+
+export const FIRESTORE_DATABASE_ID =
+  "ai-studio-geladeiraintelig-ebd28962-2ea8-42ef-98cc-767ea5f182c5";
+
+const GOOGLE_OAUTH_TOKEN_URL =
+  "https://oauth2.googleapis.com/token";
+
+const FIRESTORE_SCOPE =
+  "https://www.googleapis.com/auth/datastore";
+
+const GOOGLE_JWKS_URL =
+  "https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com";
 
 export interface AuthenticatedUser {
   uid: string;
@@ -26,247 +63,443 @@ export interface SecurityError {
   retryAfterSeconds?: number;
 }
 
-// ---------------------------------------------------------------------------
-// 1. UTILITÁRIOS BASE64URL E CRIPTOGRAFIA WEB
-// ---------------------------------------------------------------------------
+type ServiceAccountConfig = {
+  clientEmail: string;
+  privateKey: string;
+};
+
+type GoogleAccessTokenCache = {
+  accessToken: string;
+  expiresAt: number;
+};
+
+let googleJwksCache: {
+  keys: any[];
+  expiresAt: number;
+} | null = null;
+
+let googleAccessTokenCache: GoogleAccessTokenCache | null = null;
+
+const testCreditsStore = new Map<string, number>();
+
+const rateLimitStore = new Map<
+  string,
+  {
+    timestamps: number[];
+  }
+>();
+
+// ============================================================================
+// BASE64URL
+// ============================================================================
+
+function base64UrlEncodeBytes(bytes: Uint8Array): string {
+  let binary = "";
+
+  const chunkSize = 0x8000;
+
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    const chunk = bytes.subarray(
+      i,
+      Math.min(i + chunkSize, bytes.length)
+    );
+
+    binary += String.fromCharCode(...chunk);
+  }
+
+  return btoa(binary)
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/g, "");
+}
+
+function base64UrlEncodeString(value: string): string {
+  return base64UrlEncodeBytes(
+    new TextEncoder().encode(value)
+  );
+}
 
 function base64UrlDecode(str: string): Uint8Array {
-  let base64 = str.replace(/-/g, "+").replace(/_/g, "/");
-  while (base64.length % 4) base64 += "=";
+  let base64 = str
+    .replace(/-/g, "+")
+    .replace(/_/g, "/");
+
+  while (base64.length % 4) {
+    base64 += "=";
+  }
+
   const binary = atob(base64);
+
   const bytes = new Uint8Array(binary.length);
+
   for (let i = 0; i < binary.length; i++) {
     bytes[i] = binary.charCodeAt(i);
   }
+
   return bytes;
 }
 
-function parseJwt(token: string): { header: any; payload: any; signatureBytes: Uint8Array; signedData: Uint8Array } {
+// ============================================================================
+// JWT PARSER
+// ============================================================================
+
+function parseJwt(token: string): {
+  header: any;
+  payload: any;
+  signatureBytes: Uint8Array;
+  signedData: Uint8Array;
+} {
   const parts = token.split(".");
+
   if (parts.length !== 3) {
-    throw new Error("Token JWT malformado: esperado 3 segmentos separados por ponto.");
+    throw new Error(
+      "Token JWT malformado."
+    );
   }
 
-  const [rawHeader, rawPayload, rawSig] = parts;
+  const [
+    rawHeader,
+    rawPayload,
+    rawSignature,
+  ] = parts;
 
   let header: any;
   let payload: any;
 
   try {
-    header = JSON.parse(new TextDecoder().decode(base64UrlDecode(rawHeader)));
-    payload = JSON.parse(new TextDecoder().decode(base64UrlDecode(rawPayload)));
+    header = JSON.parse(
+      new TextDecoder().decode(
+        base64UrlDecode(rawHeader)
+      )
+    );
+
+    payload = JSON.parse(
+      new TextDecoder().decode(
+        base64UrlDecode(rawPayload)
+      )
+    );
   } catch {
-    throw new Error("Falha ao decodificar cabeçalho ou payload do JWT.");
+    throw new Error(
+      "Falha ao decodificar JWT."
+    );
   }
 
-  const signatureBytes = base64UrlDecode(rawSig);
-  const signedData = new TextEncoder().encode(`${rawHeader}.${rawPayload}`);
-
-  return { header, payload, signatureBytes, signedData };
+  return {
+    header,
+    payload,
+    signatureBytes: base64UrlDecode(rawSignature),
+    signedData: new TextEncoder().encode(
+      `${rawHeader}.${rawPayload}`
+    ),
+  };
 }
 
-// ---------------------------------------------------------------------------
-// 2. CACHE DE CHAVES PÚBLICAS DO GOOGLE (JWKS)
-// ---------------------------------------------------------------------------
-
-interface JwksCache {
-  keys: any[];
-  expiresAt: number;
-}
-
-let googleJwksCache: JwksCache | null = null;
+// ============================================================================
+// GOOGLE JWKS
+// ============================================================================
 
 async function getGooglePublicJwks(): Promise<any[]> {
   const now = Date.now();
-  if (googleJwksCache && googleJwksCache.expiresAt > now) {
+
+  if (
+    googleJwksCache &&
+    googleJwksCache.expiresAt > now
+  ) {
     return googleJwksCache.keys;
   }
 
   try {
-    const res = await fetch("https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com");
-    if (!res.ok) {
-      throw new Error(`Google JWKS respondeu com status ${res.status}`);
+    const response = await fetch(
+      GOOGLE_JWKS_URL
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Google JWKS respondeu HTTP ${response.status}`
+      );
     }
 
-    const data: { keys: any[] } = await res.json();
-    const cacheHeader = res.headers.get("cache-control") || "";
-    const match = cacheHeader.match(/max-age=(\d+)/);
-    const ttlSeconds = match ? parseInt(match[1], 10) : 3600;
+    const data = (await response.json()) as {
+      keys?: any[];
+    };
+
+    const cacheControl =
+      response.headers.get("cache-control") || "";
+
+    const match =
+      cacheControl.match(/max-age=(\d+)/);
+
+    const ttlSeconds = match
+      ? Number(match[1])
+      : 3600;
 
     googleJwksCache = {
       keys: data.keys || [],
-      expiresAt: now + ttlSeconds * 1000,
+      expiresAt:
+        now + ttlSeconds * 1000,
     };
 
     return googleJwksCache.keys;
-  } catch (err) {
-    if (googleJwksCache && googleJwksCache.keys.length > 0) {
+  } catch (error) {
+    if (
+      googleJwksCache &&
+      googleJwksCache.keys.length > 0
+    ) {
       return googleJwksCache.keys;
     }
-    throw err;
+
+    throw error;
   }
 }
 
-// ---------------------------------------------------------------------------
-// 3. VALIDAÇÃO CRIPTOGRÁFICA DO FIREBASE AUTH ID TOKEN
-// ---------------------------------------------------------------------------
+// ============================================================================
+// FIREBASE AUTH ID TOKEN
+// ============================================================================
 
 export async function validateFirebaseAuth(
   request: Request,
   expectedProjectId: string = FIREBASE_PROJECT_ID
 ): Promise<AuthenticatedUser> {
-  const authHeader = request.headers.get("Authorization") || request.headers.get("authorization");
+  const authHeader =
+    request.headers.get("Authorization") ||
+    request.headers.get("authorization");
+
   if (!authHeader) {
     const err: SecurityError = {
       status: 401,
-      message: "Autenticação obrigatória. O cabeçalho 'Authorization: Bearer <token>' não foi fornecido.",
+      message:
+        "Autenticação obrigatória.",
       code: "AUTH_TOKEN_MISSING",
     };
+
     throw err;
   }
 
-  const parts = authHeader.trim().split(/\s+/);
-  if (parts.length !== 2 || parts[0].toLowerCase() !== "bearer") {
+  const parts =
+    authHeader.trim().split(/\s+/);
+
+  if (
+    parts.length !== 2 ||
+    parts[0].toLowerCase() !== "bearer"
+  ) {
     const err: SecurityError = {
       status: 401,
-      message: "Formato de autorização inválido. Esperado 'Bearer <idToken>'.",
+      message:
+        "Formato de autorização inválido.",
       code: "AUTH_TOKEN_MALFORMED",
     };
+
     throw err;
   }
 
   const idToken = parts[1];
 
   let parsed: ReturnType<typeof parseJwt>;
+
   try {
     parsed = parseJwt(idToken);
-  } catch (parseErr) {
+  } catch {
     const err: SecurityError = {
       status: 401,
-      message: "Token de autenticação ilegível ou corrompido.",
+      message:
+        "Token de autenticação inválido.",
       code: "AUTH_TOKEN_INVALID",
     };
+
     throw err;
   }
 
-  const { header, payload, signatureBytes, signedData } = parsed;
+  const {
+    header,
+    payload,
+    signatureBytes,
+    signedData,
+  } = parsed;
 
-  // 1. Validação de algoritmo
+  // --------------------------------------------------------------------------
+  // Algoritmo
+  // --------------------------------------------------------------------------
+
   if (header.alg !== "RS256") {
     const err: SecurityError = {
       status: 401,
-      message: `Algoritmo de assinatura '${header.alg}' não suportado. Esperado RS256.`,
+      message:
+        "Algoritmo de assinatura não suportado.",
       code: "AUTH_TOKEN_UNSUPPORTED_ALG",
     };
+
     throw err;
   }
 
-  // 2. Validação de expiração e emissão
-  const nowInSeconds = Math.floor(Date.now() / 1000);
-  if (!payload.exp || typeof payload.exp !== "number" || payload.exp < nowInSeconds) {
+  // --------------------------------------------------------------------------
+  // Expiração
+  // --------------------------------------------------------------------------
+
+  const now = Math.floor(
+    Date.now() / 1000
+  );
+
+  if (
+    !payload.exp ||
+    typeof payload.exp !== "number" ||
+    payload.exp < now
+  ) {
     const err: SecurityError = {
       status: 401,
-      message: "Sessão expirada. Faça login novamente para atualizar suas credenciais.",
+      message:
+        "Sessão expirada. Faça login novamente.",
       code: "AUTH_TOKEN_EXPIRED",
     };
+
     throw err;
   }
 
-  // Tolerância de 5 minutos para clock skew
-  if (payload.iat && typeof payload.iat === "number" && payload.iat > nowInSeconds + 300) {
+  // --------------------------------------------------------------------------
+  // IAT / clock skew
+  // --------------------------------------------------------------------------
+
+  if (
+    payload.iat &&
+    typeof payload.iat === "number" &&
+    payload.iat > now + 300
+  ) {
     const err: SecurityError = {
       status: 401,
-      message: "Token com data de emissão no futuro (clock skew excessivo).",
+      message:
+        "Token com data de emissão inválida.",
       code: "AUTH_TOKEN_FUTURE_IAT",
     };
+
     throw err;
   }
 
-  // 3. Validação de emissor (iss) e audiência (aud)
-  const expectedIssuer = `https://securetoken.google.com/${expectedProjectId}`;
-  if (payload.iss !== expectedIssuer) {
+  // --------------------------------------------------------------------------
+  // ISSUER
+  // --------------------------------------------------------------------------
+
+  const expectedIssuer =
+    `https://securetoken.google.com/${expectedProjectId}`;
+
+  if (
+    payload.iss !== expectedIssuer
+  ) {
     const err: SecurityError = {
       status: 401,
-      message: "Emissor do token inválido para este projeto.",
+      message:
+        "Emissor do token inválido.",
       code: "AUTH_TOKEN_INVALID_ISSUER",
     };
+
     throw err;
   }
 
-  if (payload.aud !== expectedProjectId) {
+  // --------------------------------------------------------------------------
+  // AUDIENCE
+  // --------------------------------------------------------------------------
+
+  if (
+    payload.aud !== expectedProjectId
+  ) {
     const err: SecurityError = {
       status: 401,
-      message: "Audiência do token incompatível com o projeto Firebase.",
+      message:
+        "Audiência do token incompatível com o projeto Firebase.",
       code: "AUTH_TOKEN_INVALID_AUDIENCE",
     };
+
     throw err;
   }
 
-  // 4. Identificação do UID exclusivo
-  const uid = payload.sub || payload.user_id;
-  if (!uid || typeof uid !== "string" || uid.trim().length === 0) {
+  // --------------------------------------------------------------------------
+  // UID
+  // --------------------------------------------------------------------------
+
+  const uid =
+    payload.sub ||
+    payload.user_id;
+
+  if (
+    !uid ||
+    typeof uid !== "string" ||
+    uid.trim().length === 0
+  ) {
     const err: SecurityError = {
       status: 401,
-      message: "Identificador de usuário (UID) ausente no payload do token.",
+      message:
+        "UID do usuário ausente no token.",
       code: "AUTH_TOKEN_MISSING_UID",
     };
+
     throw err;
   }
 
-  // 5. Verificação Criptográfica da Assinatura com Chaves Públicas do Google
-  // Se for token simulado em ambiente de teste estrito, permite verificação controlada
-  if (header.kid === "test-key-id" && payload.testMock === true) {
-    return {
-      uid,
-      email: payload.email,
-      name: payload.name,
-      token: idToken,
-    };
-  }
+  // --------------------------------------------------------------------------
+  // Assinatura
+  // --------------------------------------------------------------------------
 
   try {
-    const keys = await getGooglePublicJwks();
-    const matchingJwk = keys.find((k) => k.kid === header.kid);
+    const keys =
+      await getGooglePublicJwks();
 
-    if (!matchingJwk) {
+    const matchingKey =
+      keys.find(
+        (key) =>
+          key.kid === header.kid
+      );
+
+    if (!matchingKey) {
       const err: SecurityError = {
         status: 401,
-        message: "Chave pública correspondente não encontrada no Google JWKS.",
+        message:
+          "Chave pública do token não encontrada.",
         code: "AUTH_KEY_NOT_FOUND",
       };
+
       throw err;
     }
 
-    const cryptoKey = await crypto.subtle.importKey(
-      "jwk",
-      matchingJwk,
-      { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" },
-      false,
-      ["verify"]
-    );
+    const cryptoKey =
+      await crypto.subtle.importKey(
+        "jwk",
+        matchingKey,
+        {
+          name: "RSASSA-PKCS1-v1_5",
+          hash: "SHA-256",
+        },
+        false,
+        ["verify"]
+      );
 
-    const isSigValid = await crypto.subtle.verify(
-      "RSASSA-PKCS1-v1_5",
-      cryptoKey,
-      signatureBytes as unknown as BufferSource,
-      signedData as unknown as BufferSource
-    );
+    const valid =
+      await crypto.subtle.verify(
+        "RSASSA-PKCS1-v1_5",
+        cryptoKey,
+        signatureBytes,
+        signedData
+      );
 
-    if (!isSigValid) {
+    if (!valid) {
       const err: SecurityError = {
         status: 401,
-        message: "Assinatura digital do token é inválida ou o token foi adulterado.",
+        message:
+          "Assinatura do token inválida.",
         code: "AUTH_SIGNATURE_INVALID",
       };
+
       throw err;
     }
-  } catch (verifyErr: any) {
-    if (verifyErr?.status) throw verifyErr;
+  } catch (error: any) {
+    if (error?.status) {
+      throw error;
+    }
+
     const err: SecurityError = {
       status: 401,
-      message: "Falha na verificação criptográfica do token de autenticação.",
+      message:
+        "Falha na verificação do token.",
       code: "AUTH_VERIFICATION_FAILED",
     };
+
     throw err;
   }
 
@@ -278,311 +511,828 @@ export async function validateFirebaseAuth(
   };
 }
 
-// ---------------------------------------------------------------------------
-// 4. VALIDAÇÃO DO FIREBASE APP CHECK
-// ---------------------------------------------------------------------------
+// ============================================================================
+// FIREBASE APP CHECK
+// ============================================================================
 
 export async function validateAppCheck(
   request: Request,
-  expectedProjectId: string = FIREBASE_PROJECT_ID,
+  _expectedProjectId: string = FIREBASE_PROJECT_ID,
   enforce: boolean = false
-): Promise<{ valid: boolean; appId?: string }> {
-  const appCheckToken =
-    request.headers.get("X-Firebase-AppCheck") ||
-    request.headers.get("x-firebase-appcheck");
+): Promise<{
+  valid: boolean;
+  appId?: string;
+}> {
+  const token =
+    request.headers.get(
+      "X-Firebase-AppCheck"
+    ) ||
+    request.headers.get(
+      "x-firebase-appcheck"
+    );
 
-  if (!appCheckToken) {
+  if (!token) {
     if (enforce) {
       const err: SecurityError = {
         status: 403,
-        message: "Acesso bloqueado: requisição sem verificação do Firebase App Check.",
+        message:
+          "Requisição sem Firebase App Check.",
         code: "APP_CHECK_MISSING",
       };
+
       throw err;
     }
-    return { valid: false };
+
+    return {
+      valid: false,
+    };
   }
 
   try {
-    const { payload } = parseJwt(appCheckToken);
-    const nowInSeconds = Math.floor(Date.now() / 1000);
+    const { payload } =
+      parseJwt(token);
 
-    if (payload.exp && typeof payload.exp === "number" && payload.exp < nowInSeconds) {
+    const now = Math.floor(
+      Date.now() / 1000
+    );
+
+    if (
+      payload.exp &&
+      typeof payload.exp === "number" &&
+      payload.exp < now
+    ) {
       const err: SecurityError = {
         status: 403,
-        message: "Token do Firebase App Check expirado.",
+        message:
+          "Token do Firebase App Check expirado.",
         code: "APP_CHECK_EXPIRED",
       };
+
       throw err;
     }
 
-    return { valid: true, appId: payload.sub || payload.app_id };
-  } catch (err: any) {
+    return {
+      valid: true,
+      appId:
+        payload.sub ||
+        payload.app_id,
+    };
+  } catch {
     if (enforce) {
-      const secErr: SecurityError = {
+      const err: SecurityError = {
         status: 403,
-        message: "Token do Firebase App Check inválido ou adulterado.",
+        message:
+          "Token do Firebase App Check inválido.",
         code: "APP_CHECK_INVALID",
       };
-      throw secErr;
+
+      throw err;
     }
-    return { valid: false };
+
+    return {
+      valid: false,
+    };
   }
 }
 
-// ---------------------------------------------------------------------------
-// 5. GESTÃO DE CRÉDITOS COM TRANSAÇÃO ATÔMICA NO FIRESTORE
-// ---------------------------------------------------------------------------
+// ============================================================================
+// SERVICE ACCOUNT
+// ============================================================================
 
-const testCreditsStore = new Map<string, number>();
+let firestoreServiceAccount: ServiceAccountConfig | null = null;
+
+export function configureFirestoreServiceAccount(
+  clientEmail: string,
+  privateKey: string
+): void {
+  firestoreServiceAccount = {
+    clientEmail,
+    privateKey,
+  };
+}
+
+function getServiceAccountConfig(): ServiceAccountConfig {
+  if (!firestoreServiceAccount) {
+    throw new Error(
+      "Service Account do Firestore não foi configurada."
+    );
+  }
+
+  return firestoreServiceAccount;
+}
 
 /**
- * Executa transação no Firestore para validação e débito atômico de créditos:
- * UID autenticado
- *       ↓
- * Firestore transaction
- *       ↓
- * credits > 0 ?
- *       ↓
- * credits = credits - 1
+ * Converte a chave privada PEM em CryptoKey.
+ */
+async function importPrivateKey(
+  pem: string
+): Promise<CryptoKey> {
+  const normalized = pem
+    .replace(/\\n/g, "\n")
+    .trim();
+
+  const base64 = normalized
+    .replace(
+      /-----BEGIN PRIVATE KEY-----/g,
+      ""
+    )
+    .replace(
+      /-----END PRIVATE KEY-----/g,
+      ""
+    )
+    .replace(/\s/g, "");
+
+  const binary = atob(base64);
+
+  const bytes = new Uint8Array(
+    binary.length
+  );
+
+  for (
+    let i = 0;
+    i < binary.length;
+    i++
+  ) {
+    bytes[i] =
+      binary.charCodeAt(i);
+  }
+
+  return crypto.subtle.importKey(
+    "pkcs8",
+    bytes.buffer,
+    {
+      name: "RSASSA-PKCS1-v1_5",
+      hash: "SHA-256",
+    },
+    false,
+    ["sign"]
+  );
+}
+
+/**
+ * Cria um JWT de Service Account para obter
+ * um access token OAuth 2.0 do Google.
+ */
+async function createServiceAccountJwt(
+  config: ServiceAccountConfig
+): Promise<string> {
+  const now =
+    Math.floor(Date.now() / 1000);
+
+  const header = {
+    alg: "RS256",
+    typ: "JWT",
+  };
+
+  const payload = {
+    iss: config.clientEmail,
+    scope: FIRESTORE_SCOPE,
+    aud: GOOGLE_OAUTH_TOKEN_URL,
+    iat: now,
+    exp: now + 3600,
+  };
+
+  const encodedHeader =
+    base64UrlEncodeString(
+      JSON.stringify(header)
+    );
+
+  const encodedPayload =
+    base64UrlEncodeString(
+      JSON.stringify(payload)
+    );
+
+  const unsignedToken =
+    `${encodedHeader}.${encodedPayload}`;
+
+  const key =
+    await importPrivateKey(
+      config.privateKey
+    );
+
+  const signature =
+    await crypto.subtle.sign(
+      "RSASSA-PKCS1-v1_5",
+      key,
+      new TextEncoder().encode(
+        unsignedToken
+      )
+    );
+
+  return (
+    `${unsignedToken}.${base64UrlEncodeBytes(
+      new Uint8Array(signature)
+    )}`
+  );
+}
+
+/**
+ * Obtém um Google OAuth 2.0 access token
+ * para a Service Account.
+ */
+async function getFirestoreAccessToken(): Promise<string> {
+  const now = Date.now();
+
+  // Mantém cache por segurança e performance.
+  // Renova 2 minutos antes de expirar.
+  if (
+    googleAccessTokenCache &&
+    googleAccessTokenCache.expiresAt >
+      now + 120_000
+  ) {
+    return googleAccessTokenCache.accessToken;
+  }
+
+  const config =
+    getServiceAccountConfig();
+
+  const assertion =
+    await createServiceAccountJwt(
+      config
+    );
+
+  const body =
+    new URLSearchParams();
+
+  body.set(
+    "grant_type",
+    "urn:ietf:params:oauth:grant-type:jwt-bearer"
+  );
+
+  body.set(
+    "assertion",
+    assertion
+  );
+
+  const response =
+    await fetch(
+      GOOGLE_OAUTH_TOKEN_URL,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/x-www-form-urlencoded",
+        },
+        body: body.toString(),
+      }
+    );
+
+  const data: any =
+    await response
+      .json()
+      .catch(() => ({}));
+
+  if (!response.ok) {
+    console.error(
+      "Google OAuth token error:",
+      response.status
+    );
+
+    throw new Error(
+      "Não foi possível autenticar o Worker no Google."
+    );
+  }
+
+  if (
+    !data.access_token
+  ) {
+    throw new Error(
+      "Google não retornou access_token."
+    );
+  }
+
+  const expiresIn =
+    Number(data.expires_in) || 3600;
+
+  googleAccessTokenCache = {
+    accessToken:
+      data.access_token,
+    expiresAt:
+      now + expiresIn * 1000,
+  };
+
+  return data.access_token;
+}
+
+// ============================================================================
+// FIRESTORE REST
+// ============================================================================
+
+function getFirestoreBaseUrl(): string {
+  return (
+    `https://firestore.googleapis.com/v1/projects/` +
+    `${FIREBASE_PROJECT_ID}/databases/` +
+    `${encodeURIComponent(FIRESTORE_DATABASE_ID)}` +
+    `/documents`
+  );
+}
+
+function firestoreHeaders(
+  accessToken: string
+): HeadersInit {
+  return {
+    Authorization:
+      `Bearer ${accessToken}`,
+    "Content-Type":
+      "application/json",
+  };
+}
+
+// ============================================================================
+// CRÉDITOS
+// ============================================================================
+
+/**
+ * Débito atômico de créditos.
  *
- * @param uid Identificador único do usuário autenticado
- * @param amount Quantidade de créditos a debitar (padrão: 1)
- * @param authToken Token de autorização Bearer (ID Token do Firebase Auth)
- * @returns remainingCredits saldo de créditos restante após o débito transacional
+ * Agora a transação é autenticada com:
+ *
+ * Service Account
+ *     ↓
+ * Google OAuth 2.0
+ *     ↓
+ * Firestore IAM
+ *
+ * O Firebase ID Token continua sendo usado somente
+ * para identificar e autenticar o usuário.
  */
 export async function checkAndDeductCredit(
   uid: string,
   amount: number = 1,
-  authToken?: string
-): Promise<{ remainingCredits: number }> {
-  if (!uid || typeof uid !== "string" || uid.trim().length === 0) {
+  _authToken?: string
+): Promise<{
+  remainingCredits: number;
+}> {
+  if (
+    !uid ||
+    typeof uid !== "string" ||
+    uid.trim().length === 0
+  ) {
     const err: SecurityError = {
       status: 401,
-      message: "UID do usuário é obrigatório para validação de créditos.",
+      message:
+        "UID do usuário é obrigatório.",
       code: "AUTH_UID_REQUIRED",
     };
+
     throw err;
   }
 
-  // Ambiente de teste unitário, mocks locais ou testes automatizados de segurança
-  const isTestMock =
-    uid.startsWith("test-") ||
-    !authToken ||
-    authToken.startsWith("mock-") ||
-    authToken.includes("test");
+  if (
+    !Number.isFinite(amount) ||
+    amount <= 0 ||
+    !Number.isInteger(amount)
+  ) {
+    const err: SecurityError = {
+      status: 400,
+      message:
+        "Quantidade de créditos inválida.",
+      code: "INVALID_CREDIT_AMOUNT",
+    };
 
-  if (isTestMock) {
-    const current = testCreditsStore.has(uid) ? (testCreditsStore.get(uid) as number) : 5;
-    if (current < amount || current <= 0) {
+    throw err;
+  }
+
+  // --------------------------------------------------------------------------
+  // TESTES LOCAIS
+  // --------------------------------------------------------------------------
+
+  if (uid.startsWith("test-")) {
+    const current =
+      testCreditsStore.has(uid)
+        ? testCreditsStore.get(uid)!
+        : 5;
+
+    if (
+      current < amount ||
+      current <= 0
+    ) {
       const err: SecurityError = {
         status: 402,
-        message: "Créditos insuficientes para realizar a análise. Adquira mais créditos.",
+        message:
+          "Créditos insuficientes para realizar a análise.",
         code: "INSUFFICIENT_CREDITS",
       };
+
       throw err;
     }
-    const remaining = current - amount;
-    testCreditsStore.set(uid, remaining);
-    return { remainingCredits: remaining };
+
+    const remaining =
+      current - amount;
+
+    testCreditsStore.set(
+      uid,
+      remaining
+    );
+
+    return {
+      remainingCredits: remaining,
+    };
   }
 
-  // --- Transação no Cloud Firestore via REST API autenticada ---
-  const projectId = FIREBASE_PROJECT_ID;
-  const databaseId = FIRESTORE_DATABASE_ID;
-  const baseUrl = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/${databaseId}/documents`;
-  const docPath = `projects/${projectId}/databases/${databaseId}/documents/users/${uid}`;
+  // --------------------------------------------------------------------------
+  // TOKEN DE SERVIÇO
+  // --------------------------------------------------------------------------
 
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
-  if (authToken) {
-    headers["Authorization"] = authToken.startsWith("Bearer ") ? authToken : `Bearer ${authToken}`;
-  }
+  let accessToken: string;
 
   try {
-    // 1. Inicia a transação Read-Write no Firestore
-    const beginRes = await fetch(`${baseUrl}:beginTransaction`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ options: { readWrite: {} } }),
-    });
+    accessToken =
+      await getFirestoreAccessToken();
+  } catch (error) {
+    console.error(
+      "Falha na autenticação do Worker com Firestore:",
+      error
+    );
 
-    if (!beginRes.ok) {
-      const errData: any = await beginRes.json().catch(() => ({}));
-      if (beginRes.status === 401 || beginRes.status === 403) {
-        throw {
-          status: 403,
-          message: "Permissão insuficiente para iniciar transação no Firestore.",
-          code: "FIRESTORE_PERMISSION_DENIED",
-          details: errData,
-        };
-      }
-      throw new Error(`Falha ao iniciar transação no Firestore: HTTP ${beginRes.status}`);
-    }
+    const err: SecurityError = {
+      status: 500,
+      message:
+        "Não foi possível conectar ao serviço de créditos.",
+      code: "FIRESTORE_SERVICE_AUTH_FAILED",
+    };
 
-    const beginData: any = await beginRes.json();
-    const transactionId = beginData?.transaction;
+    throw err;
+  }
 
-    if (!transactionId) {
-      throw new Error("Transação iniciada sem identificador retornado pelo Firestore.");
-    }
+  const baseUrl =
+    getFirestoreBaseUrl();
 
-    // 2. Consulta o documento do usuário dentro do isolamento da transação
-    const getUrl = `${baseUrl}/users/${encodeURIComponent(uid)}?transaction=${encodeURIComponent(transactionId)}`;
-    const getRes = await fetch(getUrl, {
-      method: "GET",
-      headers,
-    });
+  const userDocumentUrl =
+    `${baseUrl}/users/${encodeURIComponent(uid)}`;
 
-    let currentCredits = 5;
+  // --------------------------------------------------------------------------
+  // INICIA TRANSAÇÃO
+  // --------------------------------------------------------------------------
 
-    if (getRes.status === 200) {
-      const docData: any = await getRes.json();
-      if (docData?.fields?.credits) {
-        const rawVal = docData.fields.credits.integerValue ?? docData.fields.credits.doubleValue ?? "0";
-        currentCredits = parseInt(rawVal, 10);
-        if (isNaN(currentCredits)) currentCredits = 0;
-      }
-    } else if (getRes.status === 404) {
-      // Documento não inicializado no Firestore; assume créditos iniciais padrão (5)
-      currentCredits = 5;
-    } else {
-      // Falha na leitura: cancela transação com rollback
-      await fetch(`${baseUrl}:rollback`, {
+  const beginResponse =
+    await fetch(
+      `${baseUrl}:beginTransaction`,
+      {
         method: "POST",
-        headers,
-        body: JSON.stringify({ transaction: transactionId }),
-      }).catch(() => {});
+        headers:
+          firestoreHeaders(
+            accessToken
+          ),
+        body: JSON.stringify({
+          options: {
+            readWrite: {},
+          },
+        }),
+      }
+    );
 
-      throw new Error(`Falha na leitura transacional do documento do usuário: HTTP ${getRes.status}`);
+  const beginData: any =
+    await beginResponse
+      .json()
+      .catch(() => ({}));
+
+  if (!beginResponse.ok) {
+    console.error(
+      "Firestore beginTransaction:",
+      beginResponse.status
+    );
+
+    const err: SecurityError = {
+      status:
+        beginResponse.status === 403
+          ? 500
+          : 502,
+      message:
+        "Não foi possível iniciar a operação de créditos.",
+      code:
+        "FIRESTORE_TRANSACTION_BEGIN_FAILED",
+    };
+
+    throw err;
+  }
+
+  const transactionId =
+    beginData?.transaction;
+
+  if (!transactionId) {
+    const err: SecurityError = {
+      status: 502,
+      message:
+        "O Firestore não retornou um identificador de transação.",
+      code:
+        "FIRESTORE_TRANSACTION_ID_MISSING",
+    };
+
+    throw err;
+  }
+
+  // --------------------------------------------------------------------------
+  // LEITURA TRANSACIONAL
+  // --------------------------------------------------------------------------
+
+  const getResponse =
+    await fetch(
+      `${userDocumentUrl}?transaction=${encodeURIComponent(
+        transactionId
+      )}`,
+      {
+        method: "GET",
+        headers:
+          firestoreHeaders(
+            accessToken
+          ),
+      }
+    );
+
+  let currentCredits = 5;
+
+  if (getResponse.ok) {
+    const userDocument: any =
+      await getResponse.json();
+
+    const creditsField =
+      userDocument?.fields?.credits;
+
+    if (creditsField) {
+      if (
+        creditsField.integerValue !==
+        undefined
+      ) {
+        currentCredits =
+          Number(
+            creditsField.integerValue
+          );
+      } else if (
+        creditsField.doubleValue !==
+        undefined
+      ) {
+        currentCredits =
+          Number(
+            creditsField.doubleValue
+          );
+      }
     }
 
-    // 3. Validação estrita: credits > 0 ?
-    if (currentCredits < amount || currentCredits <= 0) {
-      // Efetua rollback da transação no Firestore
-      await fetch(`${baseUrl}:rollback`, {
+    if (
+      !Number.isFinite(
+        currentCredits
+      )
+    ) {
+      currentCredits = 0;
+    }
+  } else if (
+    getResponse.status === 404
+  ) {
+    // Usuário ainda não possui documento.
+    // Crédito inicial padrão.
+    currentCredits = 5;
+  } else {
+    await rollbackFirestoreTransaction(
+      accessToken,
+      baseUrl,
+      transactionId
+    );
+
+    const err: SecurityError = {
+      status: 502,
+      message:
+        "Não foi possível consultar os créditos do usuário.",
+      code:
+        "FIRESTORE_TRANSACTION_READ_FAILED",
+    };
+
+    throw err;
+  }
+
+  // --------------------------------------------------------------------------
+  // VERIFICA CRÉDITOS
+  // --------------------------------------------------------------------------
+
+  if (
+    currentCredits < amount ||
+    currentCredits <= 0
+  ) {
+    await rollbackFirestoreTransaction(
+      accessToken,
+      baseUrl,
+      transactionId
+    );
+
+    const err: SecurityError = {
+      status: 402,
+      message:
+        "Créditos insuficientes para realizar a análise.",
+      code: "INSUFFICIENT_CREDITS",
+    };
+
+    throw err;
+  }
+
+  const remainingCredits =
+    currentCredits - amount;
+
+  // --------------------------------------------------------------------------
+  // COMMIT
+  // --------------------------------------------------------------------------
+
+  const nowIso =
+    new Date().toISOString();
+
+  const commitResponse =
+    await fetch(
+      `${baseUrl}:commit`,
+      {
         method: "POST",
-        headers,
-        body: JSON.stringify({ transaction: transactionId }),
-      }).catch(() => {});
+        headers:
+          firestoreHeaders(
+            accessToken
+          ),
+        body: JSON.stringify({
+          transaction:
+            transactionId,
 
-      const secErr: SecurityError = {
-        status: 402,
-        message: "Créditos insuficientes para realizar a análise. Adquira mais créditos.",
-        code: "INSUFFICIENT_CREDITS",
-      };
-      throw secErr;
-    }
+          writes: [
+            {
+              updateMask: {
+                fieldPaths: [
+                  "credits",
+                  "updatedAt",
+                ],
+              },
 
-    // 4. Executa débito: credits = credits - 1
-    const remainingCredits = currentCredits - amount;
-    const nowIso = new Date().toISOString();
+              update: {
+                name:
+                  `projects/${FIREBASE_PROJECT_ID}` +
+                  `/databases/${FIRESTORE_DATABASE_ID}` +
+                  `/documents/users/${uid}`,
 
-    // 5. Commit atômico da transação no Firestore
-    const commitRes = await fetch(`${baseUrl}:commit`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({
-        transaction: transactionId,
-        writes: [
-          {
-            updateMask: {
-              fieldPaths: ["credits", "updatedAt"],
-            },
-            update: {
-              name: docPath,
-              fields: {
-                credits: {
-                  integerValue: String(remainingCredits),
-                },
-                updatedAt: {
-                  stringValue: nowIso,
+                fields: {
+                  credits: {
+                    integerValue:
+                      String(
+                        remainingCredits
+                      ),
+                  },
+
+                  updatedAt: {
+                    stringValue:
+                      nowIso,
+                  },
                 },
               },
             },
-          },
-        ],
-      }),
-    });
+          ],
+        }),
+      }
+    );
 
-    if (!commitRes.ok) {
-      const errData: any = await commitRes.json().catch(() => ({}));
-      throw {
-        status: commitRes.status,
-        message: "Falha ao gravar débito de crédito na transação do Firestore.",
-        code: "FIRESTORE_COMMIT_FAILED",
-        details: errData,
-      };
-    }
+  const commitData: any =
+    await commitResponse
+      .json()
+      .catch(() => ({}));
 
-    return { remainingCredits };
-  } catch (error: any) {
-    if (error?.status === 401 || error?.status === 402 || error?.status === 403) {
-      throw error;
-    }
-    // Fallback de contingência caso haja instabilidade transitória de rede
-    console.warn("Transação Firestore REST indisponível, utilizando fallback atômico:", error?.message || error);
-    const fallbackCur = testCreditsStore.has(uid) ? (testCreditsStore.get(uid) as number) : 5;
-    if (fallbackCur < amount || fallbackCur <= 0) {
-      const secErr: SecurityError = {
-        status: 402,
-        message: "Créditos insuficientes para realizar a análise. Adquira mais créditos.",
-        code: "INSUFFICIENT_CREDITS",
-      };
-      throw secErr;
-    }
-    const rem = fallbackCur - amount;
-    testCreditsStore.set(uid, rem);
-    return { remainingCredits: rem };
+  if (!commitResponse.ok) {
+    console.error(
+      "Firestore commit:",
+      commitResponse.status
+    );
+
+    const err: SecurityError = {
+      status: 502,
+      message:
+        "Não foi possível concluir o débito de créditos.",
+      code:
+        "FIRESTORE_COMMIT_FAILED",
+    };
+
+    throw err;
+  }
+
+  return {
+    remainingCredits,
+  };
+}
+
+// ============================================================================
+// ROLLBACK
+// ============================================================================
+
+async function rollbackFirestoreTransaction(
+  accessToken: string,
+  baseUrl: string,
+  transactionId: string
+): Promise<void> {
+  try {
+    await fetch(
+      `${baseUrl}:rollback`,
+      {
+        method: "POST",
+        headers:
+          firestoreHeaders(
+            accessToken
+          ),
+        body: JSON.stringify({
+          transaction:
+            transactionId,
+        }),
+      }
+    );
+  } catch {
+    // Não substituímos o erro original.
   }
 }
 
-/**
- * Funções auxiliares mantidas para compatibilidade de testes
- */
-export function setTestUserCredits(uid: string, credits: number): void {
-  testCreditsStore.set(uid, credits);
+// ============================================================================
+// TEST HELPERS
+// ============================================================================
+
+export function setTestUserCredits(
+  uid: string,
+  credits: number
+): void {
+  testCreditsStore.set(
+    uid,
+    credits
+  );
 }
 
-export function getUserCredits(uid: string): number {
-  return testCreditsStore.get(uid) ?? 5;
+export function getUserCredits(
+  uid: string
+): number {
+  return (
+    testCreditsStore.get(uid) ??
+    5
+  );
 }
 
-// ---------------------------------------------------------------------------
-// 6. RATE LIMITING CONTRA ABUSO DE API DE IA
-// ---------------------------------------------------------------------------
-
-interface RateLimitEntry {
-  timestamps: number[];
-}
-
-const rateLimitStore = new Map<string, RateLimitEntry>();
+// ============================================================================
+// RATE LIMITING
+// ============================================================================
 
 export function checkRateLimit(
   key: string,
   maxRequests: number = 6,
   windowMs: number = 60000
 ): void {
-  const now = Date.now();
-  const entry = rateLimitStore.get(key) || { timestamps: [] };
+  if (
+    !key ||
+    typeof key !== "string"
+  ) {
+    throw {
+      status: 400,
+      message:
+        "Chave de rate limit inválida.",
+      code:
+        "RATE_LIMIT_INVALID_KEY",
+    } satisfies SecurityError;
+  }
 
-  // Remove timestamps fora da janela
-  entry.timestamps = entry.timestamps.filter((ts) => now - ts < windowMs);
+  const now =
+    Date.now();
 
-  if (entry.timestamps.length >= maxRequests) {
-    const oldest = entry.timestamps[0];
-    const retryAfterSeconds = Math.ceil((oldest + windowMs - now) / 1000);
+  const entry =
+    rateLimitStore.get(key) || {
+      timestamps: [],
+    };
+
+  entry.timestamps =
+    entry.timestamps.filter(
+      (timestamp) =>
+        now - timestamp <
+        windowMs
+    );
+
+  if (
+    entry.timestamps.length >=
+    maxRequests
+  ) {
+    const oldest =
+      entry.timestamps[0];
+
+    const retryAfterSeconds =
+      Math.max(
+        1,
+        Math.ceil(
+          (
+            oldest +
+            windowMs -
+            now
+          ) / 1000
+        )
+      );
 
     const err: SecurityError = {
       status: 429,
-      message: `Limite de solicitações de análise atingido (${maxRequests} scans/min). Aguarde ${retryAfterSeconds} segundos.`,
-      code: "RATE_LIMIT_EXCEEDED",
+      message:
+        `Limite de solicitações atingido (${maxRequests} scans/min).`,
+      code:
+        "RATE_LIMIT_EXCEEDED",
       retryAfterSeconds,
     };
+
     throw err;
   }
 
   entry.timestamps.push(now);
-  rateLimitStore.set(key, entry);
+
+  rateLimitStore.set(
+    key,
+    entry
+  );
 }

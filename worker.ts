@@ -5,14 +5,19 @@ import {
   validateAppCheck,
   checkAndDeductCredit,
   checkRateLimit,
+  configureFirestoreServiceAccount,
   FIREBASE_PROJECT_ID,
   SecurityError,
 } from "./functions/_ai/security";
 
 type Env = {
   HF_TOKEN: string;
+  FIRESTORE_CLIENT_EMAIL: string;
+  FIRESTORE_PRIVATE_KEY: string;
   ENFORCE_APP_CHECK?: string;
-  ASSETS: { fetch: (request: Request) => Promise<Response> };
+  ASSETS: {
+    fetch: (request: Request) => Promise<Response>;
+  };
 };
 
 const MODEL = "google/gemma-3-4b-it:fastest";
@@ -77,6 +82,11 @@ async function callHfWithRetry(env: any, payload: any, maxAttempts = 4) {
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
+    configureFirestoreServiceAccount(
+      env.FIRESTORE_CLIENT_EMAIL,
+      env.FIRESTORE_PRIVATE_KEY
+    );
+
     const url = new URL(request.url);
 
     // --- API /api/scan ---
