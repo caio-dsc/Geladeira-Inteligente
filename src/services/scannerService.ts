@@ -475,9 +475,10 @@ class HuggingFaceScannerService implements IScannerService {
     const compressImageForScan = async (
       source: string,
       maxWidth: number = 1024,
-      quality: number = 0.65
+      initialQuality: number = 0.70,
+      maxBytes: number = 1_500_000
     ): Promise<string> => {
-      // Se não for Base64, mantém a URL original.
+      // Se não for Base64 de imagem, mantém a URL original.
       if (!source.startsWith('data:image/')) {
         return source;
       }
@@ -487,19 +488,15 @@ class HuggingFaceScannerService implements IScannerService {
 
         img.onload = () => {
           try {
-            const originalWidth = img.naturalWidth;
-            const originalHeight = img.naturalHeight;
+            let width = img.naturalWidth;
+            let height = img.naturalHeight;
 
-            if (!originalWidth || !originalHeight) {
-              reject(new Error('Não foi possível obter as dimensões da imagem.'));
-              return;
+            // Redimensiona mantendo proporção.
+            if (width > maxWidth) {
+              const scale = maxWidth / width;
+              width = Math.round(width * scale);
+              height = Math.round(height * scale);
             }
-
-            // Redimensiona mantendo a proporção.
-            const scale = Math.min(1, maxWidth / originalWidth);
-
-            const width = Math.max(1, Math.round(originalWidth * scale));
-            const height = Math.max(1, Math.round(originalHeight * scale));
 
             const canvas = document.createElement('canvas');
             canvas.width = width;
@@ -514,115 +511,74 @@ class HuggingFaceScannerService implements IScannerService {
               return;
             }
 
-            // Fundo branco para imagens com transparência.
+            // Fundo branco para imagens transparentes.
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, width, height);
 
-            // Qualidade de interpolação para o redimensionamento.
-            ctx.imageSmoothingEnabled = true;
-            ctx.imageSmoothingQuality = 'high';
-
-            ctx.drawImage(
-              img,
-              0,
-              0,
-              originalWidth,
-              originalHeight,
-              0,
-              0,
-              width,
-              height
-            );
+            ctx.drawImage(img, 0, 0, width, height);
 
             /*
-             * JPEG reduz drasticamente o tamanho do payload.
-             * 1024px + qualidade 0.65 é suficiente para
-             * reconhecimento visual de alimentos.
+             * Tenta várias qualidades até ficar abaixo do limite.
+             * Isso evita que uma foto de iPhone continue gerando
+             * um Base64 enorme mesmo depois do resize.
              */
+            let quality = initialQuality;
             let compressed = canvas.toDataURL('image/jpeg', quality);
 
-            /*
-             * Proteção adicional:
-             * se a imagem ainda estiver grande, reduz progressivamente
-             * a qualidade até atingir um payload razoável.
-             */
-            const MAX_BASE64_LENGTH = 3_500_000;
+            const getBase64Bytes = (dataUrl: string): number => {
+              const base64 = dataUrl.split(',')[1] || '';
+              return Math.floor((base64.length * 3) / 4);
+            };
 
-            if (compressed.length > MAX_BASE64_LENGTH) {
-              compressed = canvas.toDataURL('image/jpeg', 0.55);
-            }
+            while (
+              getBase64Bytes(compressed) > maxBytes &&
+              quality > 0.35
+            ) {
+              quality -= 0.05;
 
-            if (compressed.length > MAX_BASE64_LENGTH) {
-              compressed = canvas.toDataURL('image/jpeg', 0.45);
-            }
-
-            /*
-             * Última proteção:
-             * reduz novamente a resolução caso a foto continue muito grande.
-             */
-            if (compressed.length > MAX_BASE64_LENGTH && width > 768) {
-              const smallerScale = 768 / originalWidth;
-
-              const smallerWidth = Math.max(
-                1,
-                Math.round(originalWidth * smallerScale)
-              );
-
-              const smallerHeight = Math.max(
-                1,
-                Math.round(originalHeight * smallerScale)
-              );
-
-              const smallerCanvas = document.createElement('canvas');
-              smallerCanvas.width = smallerWidth;
-              smallerCanvas.height = smallerHeight;
-
-              const smallerCtx = smallerCanvas.getContext('2d');
-
-              if (!smallerCtx) {
-                reject(
-                  new Error(
-                    'Não foi possível reduzir a imagem para análise.'
-                  )
-                );
-                return;
-              }
-
-              smallerCtx.fillStyle = '#ffffff';
-              smallerCtx.fillRect(
-                0,
-                0,
-                smallerWidth,
-                smallerHeight
-              );
-
-              smallerCtx.imageSmoothingEnabled = true;
-              smallerCtx.imageSmoothingQuality = 'high';
-
-              smallerCtx.drawImage(
-                img,
-                0,
-                0,
-                originalWidth,
-                originalHeight,
-                0,
-                0,
-                smallerWidth,
-                smallerHeight
-              );
-
-              compressed = smallerCanvas.toDataURL(
+              compressed = canvas.toDataURL(
                 'image/jpeg',
-                0.55
+                quality
+              );
+            }
+
+            /*
+             * Se mesmo com qualidade baixa ainda ficou grande,
+             * reduz a resolução progressivamente.
+             */
+            while (
+              getBase64Bytes(compressed) > maxBytes &&
+              width > 640
+            ) {
+              width = Math.round(width * 0.85);
+              height = Math.round(height * 0.85);
+
+              canvas.width = width;
+              canvas.height = height;
+
+              ctx.fillStyle = '#ffffff';
+              ctx.fillRect(0, 0, width, height);
+
+              ctx.drawImage(img, 0, 0, width, height);
+
+              quality = 0.60;
+
+              compressed = canvas.toDataURL(
+                'image/jpeg',
+                quality
               );
             }
 
             console.log(
-              'Imagem otimizada para scan:',
-              Math.round(source.length / 1024),
-              'KB ->',
-              Math.round(compressed.length / 1024),
-              'KB'
+              '[SCAN] Imagem otimizada:',
+              Math.round(getBase64Bytes(compressed) / 1024),
+              'KB',
+              'dimensões:',
+              width,
+              'x',
+              height,
+              'qualidade:',
+              quality
             );
 
             resolve(compressed);
@@ -644,6 +600,12 @@ class HuggingFaceScannerService implements IScannerService {
     };
 
     const optimizedImage = await compressImageForScan(imageUrl);
+
+    console.log(
+      '[SCAN] Payload Base64:',
+      Math.round((optimizedImage.length * 3) / 4 / 1024),
+      'KB'
+    );
 
     onProgress?.('Enviando imagem para análise...');
 
