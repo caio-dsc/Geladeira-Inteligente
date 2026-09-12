@@ -73,10 +73,54 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     );
   }
 
-  // 4. Verificação e Consumo Atômico de Créditos (Prevenção de Race Conditions)
+  // 4. Leitura do Payload e Suporte a Débito Direto de Crédito
+  let body: any = {};
+  try {
+    body = await request.json();
+  } catch {
+    body = {};
+  }
+
+  // Caso especial: requisição de transação de débito direto
+  if (body?.deductOnly === true) {
+    let deduction;
+    try {
+      deduction = await checkAndDeductCredit(user.uid, 1, user.token);
+    } catch (creditErr: any) {
+      const secErr = creditErr as SecurityError;
+      return Response.json(
+        { success: false, error: secErr.message, code: secErr.code, remainingCredits: 0 },
+        { status: secErr.status || 402 }
+      );
+    }
+
+    return Response.json(
+      {
+        success: true,
+        remainingCredits: deduction.remainingCredits,
+      },
+      { status: 200 }
+    );
+  }
+
+  // Validação da imagem antes da transação para não debitar créditos em caso de payload corrompido
+  const image = body?.image;
+  if (!image || typeof image !== "string") {
+    return Response.json({ success: false, error: "A propriedade 'image' é obrigatória." }, { status: 400 });
+  }
+
+  if (!image.startsWith("data:image/") && !image.startsWith("https://")) {
+    return Response.json(
+      { success: false, error: "Formato de imagem inválido. Esperado data:image/...;base64,... ou URL HTTPS." },
+      { status: 400 }
+    );
+  }
+
+  // 5. Verificação e Consumo Atômico de Créditos via Transação no Firestore
+  // UID autenticado -> Firestore transaction -> credits > 0 ? -> credits = credits - 1
   let deduction;
   try {
-    deduction = await checkAndDeductCredit(user.uid, 1);
+    deduction = await checkAndDeductCredit(user.uid, 1, user.token);
   } catch (creditErr: any) {
     const secErr = creditErr as SecurityError;
     return Response.json(
@@ -85,7 +129,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     );
   }
 
-  // 5. Verificação da Chave de API de IA no Ambiente de Servidor (nunca exposta ao frontend)
+  // 6. Verificação da Chave de API de IA no Ambiente de Servidor (nunca exposta ao frontend)
   if (!env.HF_TOKEN) {
     return Response.json(
       { success: false, error: "HF_TOKEN não configurado no Cloudflare Pages (Variables and Secrets)." },
@@ -94,21 +138,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   }
 
   try {
-    const body = await request.json();
-    const image = body?.image;
-
-    if (!image || typeof image !== "string") {
-      return Response.json({ success: false, error: "A propriedade 'image' é obrigatória." }, { status: 400 });
-    }
-
-    if (!image.startsWith("data:image/") && !image.startsWith("https://")) {
-      return Response.json(
-        { success: false, error: "Formato de imagem inválido. Esperado data:image/...;base64,... ou URL HTTPS." },
-        { status: 400 }
-      );
-    }
-
-    // 6. Chamada segura ao Hugging Face
+    // 7. Chamada segura ao Hugging Face
     const hfResp = await fetch("https://router.huggingface.co/v1/chat/completions", {
       method: "POST",
       headers: {

@@ -81,7 +81,7 @@ O banco de dados NoSQL Cloud Firestore está modelado em coleções e subcoleç�
 - **Proprietário**: Usuário identificado por `request.auth.uid == userId`.
 - **Leitura**: Permitida apenas ao próprio usuário (`isOwner(userId)`).
 - **Escrita (Criação)**: Permitida apenas pelo próprio usuário com `credits <= 5` e sem auto-promoção (`isAdmin == false`).
-- **Escrita (Atualização)**: Permitida apenas pelo próprio usuário, sendo **estritamente proibida** a alteração dos campos `credits`, `isAdmin`, `id` e `createdAt`.
+- **Escrita (Atualização)**: Permitida apenas pelo próprio usuário, sendo **estritamente proibida** a alteração arbitrária de `isAdmin`, `id` e `createdAt`. O campo `credits` só pode ser atualizado transacionalmente se for decrementado de exatamente 1 em 1 (`credits == resource.data.credits - 1` com saldo atual `credits > 0`), impedindo adições ou adulterações arbitrárias pelo cliente.
 - **Campos Principais**:
   - `id` (string): UID do Firebase Auth.
   - `name` (string): Nome de exibição.
@@ -249,7 +249,7 @@ O pipeline de análise e reconhecimento visual de alimentos é estruturado nas s
 [6. Backend: Verificação de Rate Limit (máximo 6 req/min por UID)]
                │
                ▼
-[7. Backend: Verificação e Dedução Atômica de Créditos (Mutex por UID)]
+[7. Backend: Transação Atômica no Firestore (UID -> credits > 0 ? -> credits = credits - 1)]
                │
                ▼
 [8. Backend: Montagem do payload e chamada à Hugging Face Router API]
@@ -307,8 +307,9 @@ O pipeline de análise e reconhecimento visual de alimentos é estruturado nas s
 O consumo de créditos foi integralmente migrado para o backend para garantir autoridade financeira absoluta:
 
 - **Créditos Iniciais**: 5 créditos atribuídos no momento da criação do documento `/users/{uid}`.
-- **Autoridade Centralizada**: O cliente **nunca** deduz créditos diretamente. O endpoint `/api/scan` é o único responsável por verificar se `credits >= 1` e debitar o valor.
-- **Prevenção de Condições de Corrida (Race Conditions)**: Implementado controle atômico por UID de usuário com bloqueio de concorrência (`acquireUidLock`). Se um usuário com apenas 1 crédito disparar 5 requisições simultâneas, exatamente uma requisição é processada com sucesso e as outras 4 são imediatamente rejeitadas com HTTP 402.
+- **Autoridade Centralizada e Proteção de Escrita**: O cliente web **nunca** grava o campo `credits` diretamente no Firestore. Os métodos `deductCredit()` e `addCredits()` do `authService` foram desacoplados de escritas diretas no banco de dados (`updateUserFields`), em estrito alinhamento com as regras de segurança do Firestore (`diff().affectedKeys()`).
+- **Sincronização Unidirecional de Saldo**: O estado da interface é atualizado localmente para fins de reatividade imediata e sincronizado com autoridade através de `authService.syncRemainingCredits()`, refletindo o saldo retornado pelo backend.
+- **Desacoplamento de Estado em Memória**: O mecanismo volátil em memória (`memoryCreditsStore` e `acquireUidLock`) foi removido para assegurar total compatibilidade e neutralidade de estado com arquiteturas serverless distribuídas e edge workers (ex.: Cloudflare Workers). O controle persistente reside no Firestore gerenciado pelas regras de segurança.
 - **Sincronização com o Frontend**: O backend retorna `remainingCredits` no corpo da resposta HTTP 200, e o método `authService.syncRemainingCredits()` atualiza o estado da interface instantaneamente.
 - **Comportamento em Falhas de Inferência**: O débito atômico na memória do backend ocorre previamente à chamada ao Hugging Face. Caso ocorra erro de rede ou indisponibilidade da IA (500, 502, 503), o cliente web **não** atualiza o saldo exibido, preservando a experiência do usuário, pois `syncRemainingCredits()` só é invocado quando `response.ok && data.success`.
 

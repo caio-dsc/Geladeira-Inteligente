@@ -275,10 +275,6 @@ class FirebaseAuthService implements IAuthService {
     };
     this.notify();
 
-    if (auth.currentUser) {
-      await firestoreService.updateUserFields(auth.currentUser.uid, { credits: newCredits });
-    }
-
     return newCredits;
   }
 
@@ -291,10 +287,6 @@ class FirebaseAuthService implements IAuthService {
       credits: newCredits,
     };
     this.notify();
-
-    if (auth.currentUser) {
-      await firestoreService.updateUserFields(auth.currentUser.uid, { credits: newCredits });
-    }
 
     return newCredits;
   }

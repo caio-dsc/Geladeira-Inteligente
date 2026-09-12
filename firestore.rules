@@ -38,10 +38,19 @@ service cloud.firestore {
         && (!('isAdmin' in request.resource.data) || request.resource.data.isAdmin == false)
         && (!('credits' in request.resource.data) || request.resource.data.credits <= 5);
 
-      // Atualização de perfil: o usuário comum NUNCA pode alterar credits, isAdmin, id ou createdAt
-      // Utiliza diff().affectedKeys() conforme diretrizes de segurança
+      // Atualização de perfil: o usuário comum NUNCA pode alterar isAdmin, id ou createdAt.
+      // O campo 'credits' é protegido contra alterações arbitrárias via diff().affectedKeys()
+      // e só pode ser debitado transacionalmente de 1 em 1 quando credits > 0.
       allow update: if isOwner(userId)
-        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['credits', 'isAdmin', 'id', 'createdAt']);
+        && (
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['credits', 'isAdmin', 'id', 'createdAt'])
+          ||
+          (
+            request.resource.data.diff(resource.data).affectedKeys().hasOnly(['credits', 'updatedAt'])
+            && resource.data.credits > 0
+            && request.resource.data.credits == resource.data.credits - 1
+          )
+        );
 
       allow delete: if false;
 

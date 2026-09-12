@@ -58,10 +58,59 @@ export default async (req: Request) => {
     );
   }
 
-  // 4. Verificação e Consumo Atômico de Créditos (Prevenção de Race Conditions)
+  // 4. Leitura do Payload e Suporte a Débito Direto de Crédito
+  let body: any = {};
+  try {
+    body = await req.json();
+  } catch {
+    body = {};
+  }
+
+  // Caso especial: requisição de transação de débito direto
+  if (body?.deductOnly === true) {
+    let deduction;
+    try {
+      deduction = await checkAndDeductCredit(user.uid, 1, user.token);
+    } catch (creditErr: any) {
+      const secErr = creditErr as SecurityError;
+      return Response.json(
+        { success: false, error: secErr.message, code: secErr.code, remainingCredits: 0 },
+        { status: secErr.status || 402 }
+      );
+    }
+
+    return Response.json(
+      {
+        success: true,
+        remainingCredits: deduction.remainingCredits,
+      },
+      { status: 200 }
+    );
+  }
+
+  const image = body?.image;
+  if (!image || typeof image !== "string") {
+    return Response.json(
+      { success: false, error: "A propriedade 'image' é obrigatória." },
+      { status: 400 }
+    );
+  }
+
+  if (!image.startsWith("data:image/") && !image.startsWith("https://")) {
+    return Response.json(
+      {
+        success: false,
+        error: "Formato de imagem inválido. Esperado data:image/...;base64,... ou URL HTTPS.",
+      },
+      { status: 400 }
+    );
+  }
+
+  // 5. Verificação e Consumo Atômico de Créditos via Transação no Firestore
+  // UID autenticado -> Firestore transaction -> credits > 0 ? -> credits = credits - 1
   let deduction;
   try {
-    deduction = await checkAndDeductCredit(user.uid, 1);
+    deduction = await checkAndDeductCredit(user.uid, 1, user.token);
   } catch (creditErr: any) {
     const secErr = creditErr as SecurityError;
     return Response.json(
@@ -79,25 +128,6 @@ export default async (req: Request) => {
   }
 
   try {
-    const body = await req.json();
-    const image = body?.image;
-
-    if (!image || typeof image !== "string") {
-      return Response.json(
-        { success: false, error: "A propriedade 'image' é obrigatória." },
-        { status: 400 }
-      );
-    }
-
-    if (!image.startsWith("data:image/") && !image.startsWith("https://")) {
-      return Response.json(
-        {
-          success: false,
-          error: "Formato de imagem inválido. Esperado data:image/...;base64,... ou URL HTTPS.",
-        },
-        { status: 400 }
-      );
-    }
 
     const response = await fetch(
       "https://router.huggingface.co/v1/chat/completions",
