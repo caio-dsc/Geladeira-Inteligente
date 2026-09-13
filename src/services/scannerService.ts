@@ -11,9 +11,17 @@ export class ScanServiceError extends Error {
   retriable?: boolean;
   code?: string;
 
-  constructor(message: string, opts?: { status?: number; retryAfterSeconds?: number; retriable?: boolean; code?: string }) {
+  constructor(
+    message: string,
+    opts?: {
+      status?: number;
+      retryAfterSeconds?: number;
+      retriable?: boolean;
+      code?: string;
+    }
+  ) {
     super(message);
-    this.name = "ScanServiceError";
+    this.name = 'ScanServiceError';
     this.status = opts?.status;
     this.retryAfterSeconds = opts?.retryAfterSeconds;
     this.retriable = opts?.retriable;
@@ -54,10 +62,6 @@ interface StructuredFoodDetection {
   }>;
 }
 
-/*
- * Categorias permitidas para alimentos reais.
- * Categoria 'other' é expressamente rejeitada conforme Regra 2.
- */
 const ALLOWED_CATEGORIES: DetectedFoodItem['category'][] = [
   'vegetables',
   'fruits',
@@ -69,10 +73,6 @@ const ALLOWED_CATEGORIES: DetectedFoodItem['category'][] = [
   'bakery',
 ];
 
-/*
- * Lista de termos e palavras-chave não alimentícias para rejeição estrita (Regra 3).
- * Se o nome contiver qualquer um desses termos, será sumariamente bloqueado.
- */
 const NON_FOOD_KEYWORDS = [
   'objeto',
   'objetos',
@@ -192,9 +192,6 @@ const NON_FOOD_KEYWORDS = [
   'marca',
 ];
 
-/*
- * Lista de termos genéricos que não especificam um alimento real e devem ser removidos.
- */
 const GENERIC_FOOD_TERMS = [
   'alimento',
   'alimentos',
@@ -241,51 +238,48 @@ const GENERIC_FOOD_TERMS = [
   'snacks',
 ];
 
-/**
- * Extrai JSON válido do retorno da IA (suporta JSON puro, markdown code blocks e texto adjacente).
- */
 export function extractJsonFromText(rawText: string): string {
   if (!rawText) return '';
+
   let text = rawText.trim();
 
-  // 1. Se estiver envolto em markdown code fence (```json ... ``` ou ``` ... ```)
-  const codeBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
-  if (codeBlockMatch && codeBlockMatch[1]) {
+  const codeBlockMatch = text.match(
+    /```(?:json)?\s*([\s\S]*?)\s*```/i
+  );
+
+  if (codeBlockMatch?.[1]) {
     text = codeBlockMatch[1].trim();
   }
 
-  // 2. Se já for um objeto JSON válido { ... }
   if (text.startsWith('{') && text.endsWith('}')) {
     return text;
   }
 
-  // 3. Tenta localizar os limites externos { e }
   const firstBrace = text.indexOf('{');
   const lastBrace = text.lastIndexOf('}');
 
-  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+  if (
+    firstBrace !== -1 &&
+    lastBrace !== -1 &&
+    lastBrace > firstBrace
+  ) {
     return text.substring(firstBrace, lastBrace + 1).trim();
   }
 
   return text;
 }
 
-/**
- * Remove formatação Markdown, prefixos de lista e espaços extras (Regras 4, 5, 6).
- */
 export function cleanFoodName(rawName: string): string {
   if (!rawName) return '';
+
   return rawName
-    .replace(/^#+\s*/g, '') // Remove headers markdown (### Alimento)
-    .replace(/[*_`~]/g, '') // Remove negrito, itálico, código markdown
-    .replace(/^[-•*+]\s*/, '') // Remove marcadores de lista
-    .replace(/\s+/g, ' ') // Remove múltiplos espaços internos
+    .replace(/^#+\s*/g, '')
+    .replace(/[*_`~]/g, '')
+    .replace(/^[-•*+]\s*/, '')
+    .replace(/\s+/g, ' ')
     .trim();
 }
 
-/**
- * Normaliza o texto removendo acentos para comparação estrita de bloqueio.
- */
 function normalizeForComparison(str: string): string {
   return str
     .toLowerCase()
@@ -294,18 +288,16 @@ function normalizeForComparison(str: string): string {
     .trim();
 }
 
-/**
- * Verifica se o nome corresponde a um termo alimentar genérico demais (ex: "alimentos", "frutas", "itens").
- */
 export function isGenericFoodTerm(name: string): boolean {
   const normalized = normalizeForComparison(cleanFoodName(name));
+
   if (!normalized) {
     return true;
   }
 
-  // Verifica se é exatamente um termo genérico ou se é uma frase genérica (ex: "frutas diversas", "varios alimentos")
   return GENERIC_FOOD_TERMS.some((generic) => {
     const normalizedGeneric = normalizeForComparison(generic);
+
     return (
       normalized === normalizedGeneric ||
       normalized === `${normalizedGeneric} diversos` ||
@@ -318,20 +310,16 @@ export function isGenericFoodTerm(name: string): boolean {
   });
 }
 
-/**
- * Verifica se o nome corresponde a um objeto, parte do ambiente ou termo não alimentício proibido.
- * Bloqueia qualquer item com name contendo: objeto, cor, embalagem, geladeira, prateleira, mão, mesa, etc.
- */
 export function isClearlyNonFood(name: string): boolean {
   const normalized = normalizeForComparison(cleanFoodName(name));
+
   if (!normalized) {
     return true;
   }
 
-  // Bloqueio se contiver qualquer palavra-chave não alimentícia
   const containsNonFoodKeyword = NON_FOOD_KEYWORDS.some((blocked) => {
     const normalizedBlocked = normalizeForComparison(blocked);
-    // Casos: palavra exata, contida dentro da string ou como termo separado
+
     return (
       normalized === normalizedBlocked ||
       normalized.includes(normalizedBlocked)
@@ -342,17 +330,9 @@ export function isClearlyNonFood(name: string): boolean {
     return true;
   }
 
-  // Bloqueio se for um termo genérico demais ("alimentos", "frutas", "itens")
-  if (isGenericFoodTerm(normalized)) {
-    return true;
-  }
-
-  return false;
+  return isGenericFoodTerm(normalized);
 }
 
-/**
- * Normaliza uma chave de texto removendo acentuação, espaços e convertendo para minúsculo.
- */
 export function normalizeKey(s: string): string {
   return (s || '')
     .trim()
@@ -361,27 +341,31 @@ export function normalizeKey(s: string): string {
     .replace(/[\u0300-\u036f]/g, '');
 }
 
-/**
- * Agrupa e mescla itens detectados repetidos pelo nome e unidade, somando quantidades e mantendo maior confiança.
- */
-export function mergeDetectedItems(items: DetectedFoodItem[]): DetectedFoodItem[] {
+export function mergeDetectedItems(
+  items: DetectedFoodItem[]
+): DetectedFoodItem[] {
   const map = new Map<string, DetectedFoodItem>();
 
   for (const item of items) {
     const key = `${normalizeKey(item.name)}__${normalizeKey(item.unit)}`;
 
     const prev = map.get(key);
+
     if (!prev) {
       map.set(key, { ...item });
       continue;
     }
 
-    // soma quantidades, mantém maior confidence
-    const mergedQty = (prev.quantity || 1) + (item.quantity || 1);
+    const mergedQty =
+      (prev.quantity || 1) + (item.quantity || 1);
+
     map.set(key, {
       ...prev,
       quantity: normalizeQty(mergedQty, prev.unit),
-      confidence: Math.max(prev.confidence ?? 0, item.confidence ?? 0),
+      confidence: Math.max(
+        prev.confidence ?? 0,
+        item.confidence ?? 0
+      ),
       selected: prev.selected || item.selected,
     });
   }
@@ -389,30 +373,370 @@ export function mergeDetectedItems(items: DetectedFoodItem[]): DetectedFoodItem[
   return Array.from(map.values());
 }
 
-/**
- * Normaliza a quantidade garantindo números finitos válidos e inteiros para unidade "un" >= 1.
- */
-export function normalizeQty(q: unknown, unit: string): number {
+export function normalizeQty(
+  q: unknown,
+  unit: string
+): number {
   let n = typeof q === 'number' ? q : Number(q);
-  if (!Number.isFinite(n) || n <= 0) n = 1;
 
-  if (unit === 'un') n = Math.round(n);
-  if (n < 1) n = 1;
+  if (!Number.isFinite(n) || n <= 0) {
+    n = 1;
+  }
+
+  if (unit === 'un') {
+    n = Math.round(n);
+  }
+
+  if (n < 1) {
+    n = 1;
+  }
 
   return n;
 }
 
-/**
- * Normaliza o estado de frescor garantindo apenas 'fresh' | 'frozen' (Regra 13).
- */
-export function normalizeFreshness(state: any): 'fresh' | 'frozen' {
-  if (state === 'frozen') {
-    return 'frozen';
-  }
-  return 'fresh';
+export function normalizeFreshness(
+  state: any
+): 'fresh' | 'frozen' {
+  return state === 'frozen' ? 'frozen' : 'fresh';
 }
 
-class HuggingFaceScannerService implements IScannerService {
+/**
+ * Converte qualquer fonte de imagem suportada pelo navegador
+ * para JPEG Base64.
+ *
+ * Compatível com:
+ * - iPhone Safari
+ * - Chrome mobile
+ * - Android
+ * - desktop
+ * - data:image/*
+ * - blob:
+ * - File
+ * - Blob
+ */
+async function prepareImageForScan(
+  source: string | Blob,
+  maxWidth = 1280,
+  initialQuality = 0.72
+): Promise<string> {
+  const MAX_BYTES = 850 * 1024;
+
+  let blobUrl: string | null = null;
+
+  try {
+    let blob: Blob;
+
+    /**
+     * Caso 1:
+     * já recebemos Blob/File.
+     */
+    if (source instanceof Blob) {
+      blob = source;
+    }
+
+    /**
+     * Caso 2:
+     * data URL.
+     */
+    else if (source.startsWith('data:image/')) {
+      const response = await fetch(source);
+      blob = await response.blob();
+    }
+
+    /**
+     * Caso 3:
+     * blob URL.
+     *
+     * Muito importante para mobile.
+     */
+    else if (source.startsWith('blob:')) {
+      const response = await fetch(source);
+
+      if (!response.ok) {
+        throw new Error(
+          `Não foi possível ler a imagem temporária do dispositivo (${response.status}).`
+        );
+      }
+
+      blob = await response.blob();
+    }
+
+    /**
+     * Caso 4:
+     * URL HTTPS.
+     */
+    else if (
+      source.startsWith('http://') ||
+      source.startsWith('https://')
+    ) {
+      const response = await fetch(source);
+
+      if (!response.ok) {
+        throw new Error(
+          `Não foi possível baixar a imagem (${response.status}).`
+        );
+      }
+
+      blob = await response.blob();
+    }
+
+    else {
+      throw new Error(
+        'Formato de imagem não suportado pelo navegador.'
+      );
+    }
+
+    if (!blob.type.startsWith('image/')) {
+      throw new Error(
+        'O arquivo selecionado não é uma imagem válida.'
+      );
+    }
+
+    /**
+     * Cria URL temporária.
+     */
+    blobUrl = URL.createObjectURL(blob);
+
+    /**
+     * createImageBitmap é mais eficiente em muitos navegadores
+     * modernos, especialmente em dispositivos móveis.
+     *
+     * Se não estiver disponível, usamos Image().
+     */
+    let bitmap: ImageBitmap | null = null;
+
+    if ('createImageBitmap' in window) {
+      try {
+        bitmap = await createImageBitmap(blob);
+      } catch {
+        bitmap = null;
+      }
+    }
+
+    let width = bitmap?.width || 0;
+    let height = bitmap?.height || 0;
+
+    if (!width || !height) {
+      const img = await new Promise<HTMLImageElement>(
+        (resolve, reject) => {
+          const element = new Image();
+
+          element.onload = () => resolve(element);
+
+          element.onerror = () =>
+            reject(
+              new Error(
+                'Não foi possível decodificar a foto no dispositivo.'
+              )
+            );
+
+          element.src = blobUrl!;
+        }
+      );
+
+      width = img.naturalWidth;
+      height = img.naturalHeight;
+    }
+
+    if (!width || !height) {
+      throw new Error(
+        'A imagem não possui dimensões válidas.'
+      );
+    }
+
+    /**
+     * Redimensionamento proporcional.
+     */
+    const scale = Math.min(
+      1,
+      maxWidth / Math.max(width, height)
+    );
+
+    let targetWidth = Math.max(
+      1,
+      Math.round(width * scale)
+    );
+
+    let targetHeight = Math.max(
+      1,
+      Math.round(height * scale)
+    );
+
+    const canvas = document.createElement('canvas');
+
+    const ctx = canvas.getContext('2d', {
+      alpha: false,
+      willReadFrequently: false,
+    });
+
+    if (!ctx) {
+      throw new Error(
+        'O navegador não conseguiu preparar a imagem.'
+      );
+    }
+
+    /**
+     * Renderiza a imagem.
+     */
+    const render = (
+      quality: number
+    ): string => {
+      canvas.width = targetWidth;
+      canvas.height = targetHeight;
+
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(
+        0,
+        0,
+        targetWidth,
+        targetHeight
+      );
+
+      if (bitmap) {
+        ctx.drawImage(
+          bitmap,
+          0,
+          0,
+          targetWidth,
+          targetHeight
+        );
+      } else {
+        const img = new Image();
+
+        /**
+         * Esta situação ocorre apenas no fallback.
+         * O blobUrl já foi validado acima.
+         */
+        img.src = blobUrl!;
+
+        ctx.drawImage(
+          img,
+          0,
+          0,
+          targetWidth,
+          targetHeight
+        );
+      }
+
+      return canvas.toDataURL(
+        'image/jpeg',
+        quality
+      );
+    };
+
+    const getBase64Bytes = (
+      dataUrl: string
+    ): number => {
+      const comma = dataUrl.indexOf(',');
+
+      if (comma === -1) {
+        return 0;
+      }
+
+      const base64 =
+        dataUrl.substring(comma + 1);
+
+      const padding =
+        base64.endsWith('==')
+          ? 2
+          : base64.endsWith('=')
+            ? 1
+            : 0;
+
+      return Math.floor(
+        (base64.length * 3) / 4
+      ) - padding;
+    };
+
+    let quality = initialQuality;
+
+    let compressed = render(quality);
+
+    /**
+     * Primeiro reduz qualidade.
+     */
+    while (
+      getBase64Bytes(compressed) > MAX_BYTES &&
+      quality > 0.40
+    ) {
+      quality = Math.max(
+        0.40,
+        quality - 0.06
+      );
+
+      compressed = render(quality);
+    }
+
+    /**
+     * Depois reduz resolução.
+     */
+    while (
+      getBase64Bytes(compressed) > MAX_BYTES &&
+      targetWidth > 720
+    ) {
+      targetWidth = Math.max(
+        720,
+        Math.round(targetWidth * 0.82)
+      );
+
+      targetHeight = Math.max(
+        1,
+        Math.round(
+          targetHeight * 0.82
+        )
+      );
+
+      quality = 0.55;
+
+      compressed = render(quality);
+
+      while (
+        getBase64Bytes(compressed) > MAX_BYTES &&
+        quality > 0.40
+      ) {
+        quality = Math.max(
+          0.40,
+          quality - 0.05
+        );
+
+        compressed = render(quality);
+      }
+    }
+
+    const finalBytes =
+      getBase64Bytes(compressed);
+
+    console.log(
+      '[SCAN] Imagem preparada:',
+      {
+        bytes: finalBytes,
+        kb: Math.round(
+          finalBytes / 1024
+        ),
+        width: targetWidth,
+        height: targetHeight,
+        quality,
+        originalType: blob.type,
+        originalSize: blob.size,
+      }
+    );
+
+    /**
+     * Libera o ImageBitmap.
+     */
+    bitmap?.close();
+
+    return compressed;
+  } finally {
+    if (blobUrl) {
+      URL.revokeObjectURL(blobUrl);
+    }
+  }
+}
+
+class HuggingFaceScannerService
+  implements IScannerService {
+
   public getSampleImages() {
     return SAMPLE_FRIDGE_IMAGES;
   }
@@ -420,445 +744,676 @@ class HuggingFaceScannerService implements IScannerService {
   public async simulateScan(
     imageUrl: string,
     onProgress?: (msg: string) => void,
-    forceError: boolean = false
+    forceError = false
   ): Promise<DetectedFoodItem[]> {
+
     if (forceError) {
-      throw new Error(
+      throw new ScanServiceError(
         'Não foi possível identificar alimentos com clareza. Tente tirar a foto com melhor iluminação e com a porta da geladeira aberta.'
       );
     }
 
     if (!imageUrl) {
-      throw new Error('Nenhuma imagem foi selecionada.');
-    }
-
-    // Verificação de acesso ao Scan (Controle de Acesso FASE 3: scanEnabled)
-    const userProfile = await authService.getCurrentUser();
-    if (userProfile && userProfile.scanEnabled === false) {
       throw new ScanServiceError(
-        'Acesso ao Scan com IA bloqueado para esta conta (Conta Gratuita). Recurso liberado apenas para contas com scanEnabled = true.',
-        { status: 403, retriable: false, code: 'SCAN_DISABLED' }
+        'Nenhuma imagem foi selecionada.'
       );
     }
 
-    // Se a imagem for uma das amostras de teste rápido, retorna as detecções correspondentes
-    const sample = SAMPLE_FRIDGE_IMAGES.find((s) => s.url === imageUrl);
-    if (sample && sample.mockDetections && sample.mockDetections.length > 0) {
-      onProgress?.('Carregando alimentos da foto de teste...');
-      await new Promise((r) => setTimeout(r, 700));
-      onProgress?.('Processando itens detectados...');
-      return sample.mockDetections.map((item) => ({ ...item }));
-    }
+    /**
+     * Controle de acesso.
+     */
+    const userProfile =
+      await authService.getCurrentUser();
 
-    // 1. Obtém o ID Token do Firebase Authentication para validar identidade
-    const currentUser = auth.currentUser;
-    let idToken: string | null = null;
-    if (currentUser) {
-      try {
-        idToken = await currentUser.getIdToken();
-      } catch (tokenErr) {
-        console.warn('Aviso ao obter ID Token do Firebase:', tokenErr);
-      }
+    if (
+      userProfile &&
+      userProfile.scanEnabled === false
+    ) {
+      throw new ScanServiceError(
+        'Acesso ao Scan com IA bloqueado para esta conta.',
+        {
+          status: 403,
+          retriable: false,
+          code: 'SCAN_DISABLED',
+        }
+      );
     }
-
-    // 2. Obtém o token do Firebase App Check se inicializado
-    let appCheckToken: string | null = null;
-    if (appCheck) {
-      try {
-        const appCheckResult = await getToken(appCheck, false);
-        appCheckToken = appCheckResult.token;
-      } catch (acErr) {
-        console.warn('Aviso ao obter token do Firebase App Check:', acErr);
-      }
-    }
-
-    onProgress?.('Preparando imagem para análise...');
 
     /**
-     * Reduz a imagem antes do envio.
-     *
-     * Isso evita enviar fotos enormes do celular como Base64.
-     * O Base64 aumenta o tamanho dos dados em aproximadamente 33%.
+     * Imagens de demonstração.
      */
-    const compressImageForScan = async (
-      source: string,
-      maxWidth: number = 1024,
-      quality: number = 0.65
-    ): Promise<string> => {
-      // URLs HTTPS não precisam ser recodificadas.
-      if (!source.startsWith('data:image/')) {
-        return source;
+    const sample =
+      SAMPLE_FRIDGE_IMAGES.find(
+        (s) => s.url === imageUrl
+      );
+
+    if (
+      sample &&
+      sample.mockDetections &&
+      sample.mockDetections.length > 0
+    ) {
+      onProgress?.(
+        'Carregando alimentos da foto de teste...'
+      );
+
+      await new Promise((r) =>
+        setTimeout(r, 500)
+      );
+
+      onProgress?.(
+        'Processando itens detectados...'
+      );
+
+      return sample.mockDetections.map(
+        (item) => ({ ...item })
+      );
+    }
+
+    /**
+     * Firebase Authentication.
+     */
+    const currentUser =
+      auth.currentUser;
+
+    let idToken: string | null = null;
+
+    if (currentUser) {
+      try {
+        idToken =
+          await currentUser.getIdToken();
+      } catch (error) {
+        console.warn(
+          '[SCAN] Não foi possível obter ID Token:',
+          error
+        );
       }
+    }
 
-      return new Promise((resolve, reject) => {
-        const img = new Image();
+    /**
+     * Firebase App Check.
+     */
+    let appCheckToken: string | null = null;
 
-        img.onload = () => {
-          try {
-            const originalWidth = img.naturalWidth;
-            const originalHeight = img.naturalHeight;
+    if (appCheck) {
+      try {
+        const appCheckResult =
+          await getToken(
+            appCheck,
+            false
+          );
 
-            if (!originalWidth || !originalHeight) {
-              reject(new Error('Não foi possível determinar as dimensões da imagem.'));
-              return;
-            }
+        appCheckToken =
+          appCheckResult.token;
+      } catch (error) {
+        console.warn(
+          '[SCAN] App Check indisponível:',
+          error
+        );
+      }
+    }
 
-            // Redimensiona mantendo a proporção.
-            const scale = Math.min(1, maxWidth / originalWidth);
-
-            let width = Math.max(1, Math.round(originalWidth * scale));
-            let height = Math.max(1, Math.round(originalHeight * scale));
-
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-
-            if (!ctx) {
-              reject(new Error('Não foi possível preparar a imagem para análise.'));
-              return;
-            }
-
-            /**
-             * Tenta manter o payload abaixo de ~900 KB.
-             *
-             * O limite é propositalmente menor que 1 MB porque a imagem
-             * ainda será colocada dentro de JSON e o Base64 possui overhead.
-             */
-            const MAX_BYTES = 900 * 1024;
-
-            const getBase64Bytes = (dataUrl: string): number => {
-              const commaIndex = dataUrl.indexOf(',');
-              if (commaIndex === -1) return dataUrl.length;
-
-              const base64 = dataUrl.substring(commaIndex + 1);
-
-              // Tamanho aproximado dos bytes reais representados pelo Base64.
-              const padding =
-                base64.endsWith('==') ? 2 :
-                base64.endsWith('=') ? 1 : 0;
-
-              return Math.floor((base64.length * 3) / 4) - padding;
-            };
-
-            /**
-             * Gera JPEG com as dimensões atuais.
-             */
-            const render = (q: number): string => {
-              canvas.width = width;
-              canvas.height = height;
-
-              // Fundo branco para preservar corretamente imagens transparentes.
-              ctx.fillStyle = '#ffffff';
-              ctx.fillRect(0, 0, width, height);
-
-              ctx.drawImage(img, 0, 0, width, height);
-
-              return canvas.toDataURL('image/jpeg', q);
-            };
-
-            /**
-             * Primeira tentativa.
-             */
-            let currentQuality = quality;
-            let compressed = render(currentQuality);
-
-            /**
-             * Reduz progressivamente a qualidade.
-             */
-            while (
-              getBase64Bytes(compressed) > MAX_BYTES &&
-              currentQuality > 0.35
-            ) {
-              currentQuality = Math.max(0.35, currentQuality - 0.05);
-              compressed = render(currentQuality);
-            }
-
-            /**
-             * Se ainda estiver grande, reduz a resolução.
-             *
-             * Isso é importante principalmente para fotos de iPhone,
-             * que podem ter resolução muito alta mesmo depois do JPEG.
-             */
-            while (
-              getBase64Bytes(compressed) > MAX_BYTES &&
-              width > 640
-            ) {
-              width = Math.max(640, Math.round(width * 0.80));
-              height = Math.max(1, Math.round(height * 0.80));
-
-              currentQuality = 0.50;
-              compressed = render(currentQuality);
-
-              while (
-                getBase64Bytes(compressed) > MAX_BYTES &&
-                currentQuality > 0.35
-              ) {
-                currentQuality = Math.max(0.35, currentQuality - 0.05);
-                compressed = render(currentQuality);
-              }
-            }
-
-            const finalBytes = getBase64Bytes(compressed);
-
-            console.log(
-              '[SCAN] Imagem otimizada:',
-              Math.round(finalBytes / 1024),
-              'KB',
-              'dimensões:',
-              width,
-              'x',
-              height,
-              'qualidade:',
-              currentQuality
-            );
-
-            resolve(compressed);
-          } catch (error) {
-            reject(error);
-          }
-        };
-
-        img.onerror = () => {
-          reject(new Error('Não foi possível carregar a imagem selecionada.'));
-        };
-
-        img.src = source;
-      });
-    };
-
-    const optimizedImage = await compressImageForScan(imageUrl);
-
-    console.log(
-      '[SCAN] Payload Base64:',
-      Math.round((optimizedImage.length * 3) / 4 / 1024),
-      'KB'
+    onProgress?.(
+      'Preparando imagem para análise...'
     );
 
-    onProgress?.('Enviando imagem para análise...');
+    /**
+     * PREPARAÇÃO MOBILE
+     */
+    let optimizedImage: string;
 
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
+    try {
+      optimizedImage =
+        await prepareImageForScan(
+          imageUrl,
+          1280,
+          0.72
+        );
+    } catch (error: any) {
+      console.error(
+        '[SCAN] Falha ao preparar imagem:',
+        error
+      );
+
+      throw new ScanServiceError(
+        error?.message ||
+          'Não foi possível preparar a imagem no dispositivo.',
+        {
+          status: 400,
+          retriable: false,
+          code: 'IMAGE_PREPARATION_FAILED',
+        }
+      );
+    }
+
+    console.log(
+      '[SCAN] Payload:',
+      Math.round(
+        optimizedImage.length / 1024
+      ),
+      'KB base64'
+    );
+
+    onProgress?.(
+      'Enviando imagem para análise...'
+    );
+
+    /**
+     * Headers.
+     */
+    const headers: Record<
+      string,
+      string
+    > = {
+      'Content-Type':
+        'application/json',
+      'Accept':
+        'application/json',
     };
 
     if (idToken) {
-      headers['Authorization'] = `Bearer ${idToken}`;
+      headers['Authorization'] =
+        `Bearer ${idToken}`;
     }
 
     if (appCheckToken) {
-      headers['X-Firebase-AppCheck'] = appCheckToken;
+      headers[
+        'X-Firebase-AppCheck'
+      ] = appCheckToken;
     }
 
-    const response = await fetch('/api/scan', {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({
-        image: optimizedImage,
-      }),
-    });
+    /**
+     * Timeout de segurança.
+     *
+     * Evita que Safari fique indefinidamente
+     * esperando uma conexão problemática.
+     */
+    const controller =
+      new AbortController();
 
-    onProgress?.('Analisando alimentos com IA...');
+    const timeout =
+      window.setTimeout(
+        () => controller.abort(),
+        90000
+      );
 
-    const raw = await response.text();
+    let response: Response;
 
-    let data: HuggingFaceScanResponse;
+    try {
+      response = await fetch(
+        '/api/scan',
+        {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            image: optimizedImage,
+          }),
+          signal:
+            controller.signal,
+          cache: 'no-store',
+        }
+      );
+    } catch (error: any) {
+      if (
+        error?.name ===
+        'AbortError'
+      ) {
+        throw new ScanServiceError(
+          'A análise demorou demais para responder. Verifique sua conexão e tente novamente.',
+          {
+            status: 408,
+            retriable: true,
+            code: 'SCAN_TIMEOUT',
+          }
+        );
+      }
+
+      console.error(
+        '[SCAN] Erro de rede:',
+        error
+      );
+
+      throw new ScanServiceError(
+        'Não foi possível conectar ao servidor de análise. Verifique sua conexão com a internet e tente novamente.',
+        {
+          status: 0,
+          retriable: true,
+          code: 'NETWORK_ERROR',
+        }
+      );
+    } finally {
+      window.clearTimeout(timeout);
+    }
+
+    onProgress?.(
+      'Analisando alimentos com IA...'
+    );
+
+    const raw =
+      await response.text();
+
+    let data:
+      HuggingFaceScanResponse;
+
     try {
       data = JSON.parse(raw);
-    } catch (e) {
-      console.error("Resposta não-JSON do /api/scan:", response.status);
-      throw new Error(`Falha no Scan (HTTP ${response.status}). A API não retornou JSON.`);
+    } catch {
+      console.error(
+        '[SCAN] Resposta não JSON:',
+        {
+          status:
+            response.status,
+          body:
+            raw.substring(
+              0,
+              1000
+            ),
+        }
+      );
+
+      throw new ScanServiceError(
+        `Falha no Scan (HTTP ${response.status}). A API não retornou JSON.`,
+        {
+          status:
+            response.status,
+          retriable:
+            response.status >= 500,
+          code:
+            'INVALID_API_RESPONSE',
+        }
+      );
     }
 
     const isBusy =
       response.status === 503 ||
       response.status === 429 ||
-      (typeof data?.error === 'string' &&
-        (data.error.toLowerCase().includes('ocupado') ||
-         data.error.toLowerCase().includes('busy') ||
-         data.error.toLowerCase().includes('overloaded') ||
-         data.error.toLowerCase().includes('loading')));
+      (
+        typeof data?.error ===
+          'string' &&
+        (
+          data.error
+            .toLowerCase()
+            .includes('ocupado') ||
+          data.error
+            .toLowerCase()
+            .includes('busy') ||
+          data.error
+            .toLowerCase()
+            .includes(
+              'overloaded'
+            ) ||
+          data.error
+            .toLowerCase()
+            .includes(
+              'loading'
+            )
+        )
+      );
 
-    if (!response.ok || !data.success) {
-      const retryAfterHeader = response.headers.get("Retry-After");
-      const retryAfterSeconds = retryAfterHeader ? Number(retryAfterHeader) : data?.retryAfterSeconds;
+    if (
+      !response.ok ||
+      !data.success
+    ) {
+      const retryAfterHeader =
+        response.headers.get(
+          'Retry-After'
+        );
 
-      // 403 = Scan não habilitado para esta conta
-      if (response.status === 403 || data?.code === 'SCAN_NOT_ENABLED') {
+      const retryAfterSeconds =
+        retryAfterHeader
+          ? Number(
+              retryAfterHeader
+            )
+          : data?.retryAfterSeconds;
+
+      if (
+        response.status === 403 ||
+        data?.code ===
+          'SCAN_NOT_ENABLED'
+      ) {
         throw new ScanServiceError(
-          data?.error || "O reconhecimento por imagem não está habilitado para esta conta.",
-          { status: 403, retriable: false, code: 'SCAN_NOT_ENABLED' }
+          data?.error ||
+            'O reconhecimento por imagem não está habilitado para esta conta.',
+          {
+            status: 403,
+            retriable: false,
+            code:
+              'SCAN_NOT_ENABLED',
+          }
         );
       }
 
-      if (response.status === 401) {
+      if (
+        response.status === 401
+      ) {
         throw new ScanServiceError(
-          data?.error || "Você precisa estar conectado à sua conta para escanear alimentos.",
-          { status: 401, retriable: false, code: 'AUTH_REQUIRED' }
+          data?.error ||
+            'Você precisa estar conectado à sua conta para escanear alimentos.',
+          {
+            status: 401,
+            retriable: false,
+            code:
+              'AUTH_REQUIRED',
+          }
         );
       }
 
-      // 503 = ocupado/temporário (retriable)
-      if (response.status === 503 || isBusy) {
+      if (
+        response.status === 503 ||
+        isBusy
+      ) {
         throw new ScanServiceError(
-          data?.error || "Servidor da IA está ocupado no momento. Tente novamente.",
-          { status: 503, retryAfterSeconds, retriable: true, code: data?.code }
+          data?.error ||
+            'Servidor da IA está ocupado no momento. Tente novamente.',
+          {
+            status: 503,
+            retryAfterSeconds,
+            retriable: true,
+            code:
+              data?.code,
+          }
         );
       }
 
-      // outros erros
-      throw new ScanServiceError(data?.error || "Não foi possível analisar a imagem.", {
-        status: response.status,
-        retryAfterSeconds,
-        retriable: response.status === 429,
-        code: data?.code,
-      });
+      throw new ScanServiceError(
+        data?.error ||
+          'Não foi possível analisar a imagem.',
+        {
+          status:
+            response.status,
+          retryAfterSeconds,
+          retriable:
+            response.status ===
+            429,
+          code:
+            data?.code,
+        }
+      );
     }
 
     if (!data.result) {
-      throw new ScanServiceError('A IA não retornou nenhum resultado.', { status: 500, retriable: false });
+      throw new ScanServiceError(
+        'A IA não retornou nenhum resultado.',
+        {
+          status: 500,
+          retriable: false,
+          code:
+            'EMPTY_AI_RESULT',
+        }
+      );
     }
 
-    onProgress?.('Processando alimentos identificados...');
+    onProgress?.(
+      'Processando alimentos identificados...'
+    );
 
-    return this.parseStructuredResult(data.result);
+    return this.parseStructuredResult(
+      data.result
+    );
   }
 
-  private parseStructuredResult(result: string): DetectedFoodItem[] {
-    let parsed: StructuredFoodDetection;
+  private parseStructuredResult(
+    result: string
+  ): DetectedFoodItem[] {
+
+    let parsed:
+      StructuredFoodDetection;
 
     try {
-      const cleanedJson = extractJsonFromText(result);
-      parsed = JSON.parse(cleanedJson);
-      console.log('RESULTADO APÓS PARSE:', parsed);
+      const cleanedJson =
+        extractJsonFromText(
+          result
+        );
+
+      parsed =
+        JSON.parse(
+          cleanedJson
+        );
+
+      console.log(
+        'RESULTADO APÓS PARSE:',
+        parsed
+      );
     } catch (error) {
       console.error(
-        'O Hugging Face retornou um JSON inválido:',
+        'JSON inválido retornado pela IA:',
         result,
         error
       );
 
-      throw new Error(
-        'A IA retornou uma resposta inválida. Tente tirar a foto novamente.'
+      throw new ScanServiceError(
+        'A IA retornou uma resposta inválida. Tente tirar a foto novamente.',
+        {
+          status: 502,
+          retriable: true,
+          code:
+            'INVALID_AI_RESULT',
+        }
       );
     }
 
-    if (!parsed || !Array.isArray(parsed.items)) {
-      throw new Error('A IA não retornou uma lista válida de alimentos.');
+    if (
+      !parsed ||
+      !Array.isArray(
+        parsed.items
+      )
+    ) {
+      throw new ScanServiceError(
+        'A IA não retornou uma lista válida de alimentos.',
+        {
+          status: 502,
+          retriable: true,
+          code:
+            'INVALID_AI_ITEMS',
+        }
+      );
     }
 
-    /*
-     * ETAPA 1: FILTRO E SANITIZAÇÃO INDIVIDUAL
-     * - Rejeita categoria 'other' (Regra 2)
-     * - Rejeita objetos e não-alimentos (Regras 1, 3, 7, 8)
-     * - Limpa markdown e espaços extras (Regras 4, 5, 6)
-     * - Valida e atribui padrões seguros: confidence (0.9), location (null), state ('fresh')
-     */
-    const individualValidItems: Array<{
-      name: string;
-      category: DetectedFoodItem['category'];
-      quantity: number;
-      unit: DetectedFoodItem['unit'];
-      state: DetectedFoodItem['state'];
-      location: DetectedFoodItem['location'];
-      confidence: number;
-      expiryDate?: string;
-    }> = [];
+    const individualValidItems:
+      Array<{
+        name: string;
+        category:
+          DetectedFoodItem['category'];
+        quantity: number;
+        unit:
+          DetectedFoodItem['unit'];
+        state:
+          DetectedFoodItem['state'];
+        location:
+          DetectedFoodItem['location'];
+        confidence: number;
+        expiryDate?: string;
+      }> = [];
 
-    for (const item of parsed.items) {
-      if (!this.isValidFoodItem(item)) {
-        console.warn('Item rejeitado pelo filtro de alimentos:', item);
+    for (
+      const item of parsed.items
+    ) {
+      if (
+        !this.isValidFoodItem(
+          item
+        )
+      ) {
+        console.warn(
+          'Item rejeitado:',
+          item
+        );
         continue;
       }
 
-      const cleanedName = cleanFoodName(item.name);
+      const cleanedName =
+        cleanFoodName(
+          item.name
+        );
 
-      // Rejeição estrita de termos proibidos / objetos
-      if (isClearlyNonFood(cleanedName)) {
-        console.warn('Item não-alimentício rejeitado:', cleanedName);
+      if (
+        isClearlyNonFood(
+          cleanedName
+        )
+      ) {
+        console.warn(
+          'Item não alimentício rejeitado:',
+          cleanedName
+        );
+
         continue;
       }
 
-      const finalUnit = (item.unit as DetectedFoodItem['unit']) || 'un';
-      // Validação e normalização de quantidade (se unit for "un", força inteiro >= 1, se vazio/NaN vira 1)
-      const finalQuantity = normalizeQty(item.quantity, finalUnit);
+      const finalUnit =
+        (
+          item.unit as
+            DetectedFoodItem['unit']
+        ) || 'un';
 
-      // Valores padrão seguros para campos ausentes ou parciais
+      const finalQuantity =
+        normalizeQty(
+          item.quantity,
+          finalUnit
+        );
+
       const finalConfidence =
-        typeof item.confidence === 'number' &&
-        Number.isFinite(item.confidence) &&
+        typeof item.confidence ===
+          'number' &&
+        Number.isFinite(
+          item.confidence
+        ) &&
         item.confidence >= 0 &&
         item.confidence <= 1
           ? item.confidence
           : 0.9;
 
-      const finalState = normalizeFreshness(item.state);
-      const finalLocation = (item.location as DetectedFoodItem['location']) ?? null;
-      
-      // Aplica taxonomia determinística para corrigir alucinações da IA (ex: Banana -> fruits)
-      const resolvedCategory = resolveFoodCategory(cleanedName, item.category as DetectedFoodItem['category']);
-      const finalCategory = (ALLOWED_CATEGORIES.includes(resolvedCategory as any)
-        ? resolvedCategory
-        : item.category) as DetectedFoodItem['category'];
+      const finalState =
+        normalizeFreshness(
+          item.state
+        );
+
+      const finalLocation =
+        (
+          item.location as
+            DetectedFoodItem['location']
+        ) ?? null;
+
+      const resolvedCategory =
+        resolveFoodCategory(
+          cleanedName,
+          item.category as
+            DetectedFoodItem['category']
+        );
+
+      const finalCategory =
+        (
+          ALLOWED_CATEGORIES.includes(
+            resolvedCategory as any
+          )
+            ? resolvedCategory
+            : item.category
+        ) as DetectedFoodItem['category'];
 
       individualValidItems.push({
-        name: cleanedName,
-        category: finalCategory,
-        quantity: finalQuantity,
-        unit: finalUnit,
-        state: finalState,
-        location: finalLocation,
-        confidence: finalConfidence,
-        expiryDate: item.expiryDate || undefined,
+        name:
+          cleanedName,
+        category:
+          finalCategory,
+        quantity:
+          finalQuantity,
+        unit:
+          finalUnit,
+        state:
+          finalState,
+        location:
+          finalLocation,
+        confidence:
+          finalConfidence,
+        expiryDate:
+          item.expiryDate ||
+          undefined,
       });
     }
 
-    /*
-     * ETAPA 2: GERAÇÃO DOS ITENS INICIAIS E MESCLAGEM (mergeDetectedItems)
-     * Exemplo: Banana (1), Banana (1) -> Banana (2)
-     * Preserva confiança máxima, soma quantidades e normaliza unidades.
-     */
-    const initialItems: DetectedFoodItem[] = individualValidItems.map((item) => ({
-      id: `det_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
-      name: item.name,
-      category: item.category,
-      quantity: normalizeQty(item.quantity, item.unit),
-      unit: item.unit,
-      state: item.state,
-      location: item.location,
-      confidence: item.confidence,
-      expiryDate: item.expiryDate,
-      selected: true,
-    }));
+    const initialItems:
+      DetectedFoodItem[] =
+        individualValidItems.map(
+          (item) => ({
+            id:
+              `det_${Date.now()}_${Math.random()
+                .toString(36)
+                .substring(2, 7)}`,
 
-    const validItems = mergeDetectedItems(initialItems);
+            name:
+              item.name,
 
-    // Regra 9: Se após o filtro não sobrar nenhum alimento, retornar array vazio []
-    console.log('RESULTADO APÓS FILTRO:', validItems);
+            category:
+              item.category,
+
+            quantity:
+              normalizeQty(
+                item.quantity,
+                item.unit
+              ),
+
+            unit:
+              item.unit,
+
+            state:
+              item.state,
+
+            location:
+              item.location,
+
+            confidence:
+              item.confidence,
+
+            expiryDate:
+              item.expiryDate,
+
+            selected:
+              true,
+          })
+        );
+
+    const validItems =
+      mergeDetectedItems(
+        initialItems
+      );
+
+    console.log(
+      'RESULTADO APÓS FILTRO:',
+      validItems
+    );
+
     return validItems;
   }
 
   private isValidFoodItem(
     item: any
   ): boolean {
-    if (!item || typeof item !== 'object') {
+
+    if (
+      !item ||
+      typeof item !==
+        'object'
+    ) {
       return false;
     }
 
     if (
-      typeof item.name !== 'string' ||
+      typeof item.name !==
+        'string' ||
       !item.name.trim()
     ) {
       return false;
     }
 
-    // Regra 2: Rejeitar completamente 'other' ou categorias não alimentícias
     const category =
       typeof item.category === 'string'
-        ? (item.category.toLowerCase().trim() as DetectedFoodItem['category'])
+        ? ((item.category.toLowerCase().trim()) as DetectedFoodItem['category'])
         : undefined;
 
     if (
       !category ||
-      category === 'other' ||
-      !ALLOWED_CATEGORIES.includes(category)
+      category ===
+        'other' ||
+      !ALLOWED_CATEGORIES.includes(
+        category
+      )
     ) {
       return false;
     }
@@ -867,4 +1422,5 @@ class HuggingFaceScannerService implements IScannerService {
   }
 }
 
-export const scannerService = new HuggingFaceScannerService();
+export const scannerService =
+  new HuggingFaceScannerService();
