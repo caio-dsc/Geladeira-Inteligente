@@ -13,7 +13,7 @@ import { recipeService } from './services/recipeService';
 import { Header } from './components/layout/Header';
 import { BottomNavigation } from './components/layout/BottomNavigation';
 import { LoadingState } from './components/common/LoadingState';
-import { CreditsModal } from './components/common/CreditsModal';
+import { UpgradeModal } from './components/common/UpgradeModal';
 
 import { LoginView } from './components/views/LoginView';
 import { DashboardView } from './components/views/DashboardView';
@@ -48,7 +48,7 @@ export default function App() {
   const [isFoodModalOpen, setIsFoodModalOpen] = useState(false);
   const [editingFoodItem, setEditingFoodItem] = useState<FoodItem | null>(null);
   const [selectedRecipe, setSelectedRecipe] = useState<RecipeMatch | null>(null);
-  const [isCreditsModalOpen, setIsCreditsModalOpen] = useState(false);
+  const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
   const [isQuickGuideOpen, setIsQuickGuideOpen] = useState(false);
 
   // Cooking timer session state com persistência
@@ -370,11 +370,6 @@ export default function App() {
     }
   };
 
-  const handleAddCredits = async (amount: number) => {
-    await authService.addCredits(amount);
-    showToast(`+${amount} créditos adicionados com sucesso!`);
-  };
-
   if (isLoading) {
     return <LoadingState message="Inicializando Geladeira Inteligente..." fullscreen />;
   }
@@ -403,7 +398,7 @@ export default function App() {
         onTabChange={setActiveTab}
         user={user}
         onSignOut={handleSignOut}
-        onOpenCreditsModal={() => setIsCreditsModalOpen(true)}
+        onOpenUpgradeModal={() => setIsUpgradeModalOpen(true)}
       />
 
       {/* Main Content Area */}
@@ -419,27 +414,34 @@ export default function App() {
               setIsFoodModalOpen(true);
             }}
             onSelectRecipe={setSelectedRecipe}
-            onOpenCreditsModal={() => setIsCreditsModalOpen(true)}
+            onOpenUpgradeModal={() => setIsUpgradeModalOpen(true)}
             onOpenQuickGuide={() => setIsQuickGuideOpen(true)}
           />
         )}
 
         {activeTab === 'scanner' && (
           <ScannerView
-            userCredits={user.credits}
-            onDeductCredit={async (amount) => {
-              try {
-                await authService.deductCredit(amount);
-                return true;
-              } catch {
-                return false;
+            scanEnabled={Boolean(user.scanEnabled)}
+            isAdmin={Boolean(user.isAdmin)}
+            onToggleScanEnabled={async () => {
+              if (user.isAdmin) {
+                const nextVal = !user.scanEnabled;
+                await authService.updateScanEnabled(user.id, nextVal);
+                setUser({ ...user, scanEnabled: nextVal });
+                showToast(`Scan ${nextVal ? 'liberado' : 'bloqueado'} para sua conta.`);
               }
             }}
             onItemsAdded={(count) => {
               showToast(`${count} alimentos adicionados à sua geladeira!`);
             }}
             onNavigateToInventory={() => setActiveTab('inventory')}
-            onOpenCreditsModal={() => setIsCreditsModalOpen(true)}
+            onNavigateToShoppingList={() => setActiveTab('shoppingList')}
+            onNavigateToRecipes={() => setActiveTab('recipes')}
+            onOpenFoodModal={() => {
+              setEditingFoodItem(null);
+              setIsFoodModalOpen(true);
+            }}
+            onOpenUpgradeModal={() => setIsUpgradeModalOpen(true)}
           />
         )}
 
@@ -542,11 +544,14 @@ export default function App() {
         />
       )}
 
-      <CreditsModal
-        isOpen={isCreditsModalOpen}
-        onClose={() => setIsCreditsModalOpen(false)}
-        credits={user.credits}
-        onAddCredits={handleAddCredits}
+      <UpgradeModal
+        isOpen={isUpgradeModalOpen}
+        onClose={() => setIsUpgradeModalOpen(false)}
+        onOpenFoodModal={() => {
+          setEditingFoodItem(null);
+          setIsFoodModalOpen(true);
+        }}
+        onNavigateToInventory={() => setActiveTab('inventory')}
       />
 
       <QuickGuideModal

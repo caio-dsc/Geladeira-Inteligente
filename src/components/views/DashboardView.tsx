@@ -26,7 +26,8 @@ import {
   ShoppingCart,
   HelpCircle,
   Clock,
-  Sparkles
+  Sparkles,
+  Lock
 } from 'lucide-react';
 
 export interface DashboardViewProps {
@@ -36,7 +37,8 @@ export interface DashboardViewProps {
   onNavigate: (tab: NavigationTab) => void;
   onOpenFoodModal: () => void;
   onSelectRecipe: (recipe: RecipeMatch) => void;
-  onOpenCreditsModal: () => void;
+  onOpenUpgradeModal?: () => void;
+  onOpenCreditsModal?: () => void;
   onOpenQuickGuide?: () => void;
 }
 
@@ -47,9 +49,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   onNavigate,
   onOpenFoodModal,
   onSelectRecipe,
+  onOpenUpgradeModal,
   onOpenCreditsModal,
   onOpenQuickGuide,
 }) => {
+  const handleUpgradeModal = onOpenUpgradeModal || onOpenCreditsModal;
   // Real inventory metrics
   const freshCount = useMemo(() => inventory.filter((i) => i.state === 'fresh').length, [inventory]);
   const frozenCount = useMemo(() => inventory.filter((i) => i.state === 'frozen').length, [inventory]);
@@ -114,9 +118,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </p>
         </div>
 
-        {/* User credits badge */}
+        {/* User scanEnabled badge */}
         <div className="flex items-center gap-2.5 self-start sm:self-auto">
-          <CreditBadge credits={user.credits} onClick={onOpenCreditsModal} />
+          <CreditBadge scanEnabled={user.scanEnabled} onClick={handleUpgradeModal} />
         </div>
       </section>
 
@@ -191,42 +195,91 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
           <div className="relative z-10 max-w-xl">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 text-white text-xs font-semibold mb-3.5 border border-white/20 backdrop-blur-md shadow-subtle">
-              <Sparkles className="w-3.5 h-3.5 text-white" />
-              <span>Visão Computacional & Culinária</span>
+              {user.scanEnabled ? (
+                <>
+                  <Sparkles className="w-3.5 h-3.5 text-white" />
+                  <span>Visão Computacional & Culinária • Scan Liberado</span>
+                </>
+              ) : (
+                <>
+                  <Lock className="w-3.5 h-3.5 text-amber-300" />
+                  <span>Conta Gratuita • Recursos Manuais & Receitas</span>
+                </>
+              )}
             </div>
 
             <h2 className="text-2xl sm:text-4xl font-black tracking-tight text-white leading-tight">
-              Escanear alimentos da geladeira
+              {user.scanEnabled ? 'Escanear alimentos da geladeira' : 'Gerencie seus alimentos e receitas'}
             </h2>
 
             <p className="mt-2 text-sm sm:text-base text-white/90 leading-relaxed font-normal">
-              Aponte a câmera para as prateleiras ou gavetas para identificar ingredientes automaticamente, acompanhar prazos de validade e desbloquear receitas.
+              {user.scanEnabled
+                ? 'Aponte a câmera para as prateleiras ou gavetas para identificar ingredientes automaticamente com IA, acompanhar prazos de validade e desbloquear receitas.'
+                : 'Cadastre seus ingredientes manualmente, acompanhe prazos de validade na geladeira, planeje sua lista de mercado e descubra receitas deliciosas.'}
             </p>
 
             <div className="mt-6 flex flex-wrap items-center gap-3">
-              {/* PRIMARY HERO BUTTON */}
-              <Button
-                id="hero-scan-fridge-btn"
-                variant="primary"
-                size="lg"
-                onClick={() => onNavigate('scanner')}
-                className="font-bold text-sm sm:text-base px-6 sm:px-8 py-3.5 shadow-soft cursor-pointer hover:scale-[1.02] active:scale-[0.98] border border-white/30"
-                leftIcon={<Camera className="w-5 h-5 text-white shrink-0" />}
-              >
-                Escanear alimentos
-              </Button>
+              {user.scanEnabled ? (
+                <>
+                  {/* PRIMARY HERO BUTTON - SCAN LIBERADO */}
+                  <Button
+                    id="hero-scan-fridge-btn"
+                    variant="primary"
+                    size="lg"
+                    onClick={() => onNavigate('scanner')}
+                    className="font-bold text-sm sm:text-base px-6 sm:px-8 py-3.5 shadow-soft cursor-pointer hover:scale-[1.02] active:scale-[0.98] border border-white/30"
+                    leftIcon={<Camera className="w-5 h-5 text-white shrink-0" />}
+                  >
+                    Escanear alimentos
+                  </Button>
 
-              {/* SECONDARY MANUAL ADD BUTTON */}
-              <Button
-                id="hero-manual-add-btn"
-                variant="secondary"
-                size="md"
-                onClick={onOpenFoodModal}
-                className="text-xs sm:text-sm font-semibold py-3 px-4.5 bg-white/15 hover:bg-white/25 text-white border-white/25"
-                leftIcon={<Plus className="w-4 h-4 text-white" />}
-              >
-                Adicionar alimento manualmente
-              </Button>
+                  {/* SECONDARY MANUAL ADD BUTTON */}
+                  <Button
+                    id="hero-manual-add-btn"
+                    variant="secondary"
+                    size="md"
+                    onClick={onOpenFoodModal}
+                    className="text-xs sm:text-sm font-semibold py-3 px-4.5 bg-white/15 hover:bg-white/25 text-white border-white/25"
+                    leftIcon={<Plus className="w-4 h-4 text-white" />}
+                  >
+                    Adicionar alimento manualmente
+                  </Button>
+                </>
+              ) : (
+                <>
+                  {/* CONTA GRATUITA: MANUAL ADD É O PRINCIPAL */}
+                  <Button
+                    id="hero-manual-add-btn"
+                    variant="primary"
+                    size="lg"
+                    onClick={onOpenFoodModal}
+                    className="font-bold text-sm sm:text-base px-6 sm:px-8 py-3.5 shadow-soft cursor-pointer hover:scale-[1.02] active:scale-[0.98] border border-white/30"
+                    leftIcon={<Plus className="w-5 h-5 text-white shrink-0" />}
+                  >
+                    Adicionar alimento manualmente
+                  </Button>
+
+                  <Button
+                    variant="secondary"
+                    size="md"
+                    onClick={() => onNavigate('inventory')}
+                    className="text-xs sm:text-sm font-semibold py-3 px-4.5 bg-white/15 hover:bg-white/25 text-white border-white/25"
+                    leftIcon={<UtensilsCrossed className="w-4 h-4 text-white" />}
+                  >
+                    Ver Minha Geladeira
+                  </Button>
+
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onNavigate('scanner')}
+                    className="text-xs font-medium text-white/80 hover:text-white hover:bg-white/10"
+                    leftIcon={<Lock className="w-3.5 h-3.5 text-amber-300" />}
+                  >
+                    Scan com IA (Bloqueado)
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>

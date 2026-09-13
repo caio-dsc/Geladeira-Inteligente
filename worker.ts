@@ -3,17 +3,14 @@ import { foodDetectionPrompt } from "./functions/_ai/foodPrompt";
 import {
   validateFirebaseAuth,
   validateAppCheck,
-  checkAndDeductCredit,
   checkRateLimit,
-  configureFirestoreServiceAccount,
   FIREBASE_PROJECT_ID,
+  buscarUsuario,
   SecurityError,
 } from "./functions/_ai/security";
 
 type Env = {
   HF_TOKEN: string;
-  FIRESTORE_CLIENT_EMAIL: string;
-  FIRESTORE_PRIVATE_KEY: string;
   ENFORCE_APP_CHECK?: string;
   ASSETS: {
     fetch: (request: Request) => Promise<Response>;
@@ -82,11 +79,6 @@ async function callHfWithRetry(env: any, payload: any, maxAttempts = 4) {
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    configureFirestoreServiceAccount(
-      env.FIRESTORE_CLIENT_EMAIL,
-      env.FIRESTORE_PRIVATE_KEY
-    );
-
     const url = new URL(request.url);
 
     // --- API /api/scan ---
@@ -98,7 +90,13 @@ export default {
         );
       }
 
-      // 1. Validação Criptográfica do Firebase Auth ID Token (Bearer)
+      // ======================================================================
+      // FLUXO DE EXECUÇÃO:
+      // Request -> Firebase Auth -> App Check -> Rate Limit ->
+      // Verificar acesso ao Scan -> Hugging Face -> Resultado
+      // ======================================================================
+
+      // 1. Firebase Auth: Validação Criptográfica do Firebase Auth ID Token (Bearer)
       let user;
       try {
         user = await validateFirebaseAuth(request, FIREBASE_PROJECT_ID);
@@ -110,7 +108,7 @@ export default {
         );
       }
 
-      // 2. Validação do Firebase App Check Token
+      // 2. App Check: Validação de Integridade do App
       try {
         const enforceAppCheck = env.ENFORCE_APP_CHECK === "true";
         await validateAppCheck(request, FIREBASE_PROJECT_ID, enforceAppCheck);
@@ -122,7 +120,7 @@ export default {
         );
       }
 
-      // 3. Proteção contra Abuso (Rate Limiting por UID)
+      // 3. Rate Limit: Proteção contra Abuso (Rate Limiting por UID - 6 req/min)
       try {
         checkRateLimit(user.uid, 6, 60000);
       } catch (rateErr: any) {
@@ -136,34 +134,39 @@ export default {
         );
       }
 
-      // 4. Leitura do Payload e Suporte a Débito Direto de Crédito
+      // 4. Verificar acesso ao Scan no Firestore (users/{uid})
+      const userDoc = await buscarUsuario(user.uid, user.token);
+
+      if (!userDoc.exists) {
+        return json(
+          {
+            success: false,
+            error: "O reconhecimento por imagem não está habilitado para esta conta.",
+            code: "SCAN_NOT_ENABLED",
+          },
+          { status: 403 }
+        );
+      }
+
+      const userData = userDoc.data();
+
+      if (userData.scanEnabled !== true) {
+        return json(
+          {
+            success: false,
+            error: "O reconhecimento por imagem não está habilitado para esta conta.",
+            code: "SCAN_NOT_ENABLED",
+          },
+          { status: 403 }
+        );
+      }
+
+      // 5. Validação do Payload
       let body: any = {};
       try {
         body = await request.json();
       } catch {
         body = {};
-      }
-
-      // Caso especial: requisição de transação de débito direto
-      if (body?.deductOnly === true) {
-        let deduction;
-        try {
-          deduction = await checkAndDeductCredit(user.uid, 1, user.token);
-        } catch (creditErr: any) {
-          const secErr = creditErr as SecurityError;
-          return json(
-            { success: false, error: secErr.message, code: secErr.code, remainingCredits: 0 },
-            { status: secErr.status || 402 }
-          );
-        }
-
-        return json(
-          {
-            success: true,
-            remainingCredits: deduction.remainingCredits,
-          },
-          { status: 200 }
-        );
       }
 
       const image = body?.image;
@@ -188,20 +191,7 @@ export default {
         );
       }
 
-      // 5. Verificação e Consumo Atômico de Créditos via Transação no Firestore
-      // UID autenticado -> Firestore transaction -> credits > 0 ? -> credits = credits - 1
-      let deduction;
-      try {
-        deduction = await checkAndDeductCredit(user.uid, 1, user.token);
-      } catch (creditErr: any) {
-        const secErr = creditErr as SecurityError;
-        return json(
-          { success: false, error: secErr.message, code: secErr.code, remainingCredits: 0 },
-          { status: secErr.status || 402 }
-        );
-      }
-
-      // 6. Verificação da Chave de Servidor do Hugging Face
+      // 5. Hugging Face: Processamento de IA com retry resiliente
       if (!env.HF_TOKEN) {
         return json(
           { success: false, error: "HF_TOKEN não configurado no Worker." },
@@ -265,7 +255,6 @@ export default {
             success: true,
             result,
             model: MODEL,
-            remainingCredits: deduction.remainingCredits,
           },
           { status: 200 }
         );

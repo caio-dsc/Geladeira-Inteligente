@@ -2,7 +2,7 @@
   "entities": {
     "UserProfile": {
       "title": "UserProfile",
-      "description": "Perfil do usuário, preferências alimentares e saldo de créditos",
+      "description": "Perfil do usuário, preferências alimentares e permissão de acesso ao escaneamento por IA",
       "type": "object",
       "properties": {
         "id": { "type": "string" },
@@ -10,6 +10,7 @@
         "email": { "type": "string" },
         "avatarUrl": { "type": "string" },
         "credits": { "type": "number" },
+        "scanEnabled": { "type": "boolean" },
         "preferences": {
           "type": "object",
           "properties": {

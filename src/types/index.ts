@@ -120,7 +120,8 @@ export interface User {
   name: string;
   email: string;
   avatarUrl: string;
-  credits: number;
+  scanEnabled?: boolean;
+  credits?: number;
   preferences: UserPreferences;
   createdAt: string;
   age?: number | null;

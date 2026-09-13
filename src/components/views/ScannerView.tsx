@@ -21,6 +21,10 @@ import {
   RefreshCw,
   Smartphone,
   Monitor,
+  Lock,
+  BookOpen,
+  ShoppingCart,
+  UtensilsCrossed,
 } from 'lucide-react';
 
 import { Card } from '../common/Card';
@@ -36,22 +40,39 @@ import {
   getCategoryLabel,
 } from '../food/FoodCard';
 import { ErrorState } from '../common/ErrorState';
+import { UpgradeModal } from '../common/UpgradeModal';
 
 export interface ScannerViewProps {
-  userCredits: number;
-  onDeductCredit: (amount: number) => Promise<boolean>;
+  scanEnabled?: boolean;
+  isAdmin?: boolean;
+  onToggleScanEnabled?: () => Promise<void> | void;
   onItemsAdded: (count: number) => void;
   onNavigateToInventory: () => void;
-  onOpenCreditsModal: () => void;
+  onNavigateToShoppingList?: () => void;
+  onNavigateToRecipes?: () => void;
+  onOpenFoodModal?: () => void;
+  onOpenUpgradeModal?: () => void;
+  userCredits?: number;
+  onDeductCredit?: (amount: number) => Promise<boolean>;
+  onOpenCreditsModal?: () => void;
 }
 
 export const ScannerView: React.FC<ScannerViewProps> = ({
-  userCredits,
-  onDeductCredit,
+  scanEnabled = true,
+  isAdmin = false,
+  onToggleScanEnabled,
   onItemsAdded,
   onNavigateToInventory,
+  onNavigateToShoppingList,
+  onNavigateToRecipes,
+  onOpenFoodModal,
+  onOpenUpgradeModal,
+  userCredits,
+  onDeductCredit,
   onOpenCreditsModal,
 }) => {
+  const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
+  const handleOpenUpgrade = onOpenUpgradeModal || onOpenCreditsModal || (() => setIsUpgradeModalOpen(true));
   const [selectedImage, setSelectedImage] =
     useState<string | null>(null);
 
@@ -632,16 +653,6 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
       throw new Error('Nenhum alimento foi identificado com clareza. Tente uma foto mais próxima.');
     }
 
-    // Se for foto de amostra local de teste, deduz no cliente; para fotos reais, a dedução atômica já ocorreu no backend
-    const isSample = SAMPLE_FRIDGE_IMAGES.some((s) => s.url === imageToScan);
-    if (isSample) {
-      const deducted = await onDeductCredit(1);
-      if (!deducted) {
-        onOpenCreditsModal();
-        throw new Error('Sem créditos para concluir a análise.');
-      }
-    }
-
     setDetectedItems(sanitized);
     setScanStatus('success');
   };
@@ -649,8 +660,9 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
   const handleStartScan = async () => {
     if (!selectedImage) return;
 
-    if (userCredits <= 0) {
-      onOpenCreditsModal();
+    if (scanEnabled === false) {
+      setScanStatus('error');
+      setErrorMessage('Acesso ao Scan com IA bloqueado para conta gratuita (scanEnabled = false).');
       return;
     }
 
@@ -662,8 +674,8 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
 
       await runScan(selectedImage);
     } catch (err: any) {
-      if (err?.name === 'ScanServiceError' && (err?.status === 402 || err?.code === 'INSUFFICIENT_CREDITS')) {
-        onOpenCreditsModal();
+      if (err?.name === 'ScanServiceError' && (err?.status === 403 || err?.code === 'SCAN_NOT_ENABLED')) {
+        handleOpenUpgrade();
       } else if (err?.name === 'ScanServiceError' && err?.status === 503) {
         const waitSec = typeof err.retryAfterSeconds === 'number' ? err.retryAfterSeconds : 3;
         setRetryIn(waitSec);
@@ -973,6 +985,215 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
       (i) => i.selected
     );
 
+  // BLOQUEIO DE ACESSO CONTA GRATUITA (scanEnabled = false) - FASE 13
+  if (scanEnabled === false) {
+    return (
+      <div className="space-y-6 max-w-3xl mx-auto pb-24 md:pb-10 text-text-primary text-left">
+        {/* HEADER BLOQUEADO */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-800 bg-amber-50 px-3 py-1 rounded-full border border-amber-200/80 mb-2 backdrop-blur-xs">
+              <Camera className="w-3.5 h-3.5 text-amber-700" />
+              <span>Plano Completo</span>
+            </div>
+
+            <h1 className="text-2xl sm:text-3xl font-black text-text-primary tracking-tight">
+              Reconhecimento por imagem
+            </h1>
+
+            <p className="text-sm sm:text-base font-semibold text-text-primary mt-1">
+              O reconhecimento automático da geladeira está disponível no plano completo.
+            </p>
+            <p className="text-xs sm:text-sm text-text-secondary mt-0.5">
+              Você pode continuar adicionando alimentos manualmente gratuitamente.
+            </p>
+          </div>
+
+          <div className="inline-flex items-center gap-2 text-xs font-semibold text-amber-800 bg-amber-50/80 px-3.5 py-2 rounded-xl border border-amber-200 shadow-subtle self-start sm:self-auto">
+            <Lock className="w-4 h-4 text-amber-600 shrink-0" />
+            <span>Scan Bloqueado</span>
+          </div>
+        </div>
+
+        {/* HERO CARD DE UPGRADE (FASE 13) */}
+        <Card variant="default" padding="lg" className="border-border shadow-subtle relative overflow-hidden">
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 pb-5 border-b border-border">
+              <div className="w-14 h-14 rounded-2xl bg-amber-100/80 text-amber-700 flex items-center justify-center shrink-0 shadow-subtle border border-amber-200">
+                <Lock className="w-7 h-7" />
+              </div>
+              <div className="space-y-1">
+                <h2 className="text-lg sm:text-xl font-bold text-text-primary">
+                  Reconhecimento por imagem
+                </h2>
+                <p className="text-sm font-semibold text-text-primary">
+                  O reconhecimento automático da geladeira está disponível no plano completo.
+                </p>
+                <p className="text-xs sm:text-sm text-text-secondary">
+                  Você pode continuar adicionando alimentos manualmente gratuitamente.
+                </p>
+              </div>
+            </div>
+
+            {/* BOTÃO PRINCIPAL FASE 13: CONHECER O ACESSO COMPLETO */}
+            <div>
+              <Button
+                variant="primary"
+                size="lg"
+                onClick={() => handleOpenUpgrade()}
+                leftIcon={<Sparkles className="w-5 h-5 text-white" />}
+                className="w-full sm:w-auto font-bold text-sm sm:text-base shadow-soft"
+              >
+                Conhecer o acesso completo
+              </Button>
+            </div>
+
+            {/* FLUXO DA CONTA GRATUITA */}
+            <div>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-text-secondary mb-3">
+                Recursos disponíveis na sua Conta Gratuita:
+              </h3>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                {/* 1. Adicionar alimento manualmente */}
+                <div 
+                  onClick={onOpenFoodModal}
+                  className="p-4 rounded-xl border border-border bg-surface-muted/40 hover:bg-surface-muted/80 hover:border-primary/40 transition-all cursor-pointer group shadow-xs"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                      <Plus className="w-5 h-5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm font-bold text-text-primary group-hover:text-primary transition-colors">
+                        Adicionar Alimento Manualmente
+                      </h4>
+                      <p className="text-xs text-text-secondary mt-0.5 leading-relaxed">
+                        Cadastre qualquer ingrediente da sua geladeira ou despensa com quantidade e prazo de validade.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. Minha Geladeira */}
+                <div 
+                  onClick={onNavigateToInventory}
+                  className="p-4 rounded-xl border border-border bg-surface-muted/40 hover:bg-surface-muted/80 hover:border-primary/40 transition-all cursor-pointer group shadow-xs"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                      <UtensilsCrossed className="w-5 h-5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm font-bold text-text-primary group-hover:text-primary transition-colors">
+                        Gerenciar Minha Geladeira
+                      </h4>
+                      <p className="text-xs text-text-secondary mt-0.5 leading-relaxed">
+                        Acompanhe o estoque dos seus alimentos, controle datas de validade e evite desperdícios.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. Receitas */}
+                <div 
+                  onClick={onNavigateToRecipes}
+                  className="p-4 rounded-xl border border-border bg-surface-muted/40 hover:bg-surface-muted/80 hover:border-primary/40 transition-all cursor-pointer group shadow-xs"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                      <BookOpen className="w-5 h-5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm font-bold text-text-primary group-hover:text-primary transition-colors">
+                        Receitas Inteligentes
+                      </h4>
+                      <p className="text-xs text-text-secondary mt-0.5 leading-relaxed">
+                        Descubra pratos e refeições calculadas com base nos itens disponíveis no seu inventário.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 4. Lista de Compras */}
+                <div 
+                  onClick={onNavigateToShoppingList}
+                  className="p-4 rounded-xl border border-border bg-surface-muted/40 hover:bg-surface-muted/80 hover:border-primary/40 transition-all cursor-pointer group shadow-xs"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                      <ShoppingCart className="w-5 h-5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm font-bold text-text-primary group-hover:text-primary transition-colors">
+                        Lista de Mercado
+                      </h4>
+                      <p className="text-xs text-text-secondary mt-0.5 leading-relaxed">
+                        Organize ingredientes em falta por categoria e marque os itens conforme for comprando.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* BOTÕES DE AÇÃO RÁPIDA */}
+            <div className="pt-2 flex flex-wrap items-center gap-3">
+              <Button
+                variant="primary"
+                size="md"
+                onClick={onOpenFoodModal}
+                leftIcon={<Plus className="w-4 h-4" />}
+                className="font-bold"
+              >
+                Adicionar alimento manualmente
+              </Button>
+
+              <Button
+                variant="outline"
+                size="md"
+                onClick={onNavigateToInventory}
+                leftIcon={<UtensilsCrossed className="w-4 h-4" />}
+              >
+                Ver Minha Geladeira
+              </Button>
+            </div>
+
+            {/* ATALHO DE ADMIN SE APLICÁVEL */}
+            {isAdmin && onToggleScanEnabled && (
+              <div className="p-4 rounded-xl bg-primary/5 border border-primary/20 space-y-2 mt-4">
+                <div className="flex items-center gap-2 text-xs font-bold text-primary">
+                  <Sparkles className="w-4 h-4" />
+                  <span>Painel do Administrador</span>
+                </div>
+                <p className="text-xs text-text-secondary leading-relaxed">
+                  Como administrador, você pode liberar o escaneamento com IA para sua conta com um clique:
+                </p>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() => onToggleScanEnabled()}
+                  className="font-bold text-xs"
+                  leftIcon={<Sparkles className="w-3.5 h-3.5" />}
+                >
+                  Liberar Scan para esta Conta (scanEnabled = true)
+                </Button>
+              </div>
+            )}
+          </div>
+        </Card>
+
+        {/* Modal de Upgrade FASE 13 */}
+        <UpgradeModal
+          isOpen={isUpgradeModalOpen}
+          onClose={() => setIsUpgradeModalOpen(false)}
+          onOpenFoodModal={onOpenFoodModal}
+          onNavigateToInventory={onNavigateToInventory}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-24 md:pb-10 text-text-primary text-left">
       {/* HEADER */}
@@ -992,9 +1213,9 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-2 text-xs font-semibold text-primary bg-surface px-3.5 py-2 rounded-xl border border-border shadow-subtle">
-          <Sparkles className="w-4 h-4 text-primary" />
-          <span>Custo: 1 crédito por análise</span>
+        <div className="flex items-center gap-2 text-xs font-semibold text-emerald-800 bg-emerald-50 px-3.5 py-2 rounded-xl border border-emerald-200/80 shadow-subtle">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+          <span>Scan com IA Liberado</span>
         </div>
       </div>
 
@@ -1223,7 +1444,7 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
                       className="flex-1 sm:flex-none font-bold"
                       leftIcon={<Sparkles className="w-4 h-4" />}
                     >
-                      Analisar Geladeira (1 Crédito)
+                      Analisar Geladeira com IA
                     </Button>
                   </div>
                 </div>
@@ -1678,6 +1899,14 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
           </form>
         )}
       </Modal>
+
+      {/* Modal de Upgrade FASE 13 */}
+      <UpgradeModal
+        isOpen={isUpgradeModalOpen}
+        onClose={() => setIsUpgradeModalOpen(false)}
+        onOpenFoodModal={onOpenFoodModal}
+        onNavigateToInventory={onNavigateToInventory}
+      />
     </div>
   );
 };

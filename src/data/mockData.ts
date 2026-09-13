@@ -8,6 +8,7 @@ export const INITIAL_USER: User = {
   email: 'camila.rodrigues@exemplo.com.br',
   avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
   credits: 12,
+  scanEnabled: true,
   preferences: {
     dietaryRestrictions: ['Sem Frituras'],
     cookingLevel: 'Intermediário',

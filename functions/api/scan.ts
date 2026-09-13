@@ -3,10 +3,9 @@ import { foodDetectionPrompt } from "../_ai/foodPrompt";
 import {
   validateFirebaseAuth,
   validateAppCheck,
-  checkAndDeductCredit,
   checkRateLimit,
-  configureFirestoreServiceAccount,
   FIREBASE_PROJECT_ID,
+  buscarUsuario,
   SecurityError,
 } from "../_ai/security";
 
@@ -14,8 +13,6 @@ const MODEL = "google/gemma-3-4b-it:fastest";
 
 type Env = {
   HF_TOKEN: string;
-  FIRESTORE_CLIENT_EMAIL?: string;
-  FIRESTORE_PRIVATE_KEY?: string;
   ENFORCE_APP_CHECK?: string;
 };
 
@@ -37,13 +34,6 @@ export type PagesFunction<
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   const { request, env } = context;
-
-  if (env.FIRESTORE_CLIENT_EMAIL && env.FIRESTORE_PRIVATE_KEY) {
-    configureFirestoreServiceAccount(
-      env.FIRESTORE_CLIENT_EMAIL,
-      env.FIRESTORE_PRIVATE_KEY
-    );
-  }
 
   // 1. Validação Criptográfica do Firebase Auth ID Token (Bearer)
   let user;
@@ -83,7 +73,34 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     );
   }
 
-  // 4. Leitura do Payload e Suporte a Débito Direto de Crédito
+  // 4. Verificar acesso ao Scan no Firestore (users/{uid})
+  const userDoc = await buscarUsuario(user.uid, user.token);
+
+  if (!userDoc.exists) {
+    return Response.json(
+      {
+        success: false,
+        error: "O reconhecimento por imagem não está habilitado para esta conta.",
+        code: "SCAN_NOT_ENABLED",
+      },
+      { status: 403 }
+    );
+  }
+
+  const userData = userDoc.data();
+
+  if (userData.scanEnabled !== true) {
+    return Response.json(
+      {
+        success: false,
+        error: "O reconhecimento por imagem não está habilitado para esta conta.",
+        code: "SCAN_NOT_ENABLED",
+      },
+      { status: 403 }
+    );
+  }
+
+  // 5. Leitura do Payload
   let body: any = {};
   try {
     body = await request.json();
@@ -91,29 +108,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     body = {};
   }
 
-  // Caso especial: requisição de transação de débito direto
-  if (body?.deductOnly === true) {
-    let deduction;
-    try {
-      deduction = await checkAndDeductCredit(user.uid, 1, user.token);
-    } catch (creditErr: any) {
-      const secErr = creditErr as SecurityError;
-      return Response.json(
-        { success: false, error: secErr.message, code: secErr.code, remainingCredits: 0 },
-        { status: secErr.status || 402 }
-      );
-    }
-
-    return Response.json(
-      {
-        success: true,
-        remainingCredits: deduction.remainingCredits,
-      },
-      { status: 200 }
-    );
-  }
-
-  // Validação da imagem antes da transação para não debitar créditos em caso de payload corrompido
+  // Validação da imagem antes da análise
   const image = body?.image;
   if (!image || typeof image !== "string") {
     return Response.json({ success: false, error: "A propriedade 'image' é obrigatória." }, { status: 400 });
@@ -126,20 +121,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     );
   }
 
-  // 5. Verificação e Consumo Atômico de Créditos via Transação no Firestore
-  // UID autenticado -> Firestore transaction -> credits > 0 ? -> credits = credits - 1
-  let deduction;
-  try {
-    deduction = await checkAndDeductCredit(user.uid, 1, user.token);
-  } catch (creditErr: any) {
-    const secErr = creditErr as SecurityError;
-    return Response.json(
-      { success: false, error: secErr.message, code: secErr.code, remainingCredits: 0 },
-      { status: secErr.status || 402 }
-    );
-  }
-
-  // 6. Verificação da Chave de API de IA no Ambiente de Servidor (nunca exposta ao frontend)
+  // 5. Verificação da Chave de API de IA no Ambiente de Servidor (nunca exposta ao frontend)
   if (!env.HF_TOKEN) {
     return Response.json(
       { success: false, error: "HF_TOKEN não configurado no Cloudflare Pages (Variables and Secrets)." },
@@ -204,7 +186,6 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         success: true,
         result,
         model: MODEL,
-        remainingCredits: deduction.remainingCredits,
       },
       { headers: { "Cache-Control": "no-store" } }
     );

@@ -29,49 +29,51 @@ service cloud.firestore {
       allow write: if false;
     }
 
-    // Documento principal do Usuário (apenas o próprio usuário autenticado pode ler ou gravar)
+    // Documento principal do Usuário (o próprio usuário ou Administrador)
     match /users/{userId} {
-      allow read: if isOwner(userId);
+      allow read: if isOwner(userId) || isAdmin();
 
-      // Criação inicial do perfil: não pode se autopromover a admin, créditos iniciais limitados a no máximo 5
-      allow create: if isOwner(userId)
-        && (!('isAdmin' in request.resource.data) || request.resource.data.isAdmin == false)
-        && (!('credits' in request.resource.data) || request.resource.data.credits <= 5);
+      // Criação inicial do perfil: usuário comum ou Administrador cadastrando
+      allow create: if (
+          isOwner(userId)
+          && (!('isAdmin' in request.resource.data) || request.resource.data.isAdmin == false)
+          && (!('scanEnabled' in request.resource.data) || request.resource.data.scanEnabled == false)
+          && (!('credits' in request.resource.data) || request.resource.data.credits <= 5)
+        ) || isAdmin();
 
-      // Atualização de perfil: o usuário comum NUNCA pode alterar isAdmin, id ou createdAt.
-      // O campo 'credits' é protegido contra alterações arbitrárias via diff().affectedKeys()
-      // e só pode ser debitado transacionalmente de 1 em 1 quando credits > 0.
-      allow update: if isOwner(userId)
-        && (
-          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['credits', 'isAdmin', 'id', 'createdAt'])
-          ||
-          (
-            request.resource.data.diff(resource.data).affectedKeys().hasOnly(['credits', 'updatedAt'])
-            && resource.data.credits > 0
-            && request.resource.data.credits == resource.data.credits - 1
-          )
-        );
+      // Atualização de perfil: o usuário comum NUNCA pode alterar isAdmin, scanEnabled, credits, id ou createdAt.
+      // Administrador tem permissão para alterar campos (incluindo scanEnabled para liberar usuários).
+      allow update: if (
+          isOwner(userId)
+          && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['credits', 'isAdmin', 'scanEnabled', 'id', 'createdAt'])
+        ) || isAdmin();
 
-      allow delete: if false;
+      allow delete: if isAdmin();
 
       // Subcoleção: Itens do Inventário / Geladeira
       match /inventory/{itemId} {
-        allow read, write: if isOwner(userId);
+        allow read, write: if isOwner(userId) || isAdmin();
       }
 
       // Subcoleção: Histórico de Escaneamentos
       match /scans/{scanId} {
-        allow read, write: if isOwner(userId);
+        allow read, write: if isOwner(userId) || isAdmin();
       }
 
       // Subcoleção: Listas de Mercado
       match /shoppingLists/{listId} {
-        allow read, write: if isOwner(userId);
+        allow read, write: if isOwner(userId) || isAdmin();
 
         match /{subcollection=**} {
-          allow read, write: if isOwner(userId);
+          allow read, write: if isOwner(userId) || isAdmin();
         }
       }
+    }
+
+    // Coleção de Clientes Pagos pré-cadastrados (Fase 7)
+    match /paid_customers/{customerEmail} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
     }
 
     // Coleção pública de Receitas (leitura pública, escrita restrita a administradores)

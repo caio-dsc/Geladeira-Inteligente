@@ -4,7 +4,6 @@ import { foodDetectionPrompt } from "./foodPrompt";
 import {
   validateFirebaseAuth,
   validateAppCheck,
-  checkAndDeductCredit,
   checkRateLimit,
   FIREBASE_PROJECT_ID,
   SecurityError,
@@ -58,7 +57,7 @@ export default async (req: Request) => {
     );
   }
 
-  // 4. Leitura do Payload e Suporte a Débito Direto de Crédito
+  // 4. Leitura do Payload
   let body: any = {};
   try {
     body = await req.json();
@@ -66,26 +65,8 @@ export default async (req: Request) => {
     body = {};
   }
 
-  // Caso especial: requisição de transação de débito direto
   if (body?.deductOnly === true) {
-    let deduction;
-    try {
-      deduction = await checkAndDeductCredit(user.uid, 1, user.token);
-    } catch (creditErr: any) {
-      const secErr = creditErr as SecurityError;
-      return Response.json(
-        { success: false, error: secErr.message, code: secErr.code, remainingCredits: 0 },
-        { status: secErr.status || 402 }
-      );
-    }
-
-    return Response.json(
-      {
-        success: true,
-        remainingCredits: deduction.remainingCredits,
-      },
-      { status: 200 }
-    );
+    return Response.json({ success: true }, { status: 200 });
   }
 
   const image = body?.image;
@@ -103,19 +84,6 @@ export default async (req: Request) => {
         error: "Formato de imagem inválido. Esperado data:image/...;base64,... ou URL HTTPS.",
       },
       { status: 400 }
-    );
-  }
-
-  // 5. Verificação e Consumo Atômico de Créditos via Transação no Firestore
-  // UID autenticado -> Firestore transaction -> credits > 0 ? -> credits = credits - 1
-  let deduction;
-  try {
-    deduction = await checkAndDeductCredit(user.uid, 1, user.token);
-  } catch (creditErr: any) {
-    const secErr = creditErr as SecurityError;
-    return Response.json(
-      { success: false, error: secErr.message, code: secErr.code, remainingCredits: 0 },
-      { status: secErr.status || 402 }
     );
   }
 
@@ -200,7 +168,6 @@ export default async (req: Request) => {
       success: true,
       result,
       model: MODEL,
-      remainingCredits: deduction.remainingCredits,
     });
   } catch (error) {
     return Response.json(

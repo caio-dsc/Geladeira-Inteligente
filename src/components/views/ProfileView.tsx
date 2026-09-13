@@ -5,6 +5,7 @@ import { Card } from '../common/Card';
 import { Button } from '../common/Button';
 import { Input } from '../common/Input';
 import { CreditBadge } from '../common/CreditBadge';
+import { UpgradeModal } from '../common/UpgradeModal';
 import { 
   User as UserIcon, 
   Mail, 
@@ -21,6 +22,7 @@ import {
   Ruler,
   ShieldCheck,
   HelpCircle,
+  Lock,
   X
 } from 'lucide-react';
 
@@ -91,6 +93,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
 
   // Preferences editing state
   const [isEditingPreferences, setIsEditingPreferences] = useState(false);
+  const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
   const [cookingLevel, setCookingLevel] = useState(user.preferences.cookingLevel);
   const [servings, setServings] = useState(user.preferences.defaultServings);
   const [restrictions, setRestrictions] = useState<string[]>(user.preferences.dietaryRestrictions || []);
@@ -215,16 +218,6 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
     }
   };
 
-  const handleAddDemoCredits = async (amount: number) => {
-    try {
-      await authService.addCredits(amount);
-      const updated = await authService.getCurrentUser();
-      if (updated) onUpdateUser(updated);
-    } catch (e: any) {
-      alert(e.message);
-    }
-  };
-
   return (
     <div className="space-y-6 max-w-3xl mx-auto pb-24 md:pb-10 text-text-primary text-left">
       {/* Header */}
@@ -237,7 +230,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           Perfil & Preferências
         </h1>
         <p className="text-xs sm:text-sm text-text-secondary">
-          Gerencie seus dados pessoais, créditos e preferências gastronômicas.
+          Gerencie seus dados pessoais, acesso ao reconhecimento por imagem e preferências gastronômicas.
         </p>
       </div>
 
@@ -462,44 +455,55 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
         )}
       </Card>
 
-      {/* Credits Card */}
+      {/* Reconhecimento por Imagem / Status de Acesso */}
       <Card variant="default" padding="md" className="space-y-4 shadow-subtle border-border">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-primary/10 text-primary border border-primary/20 flex items-center justify-center shadow-subtle">
-              <Sparkles className="w-5 h-5" />
+            <div
+              className={`w-11 h-11 rounded-2xl flex items-center justify-center shadow-subtle border ${
+                user.scanEnabled
+                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                  : 'bg-amber-50 text-amber-700 border-amber-200'
+              }`}
+            >
+              {user.scanEnabled ? <Camera className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
             </div>
             <div>
-              <h3 className="text-sm font-bold text-text-primary">Saldo de Créditos</h3>
-              <p className="text-xs text-text-secondary">Utilizados para escaneamentos de geladeira</p>
+              <h3 className="text-sm font-bold text-text-primary">
+                {user.scanEnabled ? 'Reconhecimento por Imagem Liberado' : 'Reconhecimento por Imagem'}
+              </h3>
+              <p className="text-xs text-text-secondary">
+                {user.scanEnabled
+                  ? 'Plano Completo com escaneamento fotográfico por IA'
+                  : 'Disponível no plano completo da plataforma'}
+              </p>
             </div>
           </div>
 
-          <CreditBadge credits={user.credits} size="md" />
+          <CreditBadge
+            scanEnabled={user.scanEnabled}
+            size="md"
+            onClick={() => !user.scanEnabled && setIsUpgradeModalOpen(true)}
+          />
         </div>
 
-        <div className="pt-3 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-text-secondary">
-          <span>Cada foto analisada consome 1 crédito do seu saldo.</span>
-          <div className="flex items-center gap-2">
+        <div className="pt-3 border-t border-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-text-secondary">
+          <span>
+            {user.scanEnabled
+              ? 'Sua conta possui acesso total para escanear sua geladeira por foto com Inteligência Artificial.'
+              : 'O reconhecimento automático da geladeira está disponível no plano completo. Você pode continuar adicionando alimentos manualmente gratuitamente.'}
+          </span>
+          {!user.scanEnabled && (
             <Button
-              variant="outline"
+              variant="primary"
               size="sm"
-              onClick={() => handleAddDemoCredits(5)}
-              leftIcon={<Plus className="w-3.5 h-3.5" />}
-              className="text-xs"
+              onClick={() => setIsUpgradeModalOpen(true)}
+              leftIcon={<Sparkles className="w-3.5 h-3.5" />}
+              className="text-xs font-bold shrink-0"
             >
-              +5 Créditos
+              Conhecer o acesso completo
             </Button>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => handleAddDemoCredits(10)}
-              leftIcon={<Plus className="w-3.5 h-3.5 text-primary" />}
-              className="text-xs font-bold"
-            >
-              +10 Créditos
-            </Button>
-          </div>
+          )}
         </div>
       </Card>
 
@@ -665,6 +669,11 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           </Button>
         </Card>
       )}
+      {/* Upgrade Modal quando o usuário não tiver scan liberado */}
+      <UpgradeModal
+        isOpen={isUpgradeModalOpen}
+        onClose={() => setIsUpgradeModalOpen(false)}
+      />
     </div>
   );
 };

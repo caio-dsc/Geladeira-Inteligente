@@ -19,6 +19,7 @@ export interface HeaderProps {
   onTabChange: (tab: NavigationTab) => void;
   user: User | null;
   onSignOut: () => void;
+  onOpenUpgradeModal?: () => void;
   onOpenCreditsModal?: () => void;
 }
 
@@ -27,8 +28,10 @@ export const Header: React.FC<HeaderProps> = ({
   onTabChange,
   user,
   onSignOut,
+  onOpenUpgradeModal,
   onOpenCreditsModal,
 }) => {
+  const handleUpgradeClick = onOpenUpgradeModal || onOpenCreditsModal;
   const navItems = [
     { id: 'dashboard' as NavigationTab, label: 'Início', icon: Home },
     { id: 'scanner' as NavigationTab, label: 'Scanner', icon: Camera },
@@ -77,8 +80,8 @@ export const Header: React.FC<HeaderProps> = ({
           {user && (
             <>
               <CreditBadge
-                credits={user.credits}
-                onClick={onOpenCreditsModal}
+                scanEnabled={user.scanEnabled}
+                onClick={handleUpgradeClick}
                 size="sm"
               />
 

@@ -36,7 +36,6 @@ interface HuggingFaceScanResponse {
   result?: string;
   error?: string;
   code?: string;
-  remainingCredits?: number;
   retryAfterSeconds?: number;
   details?: any;
 }
@@ -433,6 +432,15 @@ class HuggingFaceScannerService implements IScannerService {
       throw new Error('Nenhuma imagem foi selecionada.');
     }
 
+    // Verificação de acesso ao Scan (Controle de Acesso FASE 3: scanEnabled)
+    const userProfile = await authService.getCurrentUser();
+    if (userProfile && userProfile.scanEnabled === false) {
+      throw new ScanServiceError(
+        'Acesso ao Scan com IA bloqueado para esta conta (Conta Gratuita). Recurso liberado apenas para contas com scanEnabled = true.',
+        { status: 403, retriable: false, code: 'SCAN_DISABLED' }
+      );
+    }
+
     // Se a imagem for uma das amostras de teste rápido, retorna as detecções correspondentes
     const sample = SAMPLE_FRIDGE_IMAGES.find((s) => s.url === imageUrl);
     if (sample && sample.mockDetections && sample.mockDetections.length > 0) {
@@ -672,11 +680,11 @@ class HuggingFaceScannerService implements IScannerService {
       const retryAfterHeader = response.headers.get("Retry-After");
       const retryAfterSeconds = retryAfterHeader ? Number(retryAfterHeader) : data?.retryAfterSeconds;
 
-      // 402/403 = Erro de créditos ou autorização
-      if (response.status === 402 || data?.code === 'INSUFFICIENT_CREDITS') {
+      // 403 = Scan não habilitado para esta conta
+      if (response.status === 403 || data?.code === 'SCAN_NOT_ENABLED') {
         throw new ScanServiceError(
-          data?.error || "Créditos insuficientes para realizar a análise. Adquira mais créditos.",
-          { status: 402, retriable: false, code: 'INSUFFICIENT_CREDITS' }
+          data?.error || "O reconhecimento por imagem não está habilitado para esta conta.",
+          { status: 403, retriable: false, code: 'SCAN_NOT_ENABLED' }
         );
       }
 
@@ -702,11 +710,6 @@ class HuggingFaceScannerService implements IScannerService {
         retriable: response.status === 429,
         code: data?.code,
       });
-    }
-
-    // Sincroniza saldo restante authoritative retornado pelo backend
-    if (typeof data.remainingCredits === 'number') {
-      authService.syncRemainingCredits(data.remainingCredits);
     }
 
     if (!data.result) {

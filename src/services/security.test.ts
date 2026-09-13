@@ -6,8 +6,8 @@
  * - TESTE B: Requisição para /api/scan com token inválido → BLOQUEADA (401)
  * - TESTE C: Requisição para /api/scan com token expirado → BLOQUEADA (401)
  * - TESTE D: Requisição para /api/scan SEM App Check (quando ativo) → BLOQUEADA (403)
- * - TESTE E: Validação de UID e Ausência de Estado em Memória Volátil
- * - TESTE F: Compatibilidade Serverless (Desacoplamento de Mutex em Memória)
+ * - TESTE E: Validação de Parâmetros e Chaves no Rate Limit
+ * - TESTE F: Proteção contra Abuso (Rate Limiting de 6 scans/min)
  * - TESTE G: Usuário tenta atualizar credits diretamente no Firestore → NEGADO pelas rules
  * - TESTE H: Usuário tenta atualizar isAdmin diretamente no Firestore → NEGADO pelas rules
  * - TESTE I: Usuário tenta acessar inventário/scans de outro usuário → NEGADO pelas rules
@@ -19,9 +19,7 @@
 import {
   validateFirebaseAuth,
   validateAppCheck,
-  checkAndDeductCredit,
-  setTestUserCredits,
-  getUserCredits,
+  checkRateLimit,
   FIREBASE_PROJECT_ID,
   SecurityError,
 } from "../../functions/_ai/security";
@@ -205,69 +203,72 @@ async function runSecurityTestSuite() {
   }
 
   // =========================================================================
-  // TESTE E: Validação de UID e Ausência de Estado em Memória Volátil
+  // TESTE E: Validação de Parâmetros e Chaves no Rate Limit
   // =========================================================================
-  console.log("\n--- TESTE E: Validação de UID no checkAndDeductCredit ---");
+  console.log("\n--- TESTE E: Validação de chave no checkRateLimit ---");
   {
-    let emptyUidStatus = 0;
+    let emptyKeyStatus = 0;
     try {
-      await checkAndDeductCredit("");
+      checkRateLimit("");
     } catch (err: any) {
-      emptyUidStatus = err.status;
+      emptyKeyStatus = err.status;
     }
 
     assert(
-      emptyUidStatus === 401,
-      "TESTE E (UID Obrigatório)",
-      "Bloqueado com status 401 quando UID é vazio"
+      emptyKeyStatus === 400,
+      "TESTE E (Chave Obrigatória)",
+      "Bloqueado com status 400 quando chave de rate limit é vazia"
     );
 
-    const validResult = await checkAndDeductCredit("test-valid-uid", 1);
+    let validExecution = false;
+    try {
+      checkRateLimit("test-valid-uid", 6, 60000);
+      validExecution = true;
+    } catch {
+      validExecution = false;
+    }
     assert(
-      typeof validResult.remainingCredits === "number",
+      validExecution,
       "TESTE E (Execução Sem Erro)",
-      "Execução de checkAndDeductCredit bem-sucedida para UID válido"
+      "Execução de checkRateLimit bem-sucedida para chave válida"
     );
   }
 
   // =========================================================================
-  // TESTE F: Compatibilidade Serverless (Desacoplamento de Mutex em Memória)
+  // TESTE F: Proteção contra Abuso (Rate Limiting de 6 scans/min)
   // =========================================================================
-  console.log("\n--- TESTE F: Compatibilidade Serverless (Desacoplamento de Mutex em Memória) ---");
+  console.log("\n--- TESTE F: Proteção contra Abuso (Rate Limiting por UID) ---");
   {
-    const raceUid = "test-user-serverless";
+    const rateLimitUid = "test-user-rate-limit-suite";
 
-    // 5 requisições simultâneas executam sem dependência de locks voláteis em memória local
-    const results = await Promise.allSettled([
-      checkAndDeductCredit(raceUid, 1),
-      checkAndDeductCredit(raceUid, 1),
-      checkAndDeductCredit(raceUid, 1),
-      checkAndDeductCredit(raceUid, 1),
-      checkAndDeductCredit(raceUid, 1),
-    ]);
-
-    const successes = results.filter((r) => r.status === "fulfilled");
-
-    assert(
-      successes.length === 5,
-      "TESTE F (Execução Serverless Concorrente)",
-      `Todas as 5 requisições completaram sem dependência de locks voláteis em memória (sucessos: ${successes.length})`
-    );
-
-    // 6ª requisição deve falhar com status 402 (Créditos insuficientes)
-    let sixthStatus = 0;
-    let sixthCode = "";
-    try {
-      await checkAndDeductCredit(raceUid, 1);
-    } catch (err: any) {
-      sixthStatus = err.status;
-      sixthCode = err.code;
+    let allowedCount = 0;
+    for (let i = 0; i < 6; i++) {
+      try {
+        checkRateLimit(rateLimitUid, 6, 60000);
+        allowedCount++;
+      } catch {}
     }
 
     assert(
-      sixthStatus === 402 && sixthCode === "INSUFFICIENT_CREDITS",
-      "TESTE F (Bloqueio por Crédito Esgotado)",
-      "6ª requisição rejeitada com HTTP 402 (INSUFFICIENT_CREDITS) após esgotar créditos"
+      allowedCount === 6,
+      "TESTE F (Execução das 6 Primeiras Requisições)",
+      `Todas as 6 primeiras requisições foram autorizadas dentro da janela de rate limit (sucessos: ${allowedCount})`
+    );
+
+    // 7ª requisição deve falhar com status 429 (RATE_LIMIT_EXCEEDED)
+    let seventhStatus = 0;
+    let seventhCode = "";
+    try {
+      checkRateLimit(rateLimitUid, 6, 60000);
+    } catch (err: any) {
+      seventhStatus = err.status;
+      seventhCode = err.code;
+    }
+
+    assert(
+      seventhStatus === 429 && seventhCode === "RATE_LIMIT_EXCEEDED",
+      "TESTE F (Bloqueio por Excesso de Requisições)",
+      "7ª requisição rejeitada com HTTP 429 (RATE_LIMIT_EXCEEDED) protegendo contra abuso"
     );
   }
 

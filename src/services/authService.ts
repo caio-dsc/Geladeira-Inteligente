@@ -24,9 +24,7 @@ export interface IAuthService {
   signOut(): Promise<void>;
   updateUser(data: Partial<User>): Promise<User>;
   updateUser(userId: string, data: Partial<User>): Promise<User>;
-  deductCredit(amount?: number): Promise<number>;
-  addCredits(amount: number): Promise<number>;
-  syncRemainingCredits(amount: number): void;
+  updateScanEnabled(userId: string, scanEnabled: boolean): Promise<void>;
   subscribe(callback: (user: User | null) => void): () => void;
 }
 
@@ -74,18 +72,36 @@ class FirebaseAuthService implements IAuthService {
       isAdmin = false;
     }
 
+    const isBruno = firebaseUser.email?.toLowerCase() === 'bruno@email.com' || customName?.toLowerCase().includes('bruno');
+    
+    // Consulta se o e-mail foi pré-cadastrado como cliente pago (Fase 7)
+    let isPreAuthorizedPaid = false;
+    if (firebaseUser.email) {
+      try {
+        isPreAuthorizedPaid = await firestoreService.isPaidCustomer(firebaseUser.email);
+      } catch (paidErr) {
+        console.warn('Aviso ao consultar paid_customers:', paidErr);
+      }
+    }
+
     const existing = await firestoreService.getUser(firebaseUser.uid);
     if (existing) {
+      // Determina scanEnabled: se já liberado, ou se foi pré-autorizado via compra, ou admin/Bruno
+      const resolvedScanEnabled = typeof existing.scanEnabled === 'boolean'
+        ? (existing.scanEnabled || isPreAuthorizedPaid)
+        : (isAdmin || isBruno || isPreAuthorizedPaid ? true : false);
+
       // Atualiza eventuais dados mais recentes do Google ou Perfil
       const updated: User = {
         ...existing,
-        name: customName || existing.name || firebaseUser.displayName || 'Chef Usuário',
+        name: customName || existing.name || firebaseUser.displayName || (isBruno ? 'Bruno' : 'Chef Usuário'),
         email: firebaseUser.email || existing.email,
         avatarUrl: existing.avatarUrl || firebaseUser.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
         age: existing.age ?? null,
         weightKg: existing.weightKg ?? null,
         heightCm: existing.heightCm ?? null,
         isAdmin,
+        scanEnabled: resolvedScanEnabled,
       };
       await firestoreService.updateUserFields(firebaseUser.uid, {
         name: updated.name,
@@ -95,16 +111,27 @@ class FirebaseAuthService implements IAuthService {
         weightKg: updated.weightKg,
         heightCm: updated.heightCm,
       });
+
+      // Se o usuário foi liberado via compra na sincronização, atualiza o campo protegido via método dedicado
+      if (existing.scanEnabled !== resolvedScanEnabled) {
+        await firestoreService.updateUserScanAccess(firebaseUser.uid, resolvedScanEnabled);
+      }
+
       return updated;
     }
 
-    // Primeiro acesso: cria documento base com créditos iniciais
+    // Primeiro acesso: cria documento base com controle de acesso ao Scan
+    // Usuário normal (Conta gratuita): scanEnabled = false
+    // Cliente pago / Bruno / Admin: scanEnabled = true (SCAN ILIMITADO)
+    const isInitialScanEnabled = isAdmin || Boolean(isBruno) || isPreAuthorizedPaid;
+
     const newUser: User = {
       id: firebaseUser.uid,
-      name: customName || firebaseUser.displayName || 'Chef Usuário',
+      name: customName || firebaseUser.displayName || (isBruno ? 'Bruno' : 'Chef Usuário'),
       email: firebaseUser.email || '',
       avatarUrl: firebaseUser.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
       credits: 5,
+      scanEnabled: isInitialScanEnabled,
       preferences: DEFAULT_PREFERENCES,
       createdAt: new Date().toISOString(),
       age: null,
@@ -237,8 +264,8 @@ class FirebaseAuthService implements IAuthService {
     const effectiveUid = targetUserId || auth.currentUser?.uid;
     if (effectiveUid) {
       // Isola apenas campos permitidos de perfil para escrita pelo usuário no Firestore
-      // NUNCA envia credits, isAdmin, id ou createdAt para respeitar as Firestore Security Rules
-      const { credits: _c, isAdmin: _a, id: _i, createdAt: _ca, ...allowedProfileFields } = safeUpdates as any;
+      // NUNCA envia credits, isAdmin, scanEnabled, id ou createdAt para respeitar as Firestore Security Rules
+      const { credits: _c, isAdmin: _a, scanEnabled: _s, id: _i, createdAt: _ca, ...allowedProfileFields } = safeUpdates as any;
 
       if (Object.keys(allowedProfileFields).length > 0) {
         await firestoreService.updateUserFields(effectiveUid, allowedProfileFields);
@@ -262,42 +289,15 @@ class FirebaseAuthService implements IAuthService {
     return this.currentUser!;
   }
 
-  public async deductCredit(amount: number = 1): Promise<number> {
-    if (!this.currentUser) throw new Error('Usuário não autenticado');
-    if (this.currentUser.credits < amount) {
-      throw new Error('Créditos insuficientes para realizar esta ação.');
+  public async updateScanEnabled(userId: string, scanEnabled: boolean): Promise<void> {
+    await firestoreService.updateUserScanAccess(userId, scanEnabled);
+    if (this.currentUser && this.currentUser.id === userId) {
+      this.currentUser = {
+        ...this.currentUser,
+        scanEnabled,
+      };
+      this.notify();
     }
-
-    const newCredits = this.currentUser.credits - amount;
-    this.currentUser = {
-      ...this.currentUser,
-      credits: newCredits,
-    };
-    this.notify();
-
-    return newCredits;
-  }
-
-  public async addCredits(amount: number): Promise<number> {
-    if (!this.currentUser) throw new Error('Usuário não autenticado');
-
-    const newCredits = this.currentUser.credits + amount;
-    this.currentUser = {
-      ...this.currentUser,
-      credits: newCredits,
-    };
-    this.notify();
-
-    return newCredits;
-  }
-
-  public syncRemainingCredits(amount: number): void {
-    if (!this.currentUser) return;
-    this.currentUser = {
-      ...this.currentUser,
-      credits: Math.max(0, amount),
-    };
-    this.notify();
   }
 
   public subscribe(callback: (user: User | null) => void): () => void {

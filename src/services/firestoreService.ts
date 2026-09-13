@@ -88,6 +88,112 @@ export class FirestoreService {
     }
   }
 
+  public async updateUserScanAccess(userId: string, scanEnabled: boolean): Promise<void> {
+    try {
+      const userRef = doc(db, 'users', userId);
+      await updateDoc(userRef, {
+        scanEnabled,
+        updatedAt: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error('Erro ao atualizar permissão de scan do usuário no Firestore:', error);
+      throw error;
+    }
+  }
+
+  public async listUsers(): Promise<User[]> {
+    try {
+      const usersCol = collection(db, 'users');
+      const snap = await getDocs(usersCol);
+      return snap.docs.map(d => ({ ...d.data(), id: d.id } as User));
+    } catch (error) {
+      console.warn('Aviso ao listar usuários (requer permissão):', error);
+      return [];
+    }
+  }
+
+  // ==========================================
+  // CLIENTES PAGOS (FASE 7 - SCAN ILIMITADO)
+  // ==========================================
+
+  public async isPaidCustomer(email: string): Promise<boolean> {
+    if (!email) return false;
+    try {
+      const normalizedEmail = email.trim().toLowerCase();
+      const customerRef = doc(db, 'paid_customers', normalizedEmail);
+      const snap = await getDoc(customerRef);
+      if (snap.exists()) {
+        const data = snap.data();
+        return data?.scanEnabled !== false;
+      }
+      return false;
+    } catch (error) {
+      console.warn('Aviso ao verificar status de cliente pago:', error);
+      return false;
+    }
+  }
+
+  public async registerPaidCustomer(
+    email: string,
+    name?: string,
+    scanEnabled: boolean = true
+  ): Promise<{ updatedExistingUser: boolean; userId?: string }> {
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!normalizedEmail) {
+      throw new Error('E-mail inválido para cadastro de cliente pago.');
+    }
+
+    try {
+      // 1. Salva na coleção paid_customers para assegurar liberação imediata ou em logins futuros
+      const customerRef = doc(db, 'paid_customers', normalizedEmail);
+      await setDoc(
+        customerRef,
+        {
+          email: normalizedEmail,
+          name: name?.trim() || '',
+          scanEnabled,
+          updatedAt: new Date().toISOString(),
+        },
+        { merge: true }
+      );
+
+      // 2. Procura se já existe um usuário cadastrado com esse email na coleção users
+      let updatedExistingUser = false;
+      let existingUserId: string | undefined = undefined;
+
+      const usersRef = collection(db, 'users');
+      const q = query(usersRef, where('email', '==', normalizedEmail));
+      const querySnap = await getDocs(q);
+
+      if (!querySnap.empty) {
+        for (const userDoc of querySnap.docs) {
+          await updateDoc(userDoc.ref, {
+            scanEnabled,
+            updatedAt: new Date().toISOString(),
+          });
+          updatedExistingUser = true;
+          existingUserId = userDoc.id;
+        }
+      }
+
+      return { updatedExistingUser, userId: existingUserId };
+    } catch (error) {
+      console.error('Erro ao cadastrar cliente pago no Firestore:', error);
+      throw error;
+    }
+  }
+
+  public async listPaidCustomers(): Promise<Array<{ email: string; name?: string; scanEnabled: boolean; updatedAt?: string }>> {
+    try {
+      const col = collection(db, 'paid_customers');
+      const snap = await getDocs(col);
+      return snap.docs.map((d) => d.data() as any);
+    } catch (error) {
+      console.warn('Aviso ao listar clientes pagos do Firestore:', error);
+      return [];
+    }
+  }
+
   // ==========================================
   // INVENTÁRIO / GELADEIRA (users/{userId}/inventory)
   // ==========================================
