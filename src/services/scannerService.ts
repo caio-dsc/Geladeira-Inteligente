@@ -31,7 +31,7 @@ export class ScanServiceError extends Error {
 
 export interface IScannerService {
   simulateScan(
-    imageUrl: string,
+    imageSource: string | Blob,
     onProgress?: (msg: string) => void,
     forceError?: boolean
   ): Promise<DetectedFoodItem[]>;
@@ -401,18 +401,20 @@ export function normalizeFreshness(
 }
 
 /**
- * Converte qualquer fonte de imagem suportada pelo navegador
- * para JPEG Base64.
+ * Prepara uma imagem para o Scan.
  *
- * Compatível com:
- * - iPhone Safari
- * - Chrome mobile
- * - Android
- * - desktop
- * - data:image/*
- * - blob:
- * - File
- * - Blob
+ * Objetivos:
+ * - funcionar no iPhone Safari;
+ * - funcionar no Chrome mobile;
+ * - funcionar no Android;
+ * - funcionar no desktop;
+ * - aceitar data:image/*;
+ * - aceitar blob:;
+ * - aceitar File/Blob;
+ * - evitar drawImage antes do carregamento;
+ * - reduzir resolução;
+ * - reduzir qualidade;
+ * - manter payload pequeno;
  */
 async function prepareImageForScan(
   source: string | Blob,
@@ -421,51 +423,40 @@ async function prepareImageForScan(
 ): Promise<string> {
   const MAX_BYTES = 850 * 1024;
 
-  let blobUrl: string | null = null;
+  let objectUrl: string | null = null;
 
   try {
     let blob: Blob;
 
-    /**
-     * Caso 1:
-     * já recebemos Blob/File.
+    /*
+     * ============================================================
+     * 1. OBTER O BLOB ORIGINAL
+     * ============================================================
      */
+
     if (source instanceof Blob) {
       blob = source;
-    }
-
-    /**
-     * Caso 2:
-     * data URL.
-     */
-    else if (source.startsWith('data:image/')) {
-      const response = await fetch(source);
-      blob = await response.blob();
-    }
-
-    /**
-     * Caso 3:
-     * blob URL.
-     *
-     * Muito importante para mobile.
-     */
-    else if (source.startsWith('blob:')) {
+    } else if (source.startsWith('data:image/')) {
       const response = await fetch(source);
 
       if (!response.ok) {
         throw new Error(
-          `Não foi possível ler a imagem temporária do dispositivo (${response.status}).`
+          'Não foi possível ler a imagem selecionada.'
         );
       }
 
       blob = await response.blob();
-    }
+    } else if (source.startsWith('blob:')) {
+      const response = await fetch(source);
 
-    /**
-     * Caso 4:
-     * URL HTTPS.
-     */
-    else if (
+      if (!response.ok) {
+        throw new Error(
+          `Não foi possível acessar a foto do dispositivo (${response.status}).`
+        );
+      }
+
+      blob = await response.blob();
+    } else if (
       source.startsWith('http://') ||
       source.startsWith('https://')
     ) {
@@ -478,96 +469,158 @@ async function prepareImageForScan(
       }
 
       blob = await response.blob();
-    }
-
-    else {
+    } else {
       throw new Error(
-        'Formato de imagem não suportado pelo navegador.'
+        'Formato de imagem não suportado.'
       );
     }
 
-    if (!blob.type.startsWith('image/')) {
+    /*
+     * ============================================================
+     * 2. VALIDAR MIME TYPE
+     * ============================================================
+     */
+
+    if (!blob || !blob.type.startsWith('image/')) {
       throw new Error(
         'O arquivo selecionado não é uma imagem válida.'
       );
     }
 
-    /**
-     * Cria URL temporária.
-     */
-    blobUrl = URL.createObjectURL(blob);
+    console.log('[SCAN] Imagem original:', {
+      type: blob.type,
+      size: blob.size,
+    });
 
-    /**
-     * createImageBitmap é mais eficiente em muitos navegadores
-     * modernos, especialmente em dispositivos móveis.
+    /*
+     * ============================================================
+     * 3. CRIAR OBJECT URL
+     * ============================================================
+     */
+
+    objectUrl = URL.createObjectURL(blob);
+
+    /*
+     * ============================================================
+     * 4. CARREGAR A IMAGEM DE FORMA SEGURA
      *
-     * Se não estiver disponível, usamos Image().
+     * IMPORTANTE:
+     * Esperamos explicitamente o onload antes de usar canvas.
+     *
+     * Isso evita o problema de:
+     *
+     * img.src = blobUrl
+     * ctx.drawImage(img, ...)
+     *
+     * acontecer antes do carregamento no Safari.
+     * ============================================================
      */
-    let bitmap: ImageBitmap | null = null;
 
-    if ('createImageBitmap' in window) {
-      try {
-        bitmap = await createImageBitmap(blob);
-      } catch {
-        bitmap = null;
+    const image = await new Promise<HTMLImageElement>(
+      (resolve, reject) => {
+        const img = new Image();
+
+        let settled = false;
+
+        const cleanup = () => {
+          img.onload = null;
+          img.onerror = null;
+        };
+
+        img.onload = () => {
+          if (settled) return;
+
+          settled = true;
+          cleanup();
+          resolve(img);
+        };
+
+        img.onerror = () => {
+          if (settled) return;
+
+          settled = true;
+          cleanup();
+
+          reject(
+            new Error(
+              'Não foi possível carregar a foto no dispositivo.'
+            )
+          );
+        };
+
+        /*
+         * Não usamos createImageBitmap aqui.
+         *
+         * O caminho Image + canvas é mais previsível
+         * para Safari/iPhone.
+         */
+        img.src = objectUrl!;
       }
-    }
+    );
 
-    let width = bitmap?.width || 0;
-    let height = bitmap?.height || 0;
+    /*
+     * ============================================================
+     * 5. VALIDAR DIMENSÕES
+     * ============================================================
+     */
 
-    if (!width || !height) {
-      const img = await new Promise<HTMLImageElement>(
-        (resolve, reject) => {
-          const element = new Image();
+    const originalWidth =
+      image.naturalWidth || image.width;
 
-          element.onload = () => resolve(element);
+    const originalHeight =
+      image.naturalHeight || image.height;
 
-          element.onerror = () =>
-            reject(
-              new Error(
-                'Não foi possível decodificar a foto no dispositivo.'
-              )
-            );
-
-          element.src = blobUrl!;
-        }
-      );
-
-      width = img.naturalWidth;
-      height = img.naturalHeight;
-    }
-
-    if (!width || !height) {
+    if (
+      !originalWidth ||
+      !originalHeight
+    ) {
       throw new Error(
         'A imagem não possui dimensões válidas.'
       );
     }
 
-    /**
-     * Redimensionamento proporcional.
+    console.log('[SCAN] Dimensões originais:', {
+      width: originalWidth,
+      height: originalHeight,
+    });
+
+    /*
+     * ============================================================
+     * 6. CALCULAR NOVAS DIMENSÕES
+     * ============================================================
      */
-    const scale = Math.min(
-      1,
-      maxWidth / Math.max(width, height)
+
+    const largestSide = Math.max(
+      originalWidth,
+      originalHeight
     );
+
+    const scale =
+      largestSide > maxWidth
+        ? maxWidth / largestSide
+        : 1;
 
     let targetWidth = Math.max(
       1,
-      Math.round(width * scale)
+      Math.round(originalWidth * scale)
     );
 
     let targetHeight = Math.max(
       1,
-      Math.round(height * scale)
+      Math.round(originalHeight * scale)
     );
 
-    const canvas = document.createElement('canvas');
+    /*
+     * ============================================================
+     * 7. CRIAR CANVAS
+     * ============================================================
+     */
 
-    const ctx = canvas.getContext('2d', {
-      alpha: false,
-      willReadFrequently: false,
-    });
+    const canvas =
+      document.createElement('canvas');
+
+    const ctx =
+      canvas.getContext('2d');
 
     if (!ctx) {
       throw new Error(
@@ -575,66 +628,26 @@ async function prepareImageForScan(
       );
     }
 
-    /**
-     * Renderiza a imagem.
+    /*
+     * ============================================================
+     * 8. CALCULAR TAMANHO REAL DO BASE64
+     * ============================================================
      */
-    const render = (
-      quality: number
-    ): string => {
-      canvas.width = targetWidth;
-      canvas.height = targetHeight;
-
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(
-        0,
-        0,
-        targetWidth,
-        targetHeight
-      );
-
-      if (bitmap) {
-        ctx.drawImage(
-          bitmap,
-          0,
-          0,
-          targetWidth,
-          targetHeight
-        );
-      } else {
-        const img = new Image();
-
-        /**
-         * Esta situação ocorre apenas no fallback.
-         * O blobUrl já foi validado acima.
-         */
-        img.src = blobUrl!;
-
-        ctx.drawImage(
-          img,
-          0,
-          0,
-          targetWidth,
-          targetHeight
-        );
-      }
-
-      return canvas.toDataURL(
-        'image/jpeg',
-        quality
-      );
-    };
 
     const getBase64Bytes = (
       dataUrl: string
     ): number => {
-      const comma = dataUrl.indexOf(',');
+      const comma =
+        dataUrl.indexOf(',');
 
       if (comma === -1) {
         return 0;
       }
 
       const base64 =
-        dataUrl.substring(comma + 1);
+        dataUrl.substring(
+          comma + 1
+        );
 
       const padding =
         base64.endsWith('==')
@@ -643,93 +656,234 @@ async function prepareImageForScan(
             ? 1
             : 0;
 
-      return Math.floor(
-        (base64.length * 3) / 4
-      ) - padding;
+      return Math.max(
+        0,
+        Math.floor(
+          (base64.length * 3) / 4
+        ) - padding
+      );
     };
 
-    let quality = initialQuality;
-
-    let compressed = render(quality);
-
-    /**
-     * Primeiro reduz qualidade.
+    /*
+     * ============================================================
+     * 9. RENDERIZAR JPEG
+     * ============================================================
      */
+
+    const render = (
+      quality: number
+    ): string => {
+      canvas.width =
+        targetWidth;
+
+      canvas.height =
+        targetHeight;
+
+      /*
+       * Fundo branco.
+       *
+       * Algumas imagens podem possuir transparência.
+       * Como o Scan trabalha melhor com JPEG, evitamos fundo preto.
+       */
+      ctx.fillStyle =
+        '#ffffff';
+
+      ctx.fillRect(
+        0,
+        0,
+        targetWidth,
+        targetHeight
+      );
+
+      /*
+       * IMPORTANTE:
+       * Aqui image já está completamente carregada.
+       */
+      ctx.drawImage(
+        image,
+        0,
+        0,
+        targetWidth,
+        targetHeight
+      );
+
+      return canvas.toDataURL(
+        'image/jpeg',
+        quality
+      );
+    };
+
+    /*
+     * ============================================================
+     * 10. PRIMEIRA COMPRESSÃO
+     * ============================================================
+     */
+
+    let quality =
+      initialQuality;
+
+    let compressed =
+      render(quality);
+
+    /*
+     * ============================================================
+     * 11. REDUZIR QUALIDADE
+     * ============================================================
+     */
+
     while (
-      getBase64Bytes(compressed) > MAX_BYTES &&
+      getBase64Bytes(
+        compressed
+      ) > MAX_BYTES &&
       quality > 0.40
     ) {
-      quality = Math.max(
-        0.40,
-        quality - 0.06
-      );
+      quality =
+        Math.max(
+          0.40,
+          quality - 0.06
+        );
 
-      compressed = render(quality);
+      compressed =
+        render(quality);
     }
 
-    /**
-     * Depois reduz resolução.
+    /*
+     * ============================================================
+     * 12. REDUZIR RESOLUÇÃO SE NECESSÁRIO
+     * ============================================================
      */
-    while (
-      getBase64Bytes(compressed) > MAX_BYTES &&
-      targetWidth > 720
-    ) {
-      targetWidth = Math.max(
-        720,
-        Math.round(targetWidth * 0.82)
-      );
 
-      targetHeight = Math.max(
-        1,
-        Math.round(
-          targetHeight * 0.82
-        )
-      );
+    while (
+      getBase64Bytes(
+        compressed
+      ) > MAX_BYTES &&
+      Math.max(
+        targetWidth,
+        targetHeight
+      ) > 720
+    ) {
+      targetWidth =
+        Math.max(
+          720,
+          Math.round(
+            targetWidth * 0.82
+          )
+        );
+
+      targetHeight =
+        Math.max(
+          1,
+          Math.round(
+            targetHeight * 0.82
+          )
+        );
 
       quality = 0.55;
 
-      compressed = render(quality);
+      compressed =
+        render(quality);
 
+      /*
+       * Reduz novamente a qualidade.
+       */
       while (
-        getBase64Bytes(compressed) > MAX_BYTES &&
+        getBase64Bytes(
+          compressed
+        ) > MAX_BYTES &&
         quality > 0.40
       ) {
-        quality = Math.max(
-          0.40,
-          quality - 0.05
-        );
+        quality =
+          Math.max(
+            0.40,
+            quality - 0.05
+          );
 
-        compressed = render(quality);
+        compressed =
+          render(quality);
       }
     }
 
+    /*
+     * ============================================================
+     * 13. VALIDAÇÃO FINAL
+     * ============================================================
+     */
+
     const finalBytes =
-      getBase64Bytes(compressed);
+      getBase64Bytes(
+        compressed
+      );
+
+    if (
+      !compressed.startsWith(
+        'data:image/jpeg;base64,'
+      )
+    ) {
+      throw new Error(
+        'Não foi possível converter a imagem para JPEG.'
+      );
+    }
+
+    if (
+      finalBytes <= 0
+    ) {
+      throw new Error(
+        'A imagem preparada ficou vazia.'
+      );
+    }
 
     console.log(
-      '[SCAN] Imagem preparada:',
+      '[SCAN] Imagem preparada com sucesso:',
       {
-        bytes: finalBytes,
-        kb: Math.round(
-          finalBytes / 1024
-        ),
-        width: targetWidth,
-        height: targetHeight,
+        originalType:
+          blob.type,
+
+        originalBytes:
+          blob.size,
+
+        finalBytes,
+
+        finalKB:
+          Math.round(
+            finalBytes / 1024
+          ),
+
+        width:
+          targetWidth,
+
+        height:
+          targetHeight,
+
         quality,
-        originalType: blob.type,
-        originalSize: blob.size,
       }
     );
 
-    /**
-     * Libera o ImageBitmap.
-     */
-    bitmap?.close();
-
     return compressed;
+
+  } catch (error) {
+    console.error(
+      '[SCAN] prepareImageForScan:',
+      error
+    );
+
+    if (
+      error instanceof Error
+    ) {
+      throw error;
+    }
+
+    throw new Error(
+      'Não foi possível preparar a imagem para o Scan.'
+    );
+
   } finally {
-    if (blobUrl) {
-      URL.revokeObjectURL(blobUrl);
+    /*
+     * Só revoga depois que tudo terminou.
+     */
+    if (objectUrl) {
+      URL.revokeObjectURL(
+        objectUrl
+      );
     }
   }
 }
@@ -742,7 +896,7 @@ class HuggingFaceScannerService
   }
 
   public async simulateScan(
-    imageUrl: string,
+    imageSource: string | Blob,
     onProgress?: (msg: string) => void,
     forceError = false
   ): Promise<DetectedFoodItem[]> {
@@ -753,7 +907,7 @@ class HuggingFaceScannerService
       );
     }
 
-    if (!imageUrl) {
+    if (!imageSource) {
       throw new ScanServiceError(
         'Nenhuma imagem foi selecionada.'
       );
@@ -782,31 +936,33 @@ class HuggingFaceScannerService
     /**
      * Imagens de demonstração.
      */
-    const sample =
-      SAMPLE_FRIDGE_IMAGES.find(
-        (s) => s.url === imageUrl
-      );
+    if (typeof imageSource === 'string') {
+      const sample =
+        SAMPLE_FRIDGE_IMAGES.find(
+          (s) => s.url === imageSource
+        );
 
-    if (
-      sample &&
-      sample.mockDetections &&
-      sample.mockDetections.length > 0
-    ) {
-      onProgress?.(
-        'Carregando alimentos da foto de teste...'
-      );
+      if (
+        sample &&
+        sample.mockDetections &&
+        sample.mockDetections.length > 0
+      ) {
+        onProgress?.(
+          'Carregando alimentos da foto de teste...'
+        );
 
-      await new Promise((r) =>
-        setTimeout(r, 500)
-      );
+        await new Promise((r) =>
+          setTimeout(r, 500)
+        );
 
-      onProgress?.(
-        'Processando itens detectados...'
-      );
+        onProgress?.(
+          'Processando itens detectados...'
+        );
 
-      return sample.mockDetections.map(
-        (item) => ({ ...item })
-      );
+        return sample.mockDetections.map(
+          (item) => ({ ...item })
+        );
+      }
     }
 
     /**
@@ -864,7 +1020,7 @@ class HuggingFaceScannerService
     try {
       optimizedImage =
         await prepareImageForScan(
-          imageUrl,
+          imageSource,
           1280,
           0.72
         );

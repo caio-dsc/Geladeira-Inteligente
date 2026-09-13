@@ -75,6 +75,8 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
   const handleOpenUpgrade = onOpenUpgradeModal || onOpenCreditsModal || (() => setIsUpgradeModalOpen(true));
   const [selectedImage, setSelectedImage] =
     useState<string | null>(null);
+  const [selectedFile, setSelectedFile] =
+    useState<File | null>(null);
 
   const [scanStatus, setScanStatus] = useState<
     'idle' | 'scanning' | 'success' | 'error'
@@ -561,6 +563,8 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
     const file = e.target.files?.[0];
 
     if (file) {
+      setSelectedFile(file);
+
       const reader = new FileReader();
 
       reader.onload = (event) => {
@@ -594,6 +598,8 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
     setIsDragging(false);
     const file = e.dataTransfer.files?.[0];
     if (file && file.type.startsWith('image/')) {
+      setSelectedFile(file);
+
       const reader = new FileReader();
       reader.onload = (event) => {
         if (event.target?.result) {
@@ -610,13 +616,14 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
   const handleSelectSample = (
     url: string
   ) => {
+    setSelectedFile(null);
     setSelectedImage(url);
     setScanStatus('idle');
     setDetectedItems([]);
     setErrorMessage('');
   };
 
-  const runScan = async (imageToScan: string) => {
+  const runScan = async (imageToScan: string | Blob) => {
     let results: DetectedFoodItem[] | null = null;
 
     for (let attempt = 1; attempt <= MAX_CLIENT_ATTEMPTS; attempt++) {
@@ -658,7 +665,8 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
   };
 
   const handleStartScan = async () => {
-    if (!selectedImage) return;
+    const sourceToScan = selectedFile || selectedImage;
+    if (!sourceToScan) return;
 
     if (scanEnabled === false) {
       setScanStatus('error');
@@ -672,7 +680,7 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
       setRetryIn(null);
       setProgressMessage('Preparando análise...');
 
-      await runScan(selectedImage);
+      await runScan(sourceToScan);
     } catch (err: any) {
       if (err?.name === 'ScanServiceError' && (err?.status === 403 || err?.code === 'SCAN_NOT_ENABLED')) {
         handleOpenUpgrade();
@@ -967,6 +975,7 @@ export const ScannerView: React.FC<ScannerViewProps> = ({
     };
 
   const handleResetScanner = () => {
+    setSelectedFile(null);
     setSelectedImage(null);
     setScanStatus('idle');
     setDetectedItems([]);
