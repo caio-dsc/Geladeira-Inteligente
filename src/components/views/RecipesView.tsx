@@ -1,6 +1,8 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { RecipeMatch, FoodItem } from '../../types';
 import { RecipeCard } from '../recipe/RecipeCard';
+import { Card } from '../common/Card';
+import { Button } from '../common/Button';
 import { Input } from '../common/Input';
 import { EmptyState } from '../common/EmptyState';
 import { 
@@ -18,7 +20,9 @@ import {
   RefreshCcw,
   Loader2,
   ChefHat,
-  Users
+  Users,
+  Lock,
+  UtensilsCrossed
 } from 'lucide-react';
 
 export interface RecipesViewProps {
@@ -31,6 +35,8 @@ export interface RecipesViewProps {
   recipesUpdatedAt?: number | null;
   userDietaryRestrictions?: string[];
   onDietaryRestrictionsChange?: (next: string[]) => void;
+  isFreeUser?: boolean;
+  onOpenUpgradeModal?: () => void;
 }
 
 const normalizeCategory = (c?: string) => (c && c.trim() ? c.trim() : 'Outros');
@@ -55,6 +61,8 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
   recipesUpdatedAt,
   userDietaryRestrictions,
   onDietaryRestrictionsChange,
+  isFreeUser = false,
+  onOpenUpgradeModal,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterMatch, setFilterMatch] = useState<'all' | 'ready' | 'high'>('all');
@@ -67,6 +75,78 @@ export const RecipesView: React.FC<RecipesViewProps> = ({
   useEffect(() => {
     setDietFilters(userDietaryRestrictions ?? []);
   }, [userDietaryRestrictions]);
+
+  // BLOQUEIO PARA CONTA GRATUITA (PLANO FREE)
+  if (isFreeUser) {
+    return (
+      <div className="space-y-6 max-w-3xl mx-auto pb-24 md:pb-10 text-text-primary text-left">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-800 bg-amber-50 px-3 py-1 rounded-full border border-amber-200/80 mb-2">
+              <ChefHat className="w-3.5 h-3.5 text-amber-700" />
+              <span>Plano Premium</span>
+            </div>
+
+            <h1 className="text-2xl sm:text-3xl font-black text-text-primary tracking-tight">
+              Receitas & Combinações
+            </h1>
+
+            <p className="text-xs sm:text-sm text-text-secondary mt-1">
+              O catálogo de receitas inteligentes e sugestões culinárias faz parte do Plano Premium.
+            </p>
+          </div>
+
+          <div className="inline-flex items-center gap-2 text-xs font-semibold text-amber-800 bg-amber-50/80 px-3.5 py-2 rounded-xl border border-amber-200 shadow-subtle self-start sm:self-auto">
+            <Lock className="w-4 h-4 text-amber-600 shrink-0" />
+            <span>Recurso Bloqueado</span>
+          </div>
+        </div>
+
+        <Card variant="default" padding="lg" className="border-border shadow-subtle relative overflow-hidden">
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 pb-5 border-b border-border">
+              <div className="w-14 h-14 rounded-2xl bg-amber-100/80 text-amber-700 flex items-center justify-center shrink-0 shadow-subtle border border-amber-200">
+                <Lock className="w-7 h-7" />
+              </div>
+              <div className="space-y-1">
+                <h2 className="text-lg sm:text-xl font-bold text-text-primary">
+                  Cozinhe com o que já tem em casa
+                </h2>
+                <p className="text-sm font-semibold text-text-primary">
+                  Descubra pratos que combinam perfeitamente com os ingredientes da sua geladeira, cronômetro passo a passo e filtros por dieta.
+                </p>
+                <p className="text-xs sm:text-sm text-text-secondary">
+                  No Plano Free você pode cadastrar e organizar alimentos livremente em Minha Geladeira.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center gap-3">
+              <Button
+                variant="primary"
+                size="lg"
+                onClick={onOpenUpgradeModal}
+                leftIcon={<Sparkles className="w-5 h-5 text-white" />}
+                className="w-full sm:w-auto font-bold text-sm shadow-soft"
+              >
+                Conhecer o Plano Premium
+              </Button>
+
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={onNavigateToInventory}
+                leftIcon={<UtensilsCrossed className="w-4 h-4 text-primary" />}
+                className="w-full sm:w-auto font-bold text-sm"
+              >
+                Voltar para Minha Geladeira
+              </Button>
+            </div>
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   const toggleDiet = (label: string) => {
     setDietFilters((prev) => {

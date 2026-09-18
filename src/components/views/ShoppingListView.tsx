@@ -26,17 +26,22 @@ import {
   Package,
   Copy,
   CheckCircle2,
-  DollarSign
+  DollarSign,
+  Lock
 } from 'lucide-react';
 
 export interface ShoppingListViewProps {
   userId?: string;
   onNavigateToInventory?: () => void;
+  isFreeUser?: boolean;
+  onOpenUpgradeModal?: () => void;
 }
 
 export const ShoppingListView: React.FC<ShoppingListViewProps> = ({
   userId = '',
   onNavigateToInventory,
+  isFreeUser = false,
+  onOpenUpgradeModal,
 }) => {
   const [lists, setLists] = useState<ShoppingList[]>([]);
   const [selectedListId, setSelectedListId] = useState<string | null>(null);
@@ -62,6 +67,7 @@ export const ShoppingListView: React.FC<ShoppingListViewProps> = ({
 
   // Carrega e sincroniza listas em tempo real
   useEffect(() => {
+    if (isFreeUser) return;
     setIsLoading(true);
     setLists([]);
     setSelectedListId(null);
@@ -79,7 +85,81 @@ export const ShoppingListView: React.FC<ShoppingListViewProps> = ({
     });
 
     return () => unsubscribe();
-  }, [userId]);
+  }, [userId, isFreeUser]);
+
+  // BLOQUEIO PARA CONTA GRATUITA (PLANO FREE)
+  if (isFreeUser) {
+    return (
+      <div className="space-y-6 max-w-3xl mx-auto pb-24 md:pb-10 text-text-primary text-left">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-800 bg-amber-50 px-3 py-1 rounded-full border border-amber-200/80 mb-2">
+              <ShoppingCart className="w-3.5 h-3.5 text-amber-700" />
+              <span>Plano Premium</span>
+            </div>
+
+            <h1 className="text-2xl sm:text-3xl font-black text-text-primary tracking-tight">
+              Lista de Mercado Inteligente
+            </h1>
+
+            <p className="text-xs sm:text-sm text-text-secondary mt-1">
+              A lista de mercado e planejamento de compras faz parte do Plano Premium.
+            </p>
+          </div>
+
+          <div className="inline-flex items-center gap-2 text-xs font-semibold text-amber-800 bg-amber-50/80 px-3.5 py-2 rounded-xl border border-amber-200 shadow-subtle self-start sm:self-auto">
+            <Lock className="w-4 h-4 text-amber-600 shrink-0" />
+            <span>Recurso Bloqueado</span>
+          </div>
+        </div>
+
+        <Card variant="default" padding="lg" className="border-border shadow-subtle relative overflow-hidden">
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 pb-5 border-b border-border">
+              <div className="w-14 h-14 rounded-2xl bg-amber-100/80 text-amber-700 flex items-center justify-center shrink-0 shadow-subtle border border-amber-200">
+                <Lock className="w-7 h-7" />
+              </div>
+              <div className="space-y-1">
+                <h2 className="text-lg sm:text-xl font-bold text-text-primary">
+                  Organize suas compras sem desperdício
+                </h2>
+                <p className="text-sm font-semibold text-text-primary">
+                  Crie listas sincronizadas, calcule estimativas de gastos e envie itens comprados direto para a geladeira.
+                </p>
+                <p className="text-xs sm:text-sm text-text-secondary">
+                  No Plano Free você tem controle manual ilimitado dos itens e validades na geladeira.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center gap-3">
+              <Button
+                variant="primary"
+                size="lg"
+                onClick={onOpenUpgradeModal}
+                leftIcon={<Sparkles className="w-5 h-5 text-white" />}
+                className="w-full sm:w-auto font-bold text-sm shadow-soft"
+              >
+                Conhecer o Plano Premium
+              </Button>
+
+              {onNavigateToInventory && (
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={onNavigateToInventory}
+                  leftIcon={<UtensilsCrossed className="w-4 h-4 text-primary" />}
+                  className="w-full sm:w-auto font-bold text-sm"
+                >
+                  Voltar para Minha Geladeira
+                </Button>
+              )}
+            </div>
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   const showToast = (message: string) => {
     setToastMessage(message);

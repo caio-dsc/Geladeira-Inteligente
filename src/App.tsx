@@ -49,7 +49,20 @@ export default function App() {
   const [editingFoodItem, setEditingFoodItem] = useState<FoodItem | null>(null);
   const [selectedRecipe, setSelectedRecipe] = useState<RecipeMatch | null>(null);
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
+  const [blockedFeature, setBlockedFeature] = useState<'scanner' | 'shoppingList' | 'recipes' | null>(null);
   const [isQuickGuideOpen, setIsQuickGuideOpen] = useState(false);
+
+  const isFreeUser = Boolean(user && !user.isAdmin && !user.scanEnabled);
+
+  const handleOpenUpgradeModal = useCallback((feature?: 'scanner' | 'shoppingList' | 'recipes' | null) => {
+    setBlockedFeature(feature ?? null);
+    setIsUpgradeModalOpen(true);
+  }, []);
+
+  const handleCloseUpgradeModal = useCallback(() => {
+    setIsUpgradeModalOpen(false);
+    setBlockedFeature(null);
+  }, []);
 
   // Cooking timer session state com persistência
   const [activeCookingSession, setActiveCookingSession] = useState<StoredCookingSession | null>(null);
@@ -398,7 +411,17 @@ export default function App() {
         onTabChange={setActiveTab}
         user={user}
         onSignOut={handleSignOut}
-        onOpenUpgradeModal={() => setIsUpgradeModalOpen(true)}
+        onOpenUpgradeModal={() => handleOpenUpgradeModal(null)}
+        isFreeUser={isFreeUser}
+        onBlockedTabClick={(tab) => {
+          if (tab === 'scanner' || tab === 'shoppingList' || tab === 'recipes') {
+            handleOpenUpgradeModal(tab);
+          } else {
+            handleOpenUpgradeModal(null);
+          }
+        }}
+        inventoryCount={inventory.length}
+        onNavigateTab={setActiveTab}
       />
 
       {/* Main Content Area */}
@@ -414,8 +437,9 @@ export default function App() {
               setIsFoodModalOpen(true);
             }}
             onSelectRecipe={setSelectedRecipe}
-            onOpenUpgradeModal={() => setIsUpgradeModalOpen(true)}
+            onOpenUpgradeModal={handleOpenUpgradeModal}
             onOpenQuickGuide={() => setIsQuickGuideOpen(true)}
+            isFreeUser={isFreeUser}
           />
         )}
 
@@ -441,7 +465,7 @@ export default function App() {
               setEditingFoodItem(null);
               setIsFoodModalOpen(true);
             }}
-            onOpenUpgradeModal={() => setIsUpgradeModalOpen(true)}
+            onOpenUpgradeModal={() => handleOpenUpgradeModal('scanner')}
           />
         )}
 
@@ -458,8 +482,22 @@ export default function App() {
             }}
             onDeleteItem={handleDeleteFood}
             onResetDefault={handleResetDefaultInventory}
-            onNavigateToScanner={() => setActiveTab('scanner')}
-            onNavigateToShoppingList={() => setActiveTab('shoppingList')}
+            onNavigateToScanner={() => {
+              if (isFreeUser) {
+                handleOpenUpgradeModal('scanner');
+              } else {
+                setActiveTab('scanner');
+              }
+            }}
+            onNavigateToShoppingList={() => {
+              if (isFreeUser) {
+                handleOpenUpgradeModal('shoppingList');
+              } else {
+                setActiveTab('shoppingList');
+              }
+            }}
+            isFreeUser={isFreeUser}
+            onOpenUpgradeModal={handleOpenUpgradeModal}
           />
         )}
 
@@ -467,6 +505,8 @@ export default function App() {
           <ShoppingListView
             userId={user.id}
             onNavigateToInventory={() => setActiveTab('inventory')}
+            isFreeUser={isFreeUser}
+            onOpenUpgradeModal={() => handleOpenUpgradeModal('shoppingList')}
           />
         )}
 
@@ -480,6 +520,8 @@ export default function App() {
             isRefreshingRecipes={isRefreshingRecipes}
             recipesUpdatedAt={recipesUpdatedAt}
             userDietaryRestrictions={user?.preferences?.dietaryRestrictions ?? []}
+            isFreeUser={isFreeUser}
+            onOpenUpgradeModal={() => handleOpenUpgradeModal('recipes')}
           />
         )}
 
@@ -507,6 +549,14 @@ export default function App() {
         activeTab={activeTab}
         onTabChange={setActiveTab}
         inventoryCount={inventory.length}
+        isFreeUser={isFreeUser}
+        onBlockedTabClick={(tab) => {
+          if (tab === 'scanner' || tab === 'shoppingList' || tab === 'recipes') {
+            handleOpenUpgradeModal(tab);
+          } else {
+            handleOpenUpgradeModal(null);
+          }
+        }}
       />
 
       {/* Modals */}
@@ -546,12 +596,15 @@ export default function App() {
 
       <UpgradeModal
         isOpen={isUpgradeModalOpen}
-        onClose={() => setIsUpgradeModalOpen(false)}
+        onClose={handleCloseUpgradeModal}
+        user={user}
+        blockedFeature={blockedFeature}
         onOpenFoodModal={() => {
           setEditingFoodItem(null);
           setIsFoodModalOpen(true);
         }}
         onNavigateToInventory={() => setActiveTab('inventory')}
+        onNavigateToAdmin={() => setActiveTab('admin')}
       />
 
       <QuickGuideModal

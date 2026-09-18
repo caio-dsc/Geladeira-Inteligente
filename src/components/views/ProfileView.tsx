@@ -455,55 +455,70 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
         )}
       </Card>
 
-      {/* Reconhecimento por Imagem / Status de Acesso */}
+      {/* Reconhecimento por Imagem / Status de Acesso / Planos */}
       <Card variant="default" padding="md" className="space-y-4 shadow-subtle border-border">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div
               className={`w-11 h-11 rounded-2xl flex items-center justify-center shadow-subtle border ${
-                user.scanEnabled
+                user.isAdmin
+                  ? 'bg-purple-50 text-purple-700 border-purple-200'
+                  : user.scanEnabled
                   ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                   : 'bg-amber-50 text-amber-700 border-amber-200'
               }`}
             >
-              {user.scanEnabled ? <Camera className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
+              {user.isAdmin ? (
+                <ShieldCheck className="w-5 h-5" />
+              ) : user.scanEnabled ? (
+                <Camera className="w-5 h-5" />
+              ) : (
+                <Lock className="w-5 h-5" />
+              )}
             </div>
             <div>
               <h3 className="text-sm font-bold text-text-primary">
-                {user.scanEnabled ? 'Reconhecimento por Imagem Liberado' : 'Reconhecimento por Imagem'}
+                {user.isAdmin
+                  ? 'Plano Administrador Ativo'
+                  : user.scanEnabled
+                  ? 'Plano Premium Ativo'
+                  : 'Plano Free (Conta Gratuita)'}
               </h3>
               <p className="text-xs text-text-secondary">
-                {user.scanEnabled
-                  ? 'Plano Completo com escaneamento fotográfico por IA'
-                  : 'Disponível no plano completo da plataforma'}
+                {user.isAdmin
+                  ? 'Acesso irrestrito e ferramentas de administração da plataforma'
+                  : user.scanEnabled
+                  ? 'Acesso completo ao Scan com IA, Lista de Mercado e Receitas'
+                  : 'Gestão manual da geladeira liberada. Recursos Premium bloqueados.'}
               </p>
             </div>
           </div>
 
           <CreditBadge
             scanEnabled={user.scanEnabled}
+            isAdmin={user.isAdmin}
             size="md"
-            onClick={() => !user.scanEnabled && setIsUpgradeModalOpen(true)}
+            onClick={() => setIsUpgradeModalOpen(true)}
           />
         </div>
 
         <div className="pt-3 border-t border-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-text-secondary">
           <span>
-            {user.scanEnabled
-              ? 'Sua conta possui acesso total para escanear sua geladeira por foto com Inteligência Artificial.'
-              : 'O reconhecimento automático da geladeira está disponível no plano completo. Você pode continuar adicionando alimentos manualmente gratuitamente.'}
+            {user.isAdmin
+              ? 'Você é um administrador do sistema com permissão para gerenciar contas, planos e receitas.'
+              : user.scanEnabled
+              ? 'Sua conta possui acesso total para escanear alimentos por foto com IA, gerenciar lista de compras e receitas.'
+              : 'Você pode visualizar alimentos, validades e organizar a geladeira. Adquira o Premium para desbloquear o Scan e mais.'}
           </span>
-          {!user.scanEnabled && (
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => setIsUpgradeModalOpen(true)}
-              leftIcon={<Sparkles className="w-3.5 h-3.5" />}
-              className="text-xs font-bold shrink-0"
-            >
-              Conhecer o acesso completo
-            </Button>
-          )}
+          <Button
+            variant={user.scanEnabled || user.isAdmin ? 'outline' : 'primary'}
+            size="sm"
+            onClick={() => setIsUpgradeModalOpen(true)}
+            leftIcon={user.scanEnabled || user.isAdmin ? <Check className="w-3.5 h-3.5" /> : <Sparkles className="w-3.5 h-3.5" />}
+            className="text-xs font-bold shrink-0"
+          >
+            {user.scanEnabled || user.isAdmin ? 'Ver detalhes do plano' : 'Conhecer o Plano Premium'}
+          </Button>
         </div>
       </Card>
 
@@ -673,6 +688,9 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
       <UpgradeModal
         isOpen={isUpgradeModalOpen}
         onClose={() => setIsUpgradeModalOpen(false)}
+        user={user}
+        onNavigateToInventory={() => onNavigateTab?.('inventory')}
+        onNavigateToAdmin={() => onNavigateTab?.('admin')}
       />
     </div>
   );

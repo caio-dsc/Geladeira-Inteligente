@@ -37,7 +37,7 @@ export interface DashboardViewProps {
   onNavigate: (tab: NavigationTab) => void;
   onOpenFoodModal: () => void;
   onSelectRecipe: (recipe: RecipeMatch) => void;
-  onOpenUpgradeModal?: () => void;
+  onOpenUpgradeModal?: (feature?: 'scanner' | 'shoppingList' | 'recipes' | null) => void;
   onOpenCreditsModal?: () => void;
   onOpenQuickGuide?: () => void;
 }
@@ -53,7 +53,23 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   onOpenCreditsModal,
   onOpenQuickGuide,
 }) => {
-  const handleUpgradeModal = onOpenUpgradeModal || onOpenCreditsModal;
+  const isFreeUser = Boolean(!user.isAdmin && !user.scanEnabled);
+
+  const handleOpenBlockedFeature = (feature: 'scanner' | 'shoppingList' | 'recipes') => {
+    if (onOpenUpgradeModal) {
+      onOpenUpgradeModal(feature);
+    } else if (onOpenCreditsModal) {
+      onOpenCreditsModal();
+    }
+  };
+
+  const handleUpgradeModal = () => {
+    if (onOpenUpgradeModal) {
+      onOpenUpgradeModal(null);
+    } else if (onOpenCreditsModal) {
+      onOpenCreditsModal();
+    }
+  };
   // Real inventory metrics
   const freshCount = useMemo(() => inventory.filter((i) => i.state === 'fresh').length, [inventory]);
   const frozenCount = useMemo(() => inventory.filter((i) => i.state === 'frozen').length, [inventory]);
@@ -272,8 +288,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => onNavigate('scanner')}
-                    className="text-xs font-medium text-white/80 hover:text-white hover:bg-white/10"
+                    onClick={() => handleOpenBlockedFeature('scanner')}
+                    className="text-xs font-medium text-white/80 hover:text-white hover:bg-white/10 cursor-pointer"
                     leftIcon={<Lock className="w-3.5 h-3.5 text-amber-300" />}
                   >
                     Scan com IA (Bloqueado)
@@ -335,12 +351,19 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </Card>
 
           {/* Ready to Cook Recipes */}
-          <Card variant="interactive" padding="sm" onClick={() => onNavigate('recipes')}>
+          <Card 
+            variant="interactive" 
+            padding="sm" 
+            onClick={() => (isFreeUser ? handleOpenBlockedFeature('recipes') : onNavigate('recipes'))}
+          >
             <div className="flex items-center justify-between mb-2">
               <div className="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center shadow-subtle">
                 <ChefHat className="w-4.5 h-4.5" />
               </div>
-              <span className="text-[11px] font-semibold text-primary">Prontas</span>
+              <span className="text-[11px] font-semibold text-primary flex items-center gap-1">
+                <span>Prontas</span>
+                {isFreeUser && <Lock className="w-2.5 h-2.5 text-amber-600" />}
+              </span>
             </div>
             <div className="text-2xl sm:text-3xl font-black text-text-primary">{readyRecipes.length}</div>
             <p className="text-[11px] sm:text-xs text-text-secondary mt-0.5">Receitas 100% disponíveis</p>
@@ -395,11 +418,16 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div>
             <h3 className="text-lg sm:text-xl font-bold text-text-primary tracking-tight flex items-center gap-2">
               <span>Receitas & Possibilidades</span>
-              {readyRecipes.length > 0 && (
+              {isFreeUser ? (
+                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-800 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded-full">
+                  <Lock className="w-2.5 h-2.5" />
+                  Plano Premium
+                </span>
+              ) : readyRecipes.length > 0 ? (
                 <span className="text-xs font-bold bg-primary/10 text-primary border border-primary/20 px-2.5 py-0.5 rounded-full">
                   {readyRecipes.length} prontas
                 </span>
-              )}
+              ) : null}
             </h3>
             <p className="text-xs text-text-secondary">
               {readyRecipes.length > 0
@@ -409,18 +437,22 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
 
           <button
-            onClick={() => onNavigate('recipes')}
+            onClick={() => (isFreeUser ? handleOpenBlockedFeature('recipes') : onNavigate('recipes'))}
             className="text-xs font-bold text-primary hover:text-primary-dark flex items-center gap-1 cursor-pointer shrink-0"
           >
             <span>Ver todas ({recipes.length})</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            {isFreeUser ? <Lock className="w-3 h-3 text-amber-600" /> : <ArrowRight className="w-3.5 h-3.5" />}
           </button>
         </div>
 
         {topRecipes.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {topRecipes.map((recipe) => (
-              <RecipeCard key={recipe.id} recipe={recipe} onClick={onSelectRecipe} />
+              <RecipeCard 
+                key={recipe.id} 
+                recipe={recipe} 
+                onClick={(r) => (isFreeUser ? handleOpenBlockedFeature('recipes') : onSelectRecipe(r))} 
+              />
             ))}
           </div>
         ) : (
@@ -428,9 +460,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             icon={<ChefHat className="w-8 h-8 text-primary" />}
             title="Seu inventário ainda está vazio"
             description="Cadastre seus primeiros alimentos para que nosso algoritmo calcule receitas compatíveis automaticamente."
-            actionLabel="Escanear alimentos"
-            onAction={() => onNavigate('scanner')}
-            actionIcon={<Camera className="w-4 h-4 text-white" />}
+            actionLabel={isFreeUser ? "Adicionar alimento manual" : "Escanear alimentos"}
+            onAction={() => (isFreeUser ? onOpenFoodModal() : onNavigate('scanner'))}
+            actionIcon={isFreeUser ? <Plus className="w-4 h-4 text-white" /> : <Camera className="w-4 h-4 text-white" />}
           />
         )}
       </section>
@@ -466,14 +498,22 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <Card 
             variant="interactive" 
             padding="sm" 
-            onClick={() => onNavigate('shoppingList')}
+            onClick={() => (isFreeUser ? handleOpenBlockedFeature('shoppingList') : onNavigate('shoppingList'))}
             className="flex items-center gap-3"
           >
             <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary border border-primary/20 flex items-center justify-center shrink-0">
               <ShoppingCart className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-xs sm:text-sm font-bold text-text-primary">Lista de Mercado</h4>
+              <div className="flex items-center gap-1.5">
+                <h4 className="text-xs sm:text-sm font-bold text-text-primary">Lista de Mercado</h4>
+                {isFreeUser && (
+                  <span className="inline-flex items-center text-[9px] font-bold text-amber-800 bg-amber-100 border border-amber-300 px-1 py-0.2 rounded">
+                    <Lock className="w-2 h-2 mr-0.5" />
+                    Premium
+                  </span>
+                )}
+              </div>
               <p className="text-[11px] text-text-secondary">Planejar compras & gastos</p>
             </div>
           </Card>
@@ -482,14 +522,22 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <Card 
             variant="interactive" 
             padding="sm" 
-            onClick={() => onNavigate('recipes')}
+            onClick={() => (isFreeUser ? handleOpenBlockedFeature('recipes') : onNavigate('recipes'))}
             className="flex items-center gap-3"
           >
             <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary border border-primary/20 flex items-center justify-center shrink-0">
               <SlidersHorizontal className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-xs sm:text-sm font-bold text-text-primary">Filtros & Dietas</h4>
+              <div className="flex items-center gap-1.5">
+                <h4 className="text-xs sm:text-sm font-bold text-text-primary">Filtros & Dietas</h4>
+                {isFreeUser && (
+                  <span className="inline-flex items-center text-[9px] font-bold text-amber-800 bg-amber-100 border border-amber-300 px-1 py-0.2 rounded">
+                    <Lock className="w-2 h-2 mr-0.5" />
+                    Premium
+                  </span>
+                )}
+              </div>
               <p className="text-[11px] text-text-secondary">Vegano, Low Carb, Sem Glúten</p>
             </div>
           </Card>
@@ -515,9 +563,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="pt-2">
           <HowItWorksGuide
             onOpenQuickGuide={onOpenQuickGuide}
-            onNavigateToScanner={() => onNavigate('scanner')}
+            onNavigateToScanner={() => (isFreeUser ? handleOpenBlockedFeature('scanner') : onNavigate('scanner'))}
             onNavigateToInventory={() => onNavigate('inventory')}
-            onNavigateToRecipes={() => onNavigate('recipes')}
+            onNavigateToRecipes={() => (isFreeUser ? handleOpenBlockedFeature('recipes') : onNavigate('recipes'))}
             onOpenAddModal={onOpenFoodModal}
             initialCollapsed={inventory.length > 0}
           />

@@ -13,7 +13,8 @@ import {
   UtensilsCrossed, 
   Sparkles,
   Camera,
-  ShoppingCart
+  ShoppingCart,
+  Lock
 } from 'lucide-react';
 
 export interface InventoryViewProps {
@@ -24,6 +25,8 @@ export interface InventoryViewProps {
   onResetDefault: () => void;
   onNavigateToScanner: () => void;
   onNavigateToShoppingList?: () => void;
+  isFreeUser?: boolean;
+  onOpenUpgradeModal?: (feature?: 'scanner' | 'shoppingList' | 'recipes' | null) => void;
 }
 
 export const InventoryView: React.FC<InventoryViewProps> = ({
@@ -34,10 +37,30 @@ export const InventoryView: React.FC<InventoryViewProps> = ({
   onResetDefault,
   onNavigateToScanner,
   onNavigateToShoppingList,
+  isFreeUser = false,
+  onOpenUpgradeModal,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedState, setSelectedState] = useState<string>('all');
+
+  const handleScannerClick = () => {
+    if (isFreeUser && onOpenUpgradeModal) {
+      onOpenUpgradeModal('scanner');
+      return;
+    }
+    onNavigateToScanner();
+  };
+
+  const handleShoppingListClick = () => {
+    if (isFreeUser && onOpenUpgradeModal) {
+      onOpenUpgradeModal('shoppingList');
+      return;
+    }
+    if (onNavigateToShoppingList) {
+      onNavigateToShoppingList();
+    }
+  };
 
   const categories: Array<{ id: string; label: string }> = [
     { id: 'all', label: 'Todos' },
@@ -76,28 +99,31 @@ export const InventoryView: React.FC<InventoryViewProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5 self-start sm:self-auto">
+        <div className="flex items-center gap-2.5 self-start sm:self-auto flex-wrap">
           {onNavigateToShoppingList && (
             <Button
               variant="outline"
               size="sm"
-              onClick={onNavigateToShoppingList}
+              onClick={handleShoppingListClick}
               leftIcon={<ShoppingCart className="w-4 h-4 text-primary" />}
               className="text-xs"
-              title="Abrir Lista de Mercado"
+              title={isFreeUser ? "Lista de Mercado (Recurso Premium)" : "Abrir Lista de Mercado"}
             >
-              Lista de Mercado
+              <span>Lista de Mercado</span>
+              {isFreeUser && <Lock className="w-2.5 h-2.5 text-amber-600 ml-1" />}
             </Button>
           )}
 
           <Button
             variant="outline"
             size="sm"
-            onClick={onNavigateToScanner}
+            onClick={handleScannerClick}
             leftIcon={<Camera className="w-4 h-4 text-primary" />}
             className="text-xs"
+            title={isFreeUser ? "Escanear Alimentos (Recurso Premium)" : "Escanear com IA"}
           >
-            Escanear
+            <span>Escanear</span>
+            {isFreeUser && <Lock className="w-2.5 h-2.5 text-amber-600 ml-1" />}
           </Button>
 
           <Button
@@ -173,11 +199,13 @@ export const InventoryView: React.FC<InventoryViewProps> = ({
           description={
             searchTerm || selectedCategory !== 'all'
               ? 'Tente ajustar os filtros de busca ou adicione novos itens.'
+              : isFreeUser
+              ? 'Comece adicionando seus alimentos manualmente para gerenciar validades e estoques!'
               : 'Comece adicionando itens manualmente ou escaneie as prateleiras com sua câmera!'
           }
-          actionLabel="Escanear Geladeira"
-          onAction={onNavigateToScanner}
-          actionIcon={<Camera className="w-4 h-4 text-white" />}
+          actionLabel={isFreeUser ? "Adicionar Alimento" : "Escanear Geladeira"}
+          onAction={isFreeUser ? onOpenAddModal : handleScannerClick}
+          actionIcon={isFreeUser ? <Plus className="w-4 h-4 text-white" /> : <Camera className="w-4 h-4 text-white" />}
         />
       )}
 
