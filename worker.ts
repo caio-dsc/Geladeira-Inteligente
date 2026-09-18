@@ -203,15 +203,65 @@ export default {
 
         const payload = {
           model: MODEL,
+
           messages: [
-            { role: "system", content: foodDetectionPrompt },
-            { role: "user", content: [{ type: "image_url", image_url: { url: image } }] },
+            {
+              role: "system",
+              content: foodDetectionPrompt,
+            },
+
+            {
+              role: "user",
+
+              content: [
+                {
+                  type: "image_url",
+
+                  image_url: {
+                    url: image,
+                  },
+                },
+
+                {
+                  type: "text",
+
+                  text: `
+Analise esta imagem seguindo rigorosamente as regras do sistema.
+
+IMPORTANTE:
+
+- Identifique somente alimentos realmente visíveis.
+- Não invente alimentos.
+- Não transforme objetos ou partes da cozinha em alimentos.
+- Prefira nomes específicos de alimentos.
+- Não use nomes genéricos quando for possível identificar o alimento.
+- Não invente marcas ou variedades.
+- Não invente quantidades.
+- Examine toda a imagem antes de responder.
+- Agrupe alimentos iguais quando apropriado usando quantity.
+- Retorne somente o JSON compatível com o schema.
+
+Precisão é mais importante do que quantidade de resultados.
+          `.trim(),
+                },
+              ],
+            },
           ],
-          max_tokens: 800,
-          temperature: 0.1,
+
+          max_tokens: 1000,
+
+          temperature: 0,
+
           response_format: {
             type: "json_schema",
-            json_schema: { name: "FoodDetection", schema: foodDetectionSchema, strict: true },
+
+            json_schema: {
+              name: "FoodDetection",
+
+              schema: foodDetectionSchema,
+
+              strict: true,
+            },
           },
         };
 
